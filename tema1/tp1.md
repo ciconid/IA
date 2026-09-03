@@ -51,3 +51,22 @@ Puntos importantes sobre esa relación:
 - Si el entorno **no es completamente acotado**, la **percepción será parcial** y la **influencia del agente sobre el entorno también será parcial**; por más complejo que sea el agente, no podrá conocerlo ni controlarlo por completo.
 - La **misma acción ejecutada dos veces puede tener efectos diferentes**, por lo que el agente debe estar preparado para que una acción falle o que sus efectos no sean los previstos.
 
+## 3
+Según lo consultado al LLM, un **agente de IA** es un sistema que recibe un objetivo y puede decidir qué acciones realizar para conseguirlo.
+
+A diferencia de un chatbot que simplemente responde:
+
+`LLM → pregunta → respuesta`
+
+un agente puede hacer:
+
+`Objetivo → analizar → decidir acción → usar herramientas → evaluar resultado → repetir → resultado`
+
+Por ejemplo, "organizame un viaje" podría implicar buscar vuelos, comparar precios, buscar hoteles y armar un itinerario de forma autónoma.
+
+### Contraste con la definición del punto 2 (clase)
+La definición de clase describe al agente como una entidad computacional **autónoma** que **percibe su entorno** a través de sensores y **actúa** sobre él mediante efectores, en un ciclo continuo de percepción-acción. La respuesta del chatbot coincide en lo esencial: ambos plantean un agente que **recibe información del entorno (objetivo/estado)**, **decide una acción** en base a ella y **actúa**, repitiendo el ciclo hasta lograr un resultado. La definición del chatbot está más orientada a **agentes que usan herramientas** (buscar vuelos, comparar precios) y a la autonomía para alcanzar una meta, en línea con los agentes con metas/deliberativos de la clase.
+
+### ¿ChatGPT es un agente?
+Según la definición propia, ChatGPT **por sí solo no es un agente**: responde de forma directa a una pregunta (LLM → pregunta → respuesta), sin percibir un entorno dinámico, sin decidir secuencias de acciones y sin usar herramientas ni evaluar resultados. Sin embargo, **puede comportarse como parte de un agente** cuando se lo combina con un bucle que le da un objetivo, acceso a herramientas y capacidad de evaluar resultados (por ejemplo, un agente que usa un LLM como "cerebro" para organizar un viaje). La autonomía y el ciclo análisis-acción-evaluación son lo que distingue al agente del simple chatbot.
+
