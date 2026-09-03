@@ -195,3 +195,30 @@ Explicación de cada punto:
 - **e)** Para las salas 3 y 4 se duplican los sensores (`_a` y `_b`) y se requiere que se activen **ambos a la vez** para evitar falsas alarmas.
 - Finalmente, la cláusula `movimiento/0` se reescribe para componer el movimiento de todas las salas, manteniendo el resto del programa (bomberos, policía, ladrones, etc.) sin cambios.
 
+## 6
+
+### Diferencias entre agente reactivo, con estado interno y deliberativo
+
+**Agente reactivo (de reflejo)**
+- Opera con un ciclo corto: **percibir → actuar de forma inmediata** mediante **reglas condición-acción ("si-entonces")**.
+- No guarda memoria ni razona sobre consecuencias: reacciona solo al estado actual percibido.
+- Ventajas: rapidez, simplicidad de implementación, bajo costo computacional y eficacia en tareas repetitivas en entornos predecibles. Desventajas: falta de memoria, ausencia de planificación y rigidez ante entornos complejos o cambiantes.
+- Ejemplos de clase: termostato, inflador de neumáticos, puerta automática, alarma.
+
+**Agente con estado interno**
+- Agrega al ciclo anterior un paso de **"actualizar el modelo del mundo" (creencias)**: almacena información a lo largo del tiempo y la usa para decidir.
+- Se diferencia del reactivo en que **"recuerda"** lo percibido en ciclos anteriores y mantiene una representación interna actualizada del mundo; no se limita a la percepción inmediata.
+- A diferencia del deliberativo, no necesariamente realiza razonamiento lógico complejo; puede limitarse a mantener y consultar su modelo interno para elegir la acción.
+
+**Agente deliberativo**
+- Incorpora una fase de **razonamiento sobre el conocimiento**: percibe, actualiza el modelo del mundo, **razona o infiere** conclusiones a partir de reglas y conocimiento representado, y recién entonces selecciona y ejecuta la acción.
+- Es capaz de **sacar conclusiones, dar recomendaciones o tomar decisiones** a partir de lo percibido y de lo que infiere por su propio razonamiento, pudiendo además explicar las razones.
+- Se implementa típicamente con lógica (representación de conocimiento + razonamiento automático).
+
+### ¿Con cuál se asocia el agente de seguridad de la galería?
+El agente de seguridad de la galería de arte se asocia principalmente con el **agente deliberativo**. Justificación:
+
+- Su programa en Prolog no es un simple reflejo condición-acción directo sobre el sensor, sino que **encadena reglas para inferir conclusiones** a partir del conocimiento representado. Por ejemplo, de `sensor_mov_sala1` se deduce `movimiento`, y combinando `movimiento, cerrado` se deduce `ladrones`, que a su vez permite deducir `llamar_policia`. Esto es **razonamiento automático** sobre el conocimiento, característico del agente deliberativo.
+- El agente **toma decisiones** (llamar a la policía, llamar a los bomberos, llamar al guardia) como resultado de **inferencias** sobre lo percibido y sobre las reglas, no de una reacción directa a un único estímulo.
+- Si bien podría pensarse que parte de su comportamiento (por ejemplo, `movimiento :- sensor_mov_sala1`) tiene sabor reactivo, el núcleo del programa es la **derivación lógica de acciones a partir de conocimiento**, por lo que encaja mejor como agente deliberativo que como reactivo o de estado interno puro.
+
