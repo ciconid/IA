@@ -70,3 +70,44 @@ La definición de clase describe al agente como una entidad computacional **aut�
 ### ¿ChatGPT es un agente?
 Según la definición propia, ChatGPT **por sí solo no es un agente**: responde de forma directa a una pregunta (LLM → pregunta → respuesta), sin percibir un entorno dinámico, sin decidir secuencias de acciones y sin usar herramientas ni evaluar resultados. Sin embargo, **puede comportarse como parte de un agente** cuando se lo combina con un bucle que le da un objetivo, acceso a herramientas y capacidad de evaluar resultados (por ejemplo, un agente que usa un LLM como "cerebro" para organizar un viaje). La autonomía y el ciclo análisis-acción-evaluación son lo que distingue al agente del simple chatbot.
 
+## 4
+Esquema en Prolog de un agente reactivo que modela una puerta automática, siguiendo el patrón de los ejemplos de clase (bucle del agente → percibir → actuar → reglas condición-acción):
+
+```prolog
+% --- Agente reactivo: puerta automática ---
+
+% Bucle principal del agente
+puerta :- \+ fin,
+          percibir(Entorno),
+          actuar(Entorno),
+          puerta.
+
+% Percepción: se consulta el sensor de movimiento y el estado de la puerta
+percibir(P) :- sensor_movimiento(Mov),
+               estado_puerta(Estado),
+               P = [mov(Mov), estado(Estado)].
+
+% Acción: se decide qué hacer según lo percibido
+actuar(P)    :- member(mov(Mov), P),
+                member(estado(Estado), P),
+                decidir(Estado, Mov).
+
+% Reglas condición-acción
+% Si la puerta está cerrada y hay movimiento, se abre
+decidir(cerrada, si) :- abrir_puerta,
+                        set_estado(abierta).
+% Si la puerta está abierta y ya no hay movimiento, se cierra
+decidir(abierta, no)  :- cerrar_puerta,
+                        set_estado(cerrada).
+% En cualquier otro caso no se hace nada
+decidir(_, _).
+```
+
+Descripción del comportamiento:
+- **puerta** es el ciclo del agente: mientras no haya fin, percibe, actúa y repite.
+- **percibir/1** consulta los sensores (si hay movimiento y el estado actual de la puerta).
+- **actuar/1** aplica una regla condición-acción según lo percibido.
+- Si la puerta está **cerrada** y hay **movimiento**, se **abre** (y pasa a estado `abierta`).
+- Si la puerta está **abierta** y ya **no hay movimiento**, se **cierra** (y pasa a estado `cerrada`).
+- En cualquier otro caso no hace nada.
+
