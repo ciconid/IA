@@ -111,3 +111,39 @@ Descripción del comportamiento:
 - Si la puerta está **abierta** y ya **no hay movimiento**, se **cierra** (y pasa a estado `cerrada`).
 - En cualquier otro caso no hace nada.
 
+## 5
+Programa Prolog del agente de seguridad de la galería de arte:
+
+```prolog
+llamar_bomberos :- fuego.
+fuego :- humo.
+fuego :- alarma_incendio_activada.
+fuego :- calor_intenso, noche.
+llamar_policia :- llamar_bomberos.
+llamar_policia :- ladrones.
+ladrones :- movimiento, cerrado.
+movimiento :- sensor_mov_sala1.
+movimiento :- sensor_mov_sala2.
+cerrado :- lunes.
+```
+
+Para cada escenario, la respuesta que genera el intérprete es:
+
+| Escenario (Hechos)                     | Consulta            | Respuesta |
+|----------------------------------------|---------------------|-----------|
+| `alarma_incendio_activada.`            | `?- fuego.`         | **true**  |
+| `alarma_incendio_activada.`            | `?- llamar_bomberos.` | **true**  |
+| `calor_intenso.`                       | `?- llamar_bomberos.` | **false** |
+| `sensor_mov_sala2.`                    | `?- ladrones.`      | **false** |
+| `sensor_mov_sala2.`  `cerrado.`        | `?- ladrones.`      | **true**  |
+| `sensor_mov_sala1.`  `lunes.`          | `?- llamar_policia.` | **true**  |
+
+Justificación:
+
+1. `alarma_incendio_activada.` → `?- fuego.` → **true**: `fuego :- alarma_incendio_activada.`, y el hecho está presente.
+2. `alarma_incendio_activada.` → `?- llamar_bomberos.` → **true**: `llamar_bomberos :- fuego.` y `fuego` se deriva de `alarma_incendio_activada`.
+3. `calor_intenso.` → `?- llamar_bomberos.` → **false**: para derivar `fuego` por calor se necesita `calor_intenso, noche`, pero `noche` no puede probarse (no hay hecho ni regla), por lo que `fuego` cae y `llamar_bomberos` también.
+4. `sensor_mov_sala2.` → `?- ladrones.` → **false**: `ladrones :- movimiento, cerrado.`; `movimiento` se deriva de `sensor_mov_sala2`, pero `cerrado` falla (no hay hecho `cerrado` ni `lunes`).
+5. `sensor_mov_sala2. cerrado.` → `?- ladrones.` → **true**: `movimiento` (por `sensor_mov_sala2`) y `cerrado` son ambos verdaderos.
+6. `sensor_mov_sala1. lunes.` → `?- llamar_policia.` → **true**: por `llamar_policia :- ladrones.`, con `movimiento` (por `sensor_mov_sala1`) y `cerrado :- lunes.` verdaderos.
+
