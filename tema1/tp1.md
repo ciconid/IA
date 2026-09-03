@@ -244,3 +244,20 @@ El agente de seguridad de la galería de arte se asocia principalmente con el **
 
 4. **Rigidez**: si las reglas son insuficientes o cambian, dejan de ser efectivos. Se considera una debilidad porque el comportamiento está **fijado por adelantado** en las reglas "si-entonces"; si el entorno evoluciona y las reglas no se actualizan, el agente **no puede adaptarse** por sí mismo y falla.
 
+## 8
+El agente de gestión de tráfico es principalmente un **agente deliberativo (con metas)**. 
+
+Justificación apelando a sus capacidades típicas y a las tareas del escenario:
+
+- **Percibe su entorno y actualiza un modelo del mundo**: el agente **registra el flujo de tráfico de la ciudad en tiempo real** y mantiene un estado interno actualizado de cómo circulan los vehículos en las intersecciones. Esta capacidad (percibir + mantener un modelo que evoluciona) es típica del agente con estado interno, y es la base para deliberar.
+
+- **Razona y toma decisiones a partir del conocimiento**: sobre ese flujo percibido, el agente debe **decidir cómo regular los semáforos** para mejorar la fluidez y la seguridad vial. Esta es la capacidad central del agente deliberativo: no reacciona con una regla fija ante cada estímulo, sino que **razona sobre el estado del tráfico** y selecciona el curso de acción (qué semáforos poner en qué estado) más conveniente en cada momento.
+
+- **Persigue objetivos**: el agente tiene **metas claras** (mejorar la fluidez del tráfico, la seguridad vial y optimizar los tiempos de respuesta de las emergencias). La deliberación está orientada a alcanzar estas metas, lo que lo acerca al **agente con metas / deliberativo**.
+
+- **Se coordina con otros (componente social)**: está **conectado con el sistema de emergencias** para facilitar el desplazamiento de ambulancias, policía y bomberos. Esto supone una cierta **interacción/coordinación con otros sistemas**, rasgo del **agente social**.
+
+No se lo asocia con un agente puramente **reactivo** porque su comportamiento no es un simple reflejo condición-acción: debe combinar información de todo el flujo de tráfico, priorizar emergencias y optimizar a mediano plazo, lo que exige razonamiento y planificación y no una respuesta inmediata a un único estímulo.
+
+En síntesis, el agente de gestión de tráfico combina percepción en tiempo real y modelo de mundo (estado interno), razonamiento para tomar decisiones (deliberativo), orientación a objetivos (con metas) y coordinación con emergencias (social); su núcleo es **deliberativo**, ya que decide los semáforos razonando sobre el estado del tráfico hacia las metas del municipio.
+
