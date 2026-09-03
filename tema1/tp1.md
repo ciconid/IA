@@ -37,3 +37,17 @@ Hoy existe una gran confusión porque el término "inteligencia artificial" se u
 
 Esta ambigüedad alimenta expectativas exageradas, temores y malentendidos (por ejemplo, llamar "inteligente" a un chatbot que solo predice la siguiente palabra, o confundir la automatización estadística con comprensión genuina). La clase insiste en la responsabilidad del profesional en computación de "llevar luz donde hay oscuridad y conocimiento donde hay desinformación", justamente para aclarar esta confusión.
 
+## 2
+Según lo desarrollado en clase, un **agente** es una entidad computacional (programa o robot) **autónoma**, que puede **percibir su entorno** a través de **sensores** y **actuar en ese entorno** utilizando **efectores** (o actuadores/efectores). El término proviene del latín *agere* ("hacer"), es decir, algo "que obra o tiene capacidad de obrar".
+
+La relación del agente con su entorno se da mediante un **ciclo continuo de percepción-acción**:
+1. El agente **percibe** el estado del entorno a través de sus sensores.
+2. Usando la información disponible, debe **decidir qué acción realizar** (toma de decisiones).
+3. **Actúa** sobre el entorno mediante sus efectores.
+4. Al actuar, produce **cambios en el entorno**; luego volverá a percibir esos cambios en un nuevo ciclo, y así durante todo su tiempo de vida.
+
+Puntos importantes sobre esa relación:
+- El agente no existe aislado: su comportamiento depende de la información que recibe del entorno y de los efectos que sus acciones producen sobre él.
+- Si el entorno **no es completamente acotado**, la **percepción será parcial** y la **influencia del agente sobre el entorno también será parcial**; por más complejo que sea el agente, no podrá conocerlo ni controlarlo por completo.
+- La **misma acción ejecutada dos veces puede tener efectos diferentes**, por lo que el agente debe estar preparado para que una acción falle o que sus efectos no sean los previstos.
+
