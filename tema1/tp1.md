@@ -147,3 +147,51 @@ Justificación:
 5. `sensor_mov_sala2. cerrado.` → `?- ladrones.` → **true**: `movimiento` (por `sensor_mov_sala2`) y `cerrado` son ambos verdaderos.
 6. `sensor_mov_sala1. lunes.` → `?- llamar_policia.` → **true**: por `llamar_policia :- ladrones.`, con `movimiento` (por `sensor_mov_sala1`) y `cerrado :- lunes.` verdaderos.
 
+## 5-bis
+Extensión del programa Prolog del punto 5 para representar el nuevo conocimiento:
+
+```prolog
+% --- Reglas agregadas o modificadas ---
+
+% a) Si la galería está cerrada y hay una ventana abierta, se llama al guardia.
+llamar_guardia :- cerrado, ventana_abierta.
+
+% b) Si hay un corte de luz, se activa el grupo electrógeno.
+activar_grupo_electrogeno :- corte_de_luz.
+
+% c) Se abren al público las salas 3 y 4, con un sensor de movimiento en cada una.
+abierta_al_publico(sala3).
+abierta_al_publico(sala4).
+movimiento_sala3 :- sensor_mov_sala3.
+movimiento_sala4 :- sensor_mov_sala4.
+
+% d) En las salas 1 y 2 (más grandes) se agregan sensores por sector (dos sectores
+%    por sala) para mayor cobertura. Cada sensor cubre un sector distinto.
+movimiento_sala1 :- sensor_sector1_sala1.
+movimiento_sala1 :- sensor_sector2_sala1.
+movimiento_sala2 :- sensor_sector1_sala2.
+movimiento_sala2 :- sensor_sector2_sala2.
+
+% e) En las salas 3 y 4 (objetos de arte más valiosos) se duplican los sensores:
+%    se detecta movimiento solo si se activan los DOS sensores a la vez, para
+%    evitar falsas alarmas. Las reglas de movimiento del punto c deben ser eliminadas.
+movimiento_sala3 :- sensor_mov_sala3_a, sensor_mov_sala3_b.
+movimiento_sala4 :- sensor_mov_sala4_a, sensor_mov_sala4_b.
+
+% En el programa principal, el "movimiento" se compone ahora de todas las salas
+% (las originales 1 y 2 con sus sectores, y las nuevas salas 3 y 4).
+movimiento :- movimiento_sala1.
+movimiento :- movimiento_sala2.
+movimiento :- movimiento_sala3.
+movimiento :- movimiento_sala4.
+```
+
+Explicación de cada punto:
+
+- **a)** Agrega la regla `llamar_guardia :- cerrado, ventana_abierta.` que deriva la acción cuando la galería está cerrada y hay una ventana abierta.
+- **b)** Agrega la regla `activar_grupo_electrogeno :- corte_de_luz.` (un corte de luz implica activar el grupo electrógeno).
+- **c)** Declara las salas 3 y 4 como abiertas al público y les asigna un sensor de movimiento (`sensor_mov_sala3`, `sensor_mov_sala4`).
+- **d)** Reemplaza la detección directa de salas 1 y 2 por dos sectores por sala: basta con que se active **uno** de los dos sensores del sector para detectar movimiento (mayor cobertura).
+- **e)** Para las salas 3 y 4 se duplican los sensores (`_a` y `_b`) y se requiere que se activen **ambos a la vez** para evitar falsas alarmas.
+- Finalmente, la cláusula `movimiento/0` se reescribe para componer el movimiento de todas las salas, manteniendo el resto del programa (bomberos, policía, ladrones, etc.) sin cambios.
+
