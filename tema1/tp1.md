@@ -261,3 +261,30 @@ No se lo asocia con un agente puramente **reactivo** porque su comportamiento no
 
 En síntesis, el agente de gestión de tráfico combina percepción en tiempo real y modelo de mundo (estado interno), razonamiento para tomar decisiones (deliberativo), orientación a objetivos (con metas) y coordinación con emergencias (social); su núcleo es **deliberativo**, ya que decide los semáforos razonando sobre el estado del tráfico hacia las metas del municipio.
 
+## 9
+
+### a) Capacidades del robot futbolista según cada tipo de agente
+
+- **Agente reactivo**: las acciones **inmediatas y de reflejo** durante el juego. Por ejemplo, **interponerse en el camino** de un robot rival que avanza con la pelota, o reaccionar al instante cuando la pelota se aproxima al arquero para despejar. Son respuestas rápidas "si-entonces" ante lo que percibe en ese momento, sin planificar a largo plazo.
+
+- **Con estado interno**: el robot **mantiene un modelo de la situación del partido** a lo largo del tiempo: la posición de los compañeros y rivales, de dónde viene la pelota, el resultado parcial, el tiempo restante. Esta información acumulada le permite decidir más allá de la percepción inmediata.
+
+- **Deliberativo**: el robot **razona sobre esa información** para decidir si **pasar la pelota a un compañero o rematar** según las posiciones en el campo. Evalúa las opciones (pasar a un compañero mejor ubicado o rematar al arco) y selecciona la mejor con base en razonamiento sobre la situación actual.
+
+- **Con metas**: el robot tiene **objetivos a cumplir**: marcar un gol, mantener la posesión o defender el arco. Sus decisiones individuales (pasar o rematar) están orientadas a estas metas, y el objetivo común del equipo es **ganar el partido**.
+
+- **Social**: los robots **deben coordinarse** con los compañeros del equipo (cinco robots: arquero, dos defensores y dos delanteros) para cooperar y lograr la victoria. Pasar la pelota a un compañero, organizar la defensa o coordinar un avance son comportamientos **sociales/cooperativos**.
+
+### b) Importancia de contar con parte deliberativa y reactiva
+
+Un robot futbolista necesita **ambas partes** porque el fútbol combina situaciones que exigen **respuesta inmediata** (una pelota que llega de improviso, un rival que lo presiona) y situaciones que exigen **razonamiento** (decidir la mejor jugada, posicionarse, coordinar con compañeros hacia un objetivo).
+
+- **Parte reactiva**: aparece cuando el robot debe **reaccionar al instante** — por ejemplo, **interponerse ante un rival**, interceptar la pelota o despejar cerca de su arco sin tiempo para pensar. La rapidez del reflejo es fundamental en el juego.
+- **Parte deliberativa**: aparece cuando el robot **razona** sobre el estado del partido para **pasar o rematar**, evaluando posiciones y eligiendo la opción más conveniente, o cuando planifica cómo alcanzar la meta de marcar un gol.
+
+**¿Qué pasaría si no contara con alguna de las dos?**
+- **Sin parte deliberativa**: el robot sería puramente reactivo. Reaccionaría a reflejos inmediatos pero **no podría planificar ni razonar**, por lo que no decidiría bien a quién pasar, cuándo rematar ni cómo coordinar una jugada; su comportamiento sería caótico y poco efectivo frente a la estrategia del equipo.
+- **Sin parte reactiva**: el robot solo podría deliberar, por lo que **no respondería a tiempo** ante situaciones rápidas (un rival que avanza, una pelota que llega de golpe). Al demorarse en pensar, perdería jugadas o quedará superado por la velocidad del juego.
+
+Por eso es fundamental que combine ambas: la **reactiva** garantiza la **velocidad** de reacción y la **deliberativa** la **inteligencia** de las decisiones orientadas a la meta del equipo. Esto coincide con la idea de clase de que, si el entorno no es completamente acotado, el agente debe estar preparado para percibir de forma parcial y actuar sobre efectos no siempre previsibles.
+
