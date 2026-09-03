@@ -222,3 +222,25 @@ El agente de seguridad de la galería de arte se asocia principalmente con el **
 - El agente **toma decisiones** (llamar a la policía, llamar a los bomberos, llamar al guardia) como resultado de **inferencias** sobre lo percibido y sobre las reglas, no de una reacción directa a un único estímulo.
 - Si bien podría pensarse que parte de su comportamiento (por ejemplo, `movimiento :- sensor_mov_sala1`) tiene sabor reactivo, el núcleo del programa es la **derivación lógica de acciones a partir de conocimiento**, por lo que encaja mejor como agente deliberativo que como reactivo o de estado interno puro.
 
+## 7
+
+### Puntos fuertes de los agentes reactivos
+
+1. **Rapidez**: sus respuestas son casi instantáneas. Se considera una fortaleza porque el agente **no procesa un historial de percepciones ni evalúa consecuencias complejas**: reacciona directamente al estado actual con una acción. Esto lo hace ideal para decisiones en **tiempo real**.
+
+2. **Simplicidad de implementación**: su diseño se basa en **reglas "si-entonces" (condición-acción)**. Se considera una fortaleza porque el mecanismo es muy sencillo de **programar y poner en marcha**, sin necesidad de modelos complejos del mundo.
+
+3. **Bajo costo computacional**: requieren **pocos recursos de procesamiento y memoria**. Se considera una fortaleza porque **no almacenan información histórica ni modelos complejos del mundo**, por lo que pueden ejecutarse incluso en hardware sencillo o con limitaciones.
+
+4. **Eficacia en tareas específicas**: son muy efectivos para **automatizar tareas repetitivas y mundanas** en entornos **predecibles y completamente observables**. Se considera una fortaleza porque, cuando el entorno se ajusta exactamente a las reglas previstas, el agente resuelve la tarea de forma confiable y sin necesidad de razonamiento extra.
+
+### Puntos débiles de los agentes reactivos
+
+1. **Falta de memoria**: no consideran experiencias pasadas, solo la situación actual. Se considera una debilidad porque, sin registro de lo anterior, **no pueden distinguir estados que requieren tratamiento distinto** según la historia ni aprender de lo ocurrido.
+
+2. **Ausencia de planificación**: no anticipan consecuencias a largo plazo. Se considera una debilidad porque, al elegir la acción solo según la percepción inmediata, **no pueden prever qué pasará después** ni construir una secuencia de acciones orientada a un objetivo lejano.
+
+3. **Limitados a entornos simples**: no se adaptan bien a entornos complejos o cambiantes. Se considera una debilidad porque su decisión depende de que los estímulos que percibe ya estén contemplados en las reglas; ante situaciones nuevas o variables, **no tienen forma de razonar una respuesta adecuada**.
+
+4. **Rigidez**: si las reglas son insuficientes o cambian, dejan de ser efectivos. Se considera una debilidad porque el comportamiento está **fijado por adelantado** en las reglas "si-entonces"; si el entorno evoluciona y las reglas no se actualizan, el agente **no puede adaptarse** por sí mismo y falla.
+
