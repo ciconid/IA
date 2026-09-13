@@ -29,3 +29,19 @@ K' = { llueve, llueve → calle_mojada, ¬calle_mojada }
 Ahora de K' se pueden derivar tanto `calle_mojada` como `¬calle_mojada`, y por explosión lógica se deriva cualquier sentencia (por ejemplo `2 + 2 = 5`, o cualquier otra proposición del lenguaje).
 
 **Problema que surge:** al ser inconsistente, la base trivializa el conocimiento: toda sentencia y su negación son consecuencias lógicas, por lo que la base deja de informar sobre el mundo real. Ningún agente racional, regla de inferencia o sistema de razonamiento automático puede confiar en ella para tomar decisiones, y cualquier tarea de deducción o de elección de cursos de acción pierde sentido.
+
+## 1.3. Operadores de cambio y la Identidad de Levi
+
+**Expansión (K + α):** incorpora la nueva creencia α a la base conservando todo lo anterior. El resultado es `Cn(K ∪ {α})`: ninguna creencia previa se pierde, el operador es monótono. Su desventaja es que no resuelve conflictos: si α contradice a K, la base resultante es inconsistente (y por lo tanto trivial).
+
+**Contracción (K − α):** elimina la creencia α (y todo lo que la implica) de la base, reteniendo el resto lo más intacto posible. Se usa típicamente para eliminar una creencia no deseada o para reparar una inconsistencia, quitando alguna de las sentencias en conflicto. Es no monótona: al eliminar una creencia pueden perderse consecuencias que antes se derivaban.
+
+**Revisión (K ∗ α):** incorpora la nueva información α garantizando dos condiciones: la base resultante es consistente **y** contiene a α. Es decir, cuando α contradice a K, primero se elimina lo que entra en conflicto con α y luego se agrega α.
+
+**Identidad de Levi:** expresa la revisión en términos de contracción y expansión:
+
+```
+K ∗ α = (K − ¬α) + α
+```
+
+Es decir, revisar por α equivale a: primero contraer la base eliminando la negación de la nueva información (¬α), y luego expandir agregando α. De esta forma, la contradicción se resuelve al contraer antes de expandir, garantizando consistencia e incorporación de α.
