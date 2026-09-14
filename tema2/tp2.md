@@ -75,3 +75,20 @@ La contracción solo elimina creencias de B (y sus consecuencias), nunca agrega 
 
 **Revisión (B ∗ a): No puede resultar inconsistente.**
 Por definición, la revisión impone que la base resultante sea consistente **y** contenga a `a`. Siguiendo la Identidad de Levi, `B ∗ a = (B − ¬a) + a`: la contracción elimina primero lo que entra en conflicto con `a`, dejando una base que ya no deriva `¬a`; entonces la expansión por `a` ya no produce contradicción. El resultado es, por construcción, consistente.
+
+## 1.6. Mismo análisis cuando B es de antemano inconsistente
+
+Ahora supongamos que B es inconsistente desde el inicio. En ese caso `Cn(B) = L`: de una base inconsistente se deduce cualquier sentencia del lenguaje.
+
+**Expansión (B + a): Necesariamente inconsistente.**
+Como B ya es inconsistente, su conjunto de consecuencias es todo el lenguaje. Agregar `a` no elimina nada, por lo que `B + a = Cn(B ∪ {a}) = L` sigue siendo inconsistente. La expansión no puede reparar una base ya contradictoria.
+
+**Contracción (B − a): Puede ser consistente o inconsistente.**
+La contracción solo elimina creencias, nunca agrega, por lo que no puede *introducir* nuevas contradicciones. Pero tampoco garantiza eliminarlas: si las sentencias removidas no tocan la fuente del conflicto, la base permanece inconsistente; si logran eliminar la fuente de la contradicción, la base se restaura a un estado consistente.
+
+Ejemplo: `B = { a, ¬a }` (inconsistente).
+- Si la contracción elimina `¬a`, queda `{ a }`: **consistente** (se reparó la base).
+- Si, en cambio, la contracción solo retirara otras creencias dejando `a` y `¬a` juntas, el resultado seguiría siendo **inconsistente**.
+
+**Revisión (B ∗ a): Siempre consistente (si `a` es consistente).**
+La revisión es el único operador que por definición garantiza la consistencia del resultado: al revisar, se contrae lo necesario (vía Levi: `B ∗ a = (B − ¬a) + a`, o vía kernels) para que ningún conflicto persista y luego se incorpora `a`. De hecho, revisar es el operador adecuado justamente para *sanear* una base inconsistente mientras se incorpora nueva información del entorno.
