@@ -194,3 +194,15 @@ Dadas las condiciones de A2 (no tiene reglas explícitas para inferir nueva info
 - Al no haber términos negados (`¬a`), una percepción nueva nunca puede ser la negación exacta de una creencia ya existente, por lo que no puede entrar en conflicto directo con la base.
 
 Consecuentemente, la base **siempre se mantiene consistente** y A2 solo necesita el operador de **expansión**: nunca se requiere contracción ni revisión, porque nunca aparece una situación conflictiva que resolver. El proceso de revisión de la base de conocimiento queda reducido a una simple acumulación monótona de hechos.
+
+## 7. Robot futbolista: revisión priorizada o no priorizada
+
+En el contexto del robot futbolista (Ejercicio 9 del Práctico 1) convendría emplear **revisión priorizada**.
+
+Justificación:
+- El entorno del fútbol robótico es **altamente dinámico**: la posición de la pelota, de los compañeros y de los rivales cambia constantemente en segundos. Las percepciones (vía sensores de visión, distancia, etc.) capturan el *estado actual* del mundo, mientras que las creencias previas quedan desactualizadas rápidamente.
+- Con revisión priorizada, cada nueva percepción desplaza a las creencias en conflicto, garantizando que la base siempre refleje la situación reciente del campo. Esto es fundamental para tomar decisiones correctas en tiempo real: saber dónde está realmente la pelota o un compañero para pasar, rematar o interponerse.
+- Con revisión no priorizada (que puede rechazar lo recién percibido cuando entra en conflicto con creencias previas), el robot podría quedarse con información obsoleta (por ejemplo, creyendo que un compañero está en la posición de hace unos segundos), lo que lo llevaría a decisiones erróneas y pérdida de la pelota.
+- Además, las percepciones del robot provienen de sensores directos y confiables del propio agente, no de fuentes dudosas, por lo que no hay motivo para desconfiar de la información nueva.
+
+Por todo esto, la **revisión priorizada** de tipo kernel es la adecuada: mantiene la consistencia de la base y a la vez prioriza la percepción reciente, ajustando el modelo del mundo a la realidad cambiante del partido.
