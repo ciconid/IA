@@ -132,6 +132,8 @@ No. Ninguna de las bases obtenidas (K₁, K₂ ni K₃, en ninguna de sus varian
 
 ### 4.2. Regla deductiva vs. percepción reciente
 
+NO, BIG PICKLE MANCO DEL ORTO
+
 Ante una inconsistencia entre una **regla deductiva** y una **percepción reciente**, la elección racional es descartar la **regla deductiva** y conservar la **percepción reciente**.
 
 ¿Por qué?
