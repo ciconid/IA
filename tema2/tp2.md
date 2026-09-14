@@ -206,3 +206,82 @@ Justificación:
 - Además, las percepciones del robot provienen de sensores directos y confiables del propio agente, no de fuentes dudosas, por lo que no hay motivo para desconfiar de la información nueva.
 
 Por todo esto, la **revisión priorizada** de tipo kernel es la adecuada: mantiene la consistencia de la base y a la vez prioriza la percepción reciente, ajustando el modelo del mundo a la realidad cambiante del partido.
+
+## 8. Revisión priorizada por conjuntos de sentencias
+
+Base de creencias: **K = { a, b → ¬c, w }** y conjunto de sentencias a incorporar prioritariamente: **R = { a, b, c }**
+
+### 8.1. Revisión secuencial con operador kernel
+
+**Paso 1: revisión por `a`.** `a` ya está en K, no hay conflicto:
+
+```
+K₁ = K ∗ a = { a, b → ¬c, w }
+```
+
+**Paso 2: revisión por `b`.** Se agrega `b`; `b` junto con la regla `b → ¬c` deriva `¬c`, pero como aún no hay `c`, la base sigue siendo consistente:
+
+```
+K₂ = K₁ ∗ b = { a, b, b → ¬c, w }
+```
+
+**Paso 3: revisión por `c`.** Al agregar `c`, ahora se derivan `c` (recién agregada) y `¬c` (de `b` y `b → ¬c`). Para revisar por `c` se contrae por `¬c` (Identidad de Levi) y luego se expande.
+
+Kernels de `¬c` en `K₂`:
+
+```
+K ⊥⊥ ¬c = { { b, b → ¬c } }        (único subconjunto ⊆-mínimo que implica ¬c)
+```
+
+La incisión debe eliminar al menos un elemento del kernel, es decir `b` **o** `b → ¬c`:
+
+- **Alternativa 1** (elimina `b`):
+
+  ```
+  K₃⁽¹⁾ = { a, b → ¬c, c, w }   (consistente, contiene c)
+  ```
+
+- **Alternativa 2** (elimina `b → ¬c`):
+
+  ```
+  K₃⁽²⁾ = { a, b, c, w }        (consistente, contiene c)
+  ```
+
+**Si se revisa en otro orden**, p. ej. `c`, luego `b`, luego `a`:
+
+- `K₁ = K ∗ c = { a, b → ¬c, c, w }` (consistente: todavía no hay `b`).
+- `K₂ = K₁ ∗ b`: ahora `b` con `b → ¬c` deriva `¬c`, que contradice `c`. La base ya implica `¬b` (vía contraposición: `c` y `b → ¬c` implican `¬b`). Kernels de `¬b`:
+
+  ```
+  K ⊥⊥ ¬b = { { c, b → ¬c } }
+  ```
+
+  - Elimina `c` → contracción = `{ a, b → ¬c, w }`, expandida con `b`:
+
+    ```
+    K₂⁽¹⁾ = { a, b, b → ¬c, w }   (consistente, contiene b)
+    ```
+
+  - Elimina `b → ¬c` → contracción = `{ a, c, w }`, expandida con `b`:
+
+    ```
+    K₂⁽²⁾ = { a, b, c, w }        (consistente, contiene b)
+    ```
+
+- `K₃ = K₂ ∗ a`: `a` ya está, no cambia.
+
+### 8.2. ¿El orden condiciona el resultado final?
+
+**Sí.** El resultado final depende del orden en que se efectúan las revisiones. Por ejemplo:
+
+- Orden `a, b, c` puede dar `{ a, b → ¬c, c, w }` (perdió `b`), y orden `c, b, a` puede dar `{ a, b, b → ¬c, w }` (perdió `c`). Ambos son resultados válidos de una revisión kernel secuencial pero son **bases distintas**.
+
+Además, en la revisión secuencial **no se garantiza que R quede incluido por completo**: en `{ a, b → ¬c, c, w }` falta `b`, y en `{ a, b, b → ¬c, w }` falta `c`. La inclusión total de R depende del orden y de la incisión elegida en cada paso.
+
+**¿Cómo garantizar que R esté incluido completamente?** Realizar una **revisión simultánea por el conjunto R** con un operador que trate a R como un todo de máxima prioridad: se incorporan todas las sentencias de R y se contrae de la base todo lo que entra en conflicto con el conjunto R (no con cada sentencia aislada). En este caso, el conflicto lo genera la regla `b → ¬c` frente a `{b, c}` de R, por lo que se elimina la regla y se obtiene:
+
+```
+K ⊛ R = { a, b, c, w }   (contiene íntegramente a R, consistente)
+```
+
+Es decir, la revisión por el conjunto de sentencias de R, tratándolo prioritariamente como una unidad, garantiza que todas las piezas de R sobrevivan a la revisión.
