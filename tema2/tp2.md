@@ -163,3 +163,34 @@ El punto donde ambas estrategias divergen es la percepción número 7: **noche**
 - **Revisión no priorizada:** al ser `noche` inconsistente con la base (porque `día` y `noche → ¬día` dan `¬noche`), el operador **rechaza** la percepción. La base conserva `día` y nunca incorpora `noche`: el agente sigue creyendo que es de día, no deriva `cerrado` ni `intruso`, y se pierde la información clave del cambio de contexto. Cuando en el paso 8 percibe `¬intruso`, como "intruso" nunca se derivó, la percepción es consistente y se incorpora sin problemas, manteniendo una base internamente consistente pero desconectada de la realidad.
 
 **Conclusión:** la revisión priorizada mantiene ambas propiedades (consistencia *e* incorporación de la percepción), lo que en un entorno dinámico como el de la galería resulta correcto: los sensores son confiables y las percepciones recientes reflejan el estado actual del mundo. La revisión no priorizada, al rechazar el conflicto, preserva la consistencia pero renuncia a información nueva legítima (`noche`), dejando al agente con un modelo del mundo desactualizado y con decisiones de seguridad incorrectas. Solo convendría si las percepciones fueran poco confiables (por ejemplo, sensores defectuosos).
+
+## 6. Comportamientos de agentes frente a las percepciones
+
+### 6.1. Agente A1 (descarta todo, conserva solo la última percepción)
+
+El comportamiento de A1 corresponde al operador de **reset (abandon)**, denotado `∘`, definido como:
+
+```
+K ∘ α = Cn({α})
+```
+
+Es decir, la base resultante contiene únicamente las consecuencias de la percepción más reciente y nada de lo anterior: se descarta por completo el conocimiento previo (incluso las creencias que no entraban en conflicto con `α`) y se conserva solo `α`. Es el operador de cambio más radical: a diferencia de la revisión (que intenta preservar todo lo posible), el reset no preserva nada. Se relaciona además con una contracción total de la base seguida de una expansión por `α`.
+
+### 6.2. Agente A2 (acumula información del entorno)
+
+El comportamiento de A2 corresponde al operador de **expansión** (`+`):
+
+```
+K + α = Cn( K ∪ {α} )
+```
+
+A2 incorpora cada nueva percepción al conjunto de creencias sin eliminar ninguna creencia previa, acumulando información de forma monótona. La expansión es el operador adecuado para modelar este comportamiento, siempre que no se generen contradicciones.
+
+### 6.3. Efecto de no tener reglas de inferencia ni términos negados en A2
+
+Dadas las condiciones de A2 (no tiene reglas explícitas para inferir nueva información y las percepciones no incluyen términos negados), **la expansión nunca produce inconsistencias**:
+
+- Al no haber reglas, ninguna percepción nueva puede deducir una contradicción a partir de lo acumulado: solo se agregan los hechos directamente percibidos.
+- Al no haber términos negados (`¬a`), una percepción nueva nunca puede ser la negación exacta de una creencia ya existente, por lo que no puede entrar en conflicto directo con la base.
+
+Consecuentemente, la base **siempre se mantiene consistente** y A2 solo necesita el operador de **expansión**: nunca se requiere contracción ni revisión, porque nunca aparece una situación conflictiva que resolver. El proceso de revisión de la base de conocimiento queda reducido a una simple acumulación monótona de hechos.
