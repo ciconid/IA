@@ -118,3 +118,12 @@ K + ¬a = Cn( K ∪ {¬a} )
 ```
 
 Ahora de la base se derivan tanto `a` como `¬a`. Por el principio de explosión lógica (*ex falso quodlibet*), de `K + ¬a` se sigue cualquier sentencia del lenguaje, por lo que la base queda trivializada e inconsistente. La expansión es monótona y no protege contra contradicciones: falla justamente cuando la nueva creencia contradice alguna consecuencia ya presente en la base.
+
+### 3.5. ¿Alguna Kᵢ es igual a K?
+
+No. Ninguna de las bases obtenidas (K₁, K₂ ni K₃, en ninguna de sus variantes) coincide con la base original K = {c, b, c→b, d, d→a, d→e}.
+
+- K₃⁽¹⁾ carece de `d` (tiene `a` en su lugar, agregado explícitamente).
+- K₃⁽²⁾ carece de `d→a` (tiene `a` asertado, pero sin la regla que lo relacionaba con `d`).
+
+**Conclusión:** el proceso de revisar por `¬a`, contraer por `¬a` y volver a expandir con `a` no recupera la base original. Esto ilustra que las operaciones de cambio de creencias (en particular la revisión) implican una pérdida irreversible de información: al revisar por `¬a` se tuvo que sacrificar `d` o `d→a` para evitar la inconsistencia, y esa información nunca se recupera aunque luego se vuelva a agregar `a`. Es decir, revisión + contracción + expansión no forman una operación identidad sobre la base original, a diferencia de lo que podría esperarse ingenuamente.
