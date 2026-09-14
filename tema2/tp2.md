@@ -127,3 +127,16 @@ No. Ninguna de las bases obtenidas (K₁, K₂ ni K₃, en ninguna de sus varian
 - K₃⁽²⁾ carece de `d→a` (tiene `a` asertado, pero sin la regla que lo relacionaba con `d`).
 
 **Conclusión:** el proceso de revisar por `¬a`, contraer por `¬a` y volver a expandir con `a` no recupera la base original. Esto ilustra que las operaciones de cambio de creencias (en particular la revisión) implican una pérdida irreversible de información: al revisar por `¬a` se tuvo que sacrificar `d` o `d→a` para evitar la inconsistencia, y esa información nunca se recupera aunque luego se vuelva a agregar `a`. Es decir, revisión + contracción + expansión no forman una operación identidad sobre la base original, a diferencia de lo que podría esperarse ingenuamente.
+
+## 4. El tesoro
+
+### 4.2. Regla deductiva vs. percepción reciente
+
+Ante una inconsistencia entre una **regla deductiva** y una **percepción reciente**, la elección racional es descartar la **regla deductiva** y conservar la **percepción reciente**.
+
+¿Por qué?
+- La percepción reciente refleja el **estado actual** del entorno (información proveniente de los sentidos o de otros agentes en el momento presente). En un mundo dinámico, el estado del mundo puede cambiar y es la percepción más reciente la que mejor describe "cómo están las cosas ahora".
+- La regla deductiva, en cambio, suele expresar conocimiento general o estático del dominio. Si bien sirve mientras sus condiciones se cumplen, no está garantizado que siga siendo aplicable en el contexto puntual, y en un conflicto puntual es más probable que la percepción tenga razón.
+- Además, el hecho de que se produzca una inconsistencia indica que una de las dos ya no describe correctamente el mundo; dado que las percepciones son datos directos y los algoritmos asumen que son fiables, se prefiere la información nueva y se sacrifica la regla que la contradice.
+
+En términos de dinámica de creencias, esto corresponde a una **revisión priorizada**: la información entrante (percepción) tiene mayor prioridad que las creencias previas (reglas), por lo que ante el conflicto se contrae la regla y se incorpora la percepción, manteniendo la base consistente.
