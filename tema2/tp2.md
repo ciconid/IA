@@ -92,3 +92,29 @@ Ejemplo: `B = { a, ¬a }` (inconsistente).
 
 **Revisión (B ∗ a): Siempre consistente (si `a` es consistente).**
 La revisión es el único operador que por definición garantiza la consistencia del resultado: al revisar, se contrae lo necesario (vía Levi: `B ∗ a = (B − ¬a) + a`, o vía kernels) para que ningún conflicto persista y luego se incorpora `a`. De hecho, revisar es el operador adecuado justamente para *sanear* una base inconsistente mientras se incorpora nueva información del entorno.
+
+## 3. Kernel, caso de estudio
+
+Base de creencias:
+
+```
+K = { c, b, c → b, d, d → a, d → e }
+```
+
+### 3.1. Expansión de K con ¬a
+
+Si se expande K con `¬a`, la base resultante es **inconsistente**.
+
+Es decir: `K` ya contiene las creencias `d` y `d → a`. Aplicando modus ponens se deduce:
+
+```
+d, d → a  ⟹  a
+```
+
+Por lo tanto `K ⊢ a`. Al expandir agregamos `¬a`, conservando todo lo anterior (la expansión no elimina creencias):
+
+```
+K + ¬a = Cn( K ∪ {¬a} )
+```
+
+Ahora de la base se derivan tanto `a` como `¬a`. Por el principio de explosión lógica (*ex falso quodlibet*), de `K + ¬a` se sigue cualquier sentencia del lenguaje, por lo que la base queda trivializada e inconsistente. La expansión es monótona y no protege contra contradicciones: falla justamente cuando la nueva creencia contradice alguna consecuencia ya presente en la base.
