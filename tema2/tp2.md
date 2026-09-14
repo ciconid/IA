@@ -140,3 +140,26 @@ Ante una inconsistencia entre una **regla deductiva** y una **percepción recien
 - Además, el hecho de que se produzca una inconsistencia indica que una de las dos ya no describe correctamente el mundo; dado que las percepciones son datos directos y los algoritmos asumen que son fiables, se prefiere la información nueva y se sacrifica la regla que la contradice.
 
 En términos de dinámica de creencias, esto corresponde a una **revisión priorizada**: la información entrante (percepción) tiene mayor prioridad que las creencias previas (reglas), por lo que ante el conflicto se contrae la regla y se incorpora la percepción, manteniendo la base consistente.
+
+## 5. Galería de arte
+
+Reglas y hechos de conocimiento previo:
+
+```
+1. noche → cerrado
+2. movimiento, cerrado → intruso
+3. sensor_movimiento_activo → movimiento
+4. noche → ¬día
+```
+
+### 5.2. Revisión priorizada vs. no priorizada en el escenario
+
+En este escenario asumimos que el operador **no priorizado rechaza toda información inconsistente con la base actual**; en cambio, el **priorizado siempre incorpora la percepción nueva**, descartando (contrayendo) lo que la contradiga.
+
+El punto donde ambas estrategias divergen es la percepción número 7: **noche**. Después de las percepciones 1–6, la base del agente contiene `día` (percibido en el paso 1) y la regla `noche → ¬día`. Por lo tanto:
+
+- **Revisión priorizada:** `noche` tiene prioridad. Se contrae la base eliminando una de las creencias en conflicto (típicamente `día`), y `noche` queda incorporada. A partir de allí el agente deriva `cerrado` (regla 1, conjuntamente con `noche`) y, como ya percibió `sensor_movimiento_activo` → `movimiento`, deriva `intruso` (regla 2). El agente pasa a creer que es de noche y que hay un intruso, consistente con el mundo real del problema.
+
+- **Revisión no priorizada:** al ser `noche` inconsistente con la base (porque `día` y `noche → ¬día` dan `¬noche`), el operador **rechaza** la percepción. La base conserva `día` y nunca incorpora `noche`: el agente sigue creyendo que es de día, no deriva `cerrado` ni `intruso`, y se pierde la información clave del cambio de contexto. Cuando en el paso 8 percibe `¬intruso`, como "intruso" nunca se derivó, la percepción es consistente y se incorpora sin problemas, manteniendo una base internamente consistente pero desconectada de la realidad.
+
+**Conclusión:** la revisión priorizada mantiene ambas propiedades (consistencia *e* incorporación de la percepción), lo que en un entorno dinámico como el de la galería resulta correcto: los sensores son confiables y las percepciones recientes reflejan el estado actual del mundo. La revisión no priorizada, al rechazar el conflicto, preserva la consistencia pero renuncia a información nueva legítima (`noche`), dejando al agente con un modelo del mundo desactualizado y con decisiones de seguridad incorrectas. Solo convendría si las percepciones fueran poco confiables (por ejemplo, sensores defectuosos).
