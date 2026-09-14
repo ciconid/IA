@@ -45,3 +45,13 @@ K ∗ α = (K − ¬α) + α
 ```
 
 Es decir, revisar por α equivale a: primero contraer la base eliminando la negación de la nueva información (¬α), y luego expandir agregando α. De esta forma, la contradicción se resuelve al contraer antes de expandir, garantizando consistencia e incorporación de α.
+
+## 1.4. Revisión priorizada vs. no priorizada
+
+**Revisión priorizada:** la nueva información percibida tiene siempre mayor prioridad que las creencias previas. Cuando la nueva percepción entra en conflicto con la base, se elimina (contrae) todo lo que se oponga a la nueva información, que siempre termina incorporada. Es la postura de "la percepción más reciente es la más confiable": modela agentes en entornos dinámicos, donde el conocimiento anterior queda desactualizado rápidamente.
+
+*Escenario conveniente:* un robot o agente que se mueve por un entorno cambiante y percibe el mundo con sensores confiables. Por ejemplo, un agente de seguridad que registra que se activa un sensor de movimiento: aunque antes creyera que nadie estaba en la sala, la percepción nueva de "movimiento" es más reciente y fiable, por lo que debe revisar su base y creer lo recién percibido.
+
+**Revisión no priorizada:** la nueva información **no** tiene garantizada la incorporación: si contradice creencias previas, puede ser rechazada cuando estas se consideran más confiables o mejor justificadas que la percepción nueva. La decisión de aceptar o no la nueva información depende de su confiabilidad y no simplemente de ser la más reciente.
+
+*Escenario conveniente:* ambientes con fuentes de distinta confiabilidad. Por ejemplo, un agente que recibe información de otros agentes o de fuentes no verificadas (rumores, sensores defectuosos, noticias dudosas). Si un agente confiable le comunica "el tesoro no está en la posición A" pero un sensor poco fiable reporta lo contrario, conviene no priorizar la percepción nueva y conservar la creencia que se considera más sólida.
