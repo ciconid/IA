@@ -55,3 +55,23 @@ Es decir, revisar por α equivale a: primero contraer la base eliminando la nega
 **Revisión no priorizada:** la nueva información **no** tiene garantizada la incorporación: si contradice creencias previas, puede ser rechazada cuando estas se consideran más confiables o mejor justificadas que la percepción nueva. La decisión de aceptar o no la nueva información depende de su confiabilidad y no simplemente de ser la más reciente.
 
 *Escenario conveniente:* ambientes con fuentes de distinta confiabilidad. Por ejemplo, un agente que recibe información de otros agentes o de fuentes no verificadas (rumores, sensores defectuosos, noticias dudosas). Si un agente confiable le comunica "el tesoro no está en la posición A" pero un sensor poco fiable reporta lo contrario, conviene no priorizar la percepción nueva y conservar la creencia que se considera más sólida.
+
+## 1.5. ¿Puede una base consistente volverse inconsistente tras un cambio?
+
+Supongamos que B es consistente y queremos analizar cada operador aplicado por la sentencia `a`.
+
+**Expansión (B + a): Sí, puede resultar inconsistente.**
+La expansión agrega `a` sin eliminar ninguna creencia previa. Si B ya implicaba `¬a`, entonces al incorporar `a` se deriva tanto `a` como `¬a`.
+
+Ejemplo:
+```
+B = { ¬a }          (consistente)
+B + a = Cn({ ¬a, a })   (inconsistente, ya que se derivan a y ¬a)
+```
+La expansión no ofrece garantía de consistencia: solo asegura que la nueva creencia queda incluida.
+
+**Contracción (B − a): No puede resultar inconsistente.**
+La contracción solo elimina creencias de B (y sus consecuencias), nunca agrega información nueva. Como B es consistente, todo subconjunto de `Cn(B)` (y en particular el resultado de la contracción) también lo es. Por lo tanto, `B − a` es siempre consistente.
+
+**Revisión (B ∗ a): No puede resultar inconsistente.**
+Por definición, la revisión impone que la base resultante sea consistente **y** contenga a `a`. Siguiendo la Identidad de Levi, `B ∗ a = (B − ¬a) + a`: la contracción elimina primero lo que entra en conflicto con `a`, dejando una base que ya no deriva `¬a`; entonces la expansión por `a` ya no produce contradicción. El resultado es, por construcción, consistente.
