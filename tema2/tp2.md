@@ -285,3 +285,94 @@ K ⊛ R = { a, b, c, w }   (contiene íntegramente a R, consistente)
 ```
 
 Es decir, la revisión por el conjunto de sentencias de R, tratándolo prioritariamente como una unidad, garantiza que todas las piezas de R sobrevivan a la revisión.
+
+## 9. Restaurante
+
+Hechos y reglas:
+
+```
+Ab (abierto)                 r1: Ab → Pe (si está abierto, hay personal)
+Fe (esFeriado)               r2: Fe → ¬Ab (si es feriado, no abre)
+CLu (hayCorteDeLuz)          r3: CLu → ¬Ab (si hay corte de luz, no abre)
+Pe (hayPersonal)
+```
+
+Base de creencias: **K = { Fe, CLu, Ab → Pe, Fe → ¬Ab, CLu → ¬Ab }**
+Sentencias a incorporar prioritariamente: **S = { Ab, ¬Fe }**
+
+Observación: K es consistente e implica `¬Ab` (por `Fe` con `Fe→¬Ab` y por `CLu` con `CLu→¬Ab`).
+
+### 9.1. Revisión secuencial (primero `Ab`, luego `¬Fe`)
+
+**Paso 1: K₁ = K ∗ Ab.** Hay que contraer `¬Ab`. Kernels de `¬Ab`:
+
+```
+K ⊥⊥ ¬Ab = { { Fe, Fe → ¬Ab }, { CLu, CLu → ¬Ab } }
+```
+
+La incisión elimina un elemento de cada kernel (2 × 2 = 4 posibilidades) y luego se expande con `Ab`:
+
+| Incisión (quita) | K₁ |
+|---|---|
+| `Fe`, `CLu` | { Ab → Pe, Fe → ¬Ab, CLu → ¬Ab, Ab } |
+| `Fe`, `CLu → ¬Ab` | { Ab → Pe, Fe → ¬Ab, CLu, Ab } |
+| `Fe → ¬Ab`, `CLu` | { Ab → Pe, Fe, CLu → ¬Ab, Ab } |
+| `Fe → ¬Ab`, `CLu → ¬Ab` | { Ab → Pe, Fe, CLu, Ab } |
+
+Todas son consistentes y contienen `Ab`.
+
+**Paso 2: K₂ = K₁ ∗ ¬Fe.**
+
+- Sobre las filas 1 y 2 (no contienen `Fe`): `¬Fe` es consistente con la base, solo se agrega:
+
+  ```
+  K₂⁽¹⁾ = { Ab → Pe, Fe → ¬Ab, CLu → ¬Ab, Ab, ¬Fe }
+  K₂⁽²⁾ = { Ab → Pe, Fe → ¬Ab, CLu, Ab, ¬Fe }
+  ```
+
+- Sobre las filas 3 y 4 (contienen `Fe`): `¬Fe` entra en conflicto con `Fe`. Kernel de `Fe`:
+
+  ```
+  K ⊥⊥ Fe = { { Fe } }
+  ```
+
+  La incisión elimina `Fe` y se agrega `¬Fe`:
+
+  ```
+  K₂⁽³⁾ = { Ab → Pe, CLu → ¬Ab, Ab, ¬Fe }
+  K₂⁽⁴⁾ = { Ab → Pe, CLu, Ab, ¬Fe }
+  ```
+
+Resultados posibles de la revisión secuencial: las 4 bases `K₂⁽¹⁾`–`K₂⁽⁴⁾`, todas consistentes y conteniendo íntegramente a S.
+
+### 9.2. Revisión simultánea (S tratado como conjunto prioritario)
+
+Se consideran los subconjuntos mínimos inconsistentes de `K ∪ S`:
+
+```
+K ∪ S = { Fe, CLu, Ab → Pe, Fe → ¬Ab, CLu → ¬Ab, Ab, ¬Fe }
+```
+
+Mínimos inconsistentes:
+
+1. `{ Fe, ¬Fe }` → solo puede sacrificarse `Fe` (la incisión nunca toca S)
+2. `{ Fe, Fe → ¬Ab, Ab }` → sacrificar `Fe` o `Fe → ¬Ab`
+3. `{ CLu, CLu → ¬Ab, Ab }` → sacrificar `CLu` o `CLu → ¬Ab`
+
+Como la incisión es la unión de los cortes de todos los kernels, `Fe` se elimina **siempre** (obligado por el kernel 1). Las combinaciones posibles (2 × 2):
+
+| Incisión (quita) | K ⊛ S |
+|---|---|
+| `Fe`, `CLu` | { Ab → Pe, Fe → ¬Ab, CLu → ¬Ab, Ab, ¬Fe } |
+| `Fe`, `CLu → ¬Ab` | { Ab → Pe, Fe → ¬Ab, CLu, Ab, ¬Fe } |
+| `Fe`, `Fe → ¬Ab`, `CLu` | { Ab → Pe, CLu → ¬Ab, Ab, ¬Fe } |
+| `Fe`, `Fe → ¬Ab`, `CLu → ¬Ab` | { Ab → Pe, CLu, Ab, ¬Fe } |
+
+Todas consistentes y con S completo.
+
+### 9.3. Comparación y conclusiones
+
+- En este ejemplo, el **conjunto de bases resultantes es el mismo** en ambas modalidades (las mismas 4 bases): la revisión simultánea de por sí no aporta resultados nuevos respecto de la secuencial.
+- En ambos casos `Fe` termina eliminado siempre (la prioridad de `¬Fe` obliga a sacrificarlo), y las reglas `Fe → ¬Ab` y `CLu → ¬Ab` pueden conservarse o perderse según la incisión.
+- Diferencia operativa: la secuencial depende del orden y puede dejar `Fe` en la base *durante* el paso intermedio hasta que llega la revisión por `¬Fe`; la simultánea trata a S como una unidad de máxima prioridad y garantiza de una sola vez que `Ab` y `¬Fe` queden incorporados y la base quede consistente.
+- En general (como se vio en el punto 8), la secuencial **no garantiza** la inclusión completa de S en la base final ni es conmutativa; aquí coinciden porque `Ab` y `¬Fe` generan conflictos disjuntos (no interactúan entre sí), por lo que el orden no introduce diferencias.
