@@ -1,0 +1,3 @@
+- Agregar fuentes siempre que se use alguno de los libros en libros/
+- Escribir respuestas sin mucha verbosidad innecesaria
+- En caso de citar fuentes en inglés, no traducir al español. Poner el texto original.
