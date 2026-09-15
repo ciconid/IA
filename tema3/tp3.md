@@ -96,6 +96,21 @@ En el algoritmo genérico dado, la estrategia de búsqueda se determina en los p
 
 Como señalan las notas de clase, "la forma de seleccionar el nodo a expandir y la forma como agregar un nodo a la frontera permite definir diferentes estrategias de búsqueda" [García, Episodio II, sec. Estrategia de búsqueda]. Por ejemplo, con `seleccionar` = primero de la frontera: si `agregar` coloca los vecinos al principio de la frontera se obtiene búsqueda en profundidad (DFS, comportamiento de pila), y si los coloca al final se obtiene búsqueda a lo ancho (BFS, comportamiento de cola) [García, Episodio II, sec. Estrategia de búsqueda]. La misma idea se encuentra en AIMA: la estrategia se define por cómo se elige qué nodo expandir ("they vary primarily according to how they choose which state to expand next—the so-called search strategy" [RN10, sec. 3.3, p. 75]).
 
+## 9. Estrategia de búsqueda en `busqueda.pl`
+
+### 9-a. ¿Qué estrategia usa `busqueda.pl`?
+
+La estrategia implementada es **búsqueda en profundidad (DFS)**. Se determina por la manipulación de la frontera en **`seleccionar/3`** y **`agregar/3`**:
+
+- **`seleccionar/3`:** siempre toma el **primer** elemento de la frontera (`seleccionar([Nodo|FronteraSinNodo],Nodo,FronteraSinNodo)`).
+- **`agregar/3`:** los vecinos recién generados se colocan **al principio** de la frontera (`append(Vecinos, Frontera, FronteraNueva)`).
+
+Con `seleccionar` = primero de la frontera, si `agregar` pone los vecinos al **principio** se obtiene búsqueda en profundidad (DFS, comportamiento de **pila/LIFO**); si los pusiera al **final** se obtendría BFS (cola/FIFO) [García, Episodio II, sec. Estrategia de búsqueda; ver punto 8 de este TP]. Al expandirse siempre el nodo más recientemente generado, la frontera desciende en profundidad hasta encontrar una meta (en este caso `H`, alcanzando la solución `A → B → E → G → H`, o bien `J` si la búsqueda la encontrara antes).
+
+Nota sobre el orden de los hechos `ady/3`: los sucesores se generan con `findall` respetando el orden en que están escritas las cláusulas, y como el nodo que entra primero a la frontera se expande primero (DFS), ese orden decide **cuál vecino se explora antes** y, en consecuencia, **qué solución** se encuentra. Por ejemplo, intercambiar `ady('B','E',1)` y `ady('B','D',1)` cambiaría si se desciende por `E` o por `D` desde `B`, y por lo tanto cuál de las metas se visita primero.
+
+(*) tipográfico; corrección: **DFS**.
+
 ---
 
 **Fuentes consultadas:**
