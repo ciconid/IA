@@ -44,6 +44,17 @@ En síntesis, la búsqueda es cómo el agente "piensa" para pasar de su estado a
 
 **Grafo de búsqueda:** el grafo que representa el espacio de estados, donde cada nodo representa un estado y cada arco la aplicación de un operador del problema; al representar el espacio de estados también se lo llama "espacio de búsqueda" o "grafo de búsqueda", y puede generarse dinámicamente a medida que la búsqueda avanza [García, Episodio II, sec. Terminología]. Cuando la representación se expande como un árbol con raíz en el estado inicial se denomina "árbol de búsqueda" [García, Episodio II, sec. Terminología]. La misma idea se encuentra en AIMA [RN10, sec. 3.1.1, p. 67].
 
+## 4. El ta-te-ti (tic-tac-toe) como problema de búsqueda
+
+Siguiendo la definición de problema de búsqueda del punto 2 [García, Episodio II, sec. Terminología], el ta-te-ti se define de la siguiente manera:
+
+- **Estado inicial:** tablero de 3x3 completamente vacío, con el turno del jugador X.
+- **Operadores:** colocar la ficha del jugador en turno (X u O) en una casilla vacía del tablero. Dado un estado, hay tantos operadores aplicables como casillas vacías (como máximo 9).
+- **Test de meta:** un estado es meta si uno de los jugadores completó una fila, una columna o una diagonal (ganó), o si el tablero quedó completo sin que ninguno formara una línea (empate).
+- **Función de costo de camino:** se asume costo 1 por cada operador aplicado, por lo que *g(n)* = profundidad del nodo (cantidad de fichas colocadas).
+
+Una solución es entonces una secuencia de movimientos que, partiendo del tablero vacío, lleva a un estado meta. Dado que el ta-te-ti es un juego de dos jugadores con turnos alternados, una modelización más realista debe considerar las jugadas del oponente; esto se aborda con la búsqueda adversarial (juegos) [RN10, cap. 5].
+
 ---
 
 **Fuentes consultadas:**
