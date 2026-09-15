@@ -87,6 +87,15 @@ Que una estrategia sea **ciega** (también llamada *blind search* o *no informad
 
 **Breadth First Search (BFS):** *búsqueda a lo ancho*. La estrategia consiste en expandir siempre el nodo menos profundo de la frontera: se retira el primero de la lista de la frontera y los nuevos nodos generados se agregan al final (comportamiento de **cola**, *queue*, FIFO) [García, Episodio II, sec. Búsqueda a lo ancho - BFS]. Por lo tanto, se expanden todos los nodos de una profundidad del árbol antes de pasar al siguiente nivel; en AIMA: "Breadth-ﬁrst search is a simple strategy in which the root node is expanded ﬁrst, then all the successors of the root node are expanded next, then their successors, and so on" [RN10, sec. 3.4.1, p. 81]. La frontera queda formada por los "hijos" del último nivel explorado, por lo que crece *exponencialmente*: requiere O(b\^d) nodos en memoria [García, Episodio II; RN10, sec. 3.4.1, pp. 81-82]. A cambio, es completa y, cuando todos los costos de paso son iguales (como en este TP, donde cada movimiento tiene costo 1), es **óptima**, ya que siempre encuentra la meta menos profunda [RN10, sec. 3.4.1, p. 82].
 
+## 8. Dónde se determina la estrategia en el algoritmo genérico de búsqueda
+
+En el algoritmo genérico dado, la estrategia de búsqueda se determina en los predicados **`seleccionar/3`** y **`agregar/3`**:
+
+- **`seleccionar(Nodo, Frontera, FronteraReducida)`:** decide cuál nodo de la frontera se elige para expandir en cada paso (p. ej., el primero, el de menor costo, el más promisorio según una heurística).
+- **`agregar(FronteraReducida, Vecinos, NuevaFrontera)`:** decide en qué posición de la frontera se colocan los vecinos recién generados.
+
+Como señalan las notas de clase, "la forma de seleccionar el nodo a expandir y la forma como agregar un nodo a la frontera permite definir diferentes estrategias de búsqueda" [García, Episodio II, sec. Estrategia de búsqueda]. Por ejemplo, con `seleccionar` = primero de la frontera: si `agregar` coloca los vecinos al principio de la frontera se obtiene búsqueda en profundidad (DFS, comportamiento de pila), y si los coloca al final se obtiene búsqueda a lo ancho (BFS, comportamiento de cola) [García, Episodio II, sec. Estrategia de búsqueda]. La misma idea se encuentra en AIMA: la estrategia se define por cómo se elige qué nodo expandir ("they vary primarily according to how they choose which state to expand next—the so-called search strategy" [RN10, sec. 3.3, p. 75]).
+
 ---
 
 **Fuentes consultadas:**
