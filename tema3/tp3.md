@@ -77,6 +77,10 @@ Estos problemas se evitan de dos maneras complementarias:
 
 El control de visitados convierte la búsqueda de *tree search* en *graph search*: no se vuelven a considerar caminos redundantes ni ciclos ("algorithms that forget their history are doomed to repeat it" [RN10, sec. 3.3, p. 77]). El algoritmo sigue construyendo un árbol de búsqueda, pero al descartar estados repetidos ese árbol crece directamente sobre el grafo del espacio de estados ("the search tree constructed by the GRAPH-SEARCH algorithm contains at most one copy of each state, so we can think of it as growing a tree directly on the state-space graph" [RN10, sec. 3.3, p. 77]). La diferencia entre ambos es que el *tree search* considera todos los caminos posibles, mientras que el *graph search* evita caminos redundantes [RN10, sec. 3.7, p. 108].
 
+## 6. Qué significa que una estrategia de búsqueda sea ciega
+
+Que una estrategia sea **ciega** (también llamada *blind search* o *no informada*, *uninformed search*) significa que, para decidir qué nodo expandir de la frontera, no utiliza ninguna información del problema más allá de su definición: no sabe cuáles nodos son "más promisorios" que otros. Los métodos ciegos "recorren el espacio de búsqueda hasta que se 'tropiezan' con la solución" y "exploran el espacio de búsqueda 'a ciegas' sin usar ningún tipo de información que 'dirija' la búsqueda hacia nodos sin explorar que sean 'más promisorios'" [García, Episodio II, sec. Búsqueda a ciegas]. La misma definición se encuentra en AIMA [RN10, sec. 3.4, p. 81]. Por eso la exploración se define solo por el *orden* en que se seleccionan y expanden los nodos (DFS expande el nodo más profundo, BFS el menos profundo, UCS el de menor costo), sin ninguna guía heurística. Como contrapartida, las estrategias **informadas** (heurísticas) sí usan información específica del problema para orientar la búsqueda.
+
 ---
 
 **Fuentes consultadas:**

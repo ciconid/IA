@@ -2,3 +2,4 @@
 - Escribir respuestas sin mucha verbosidad innecesaria
 - En caso de citar fuentes en inglés, no traducir al español. Poner el texto original.
 - Si varias fuentes expresan la misma idea o definición, citar solo una de ellas. En todo caso, agregar una aclaración de que la información también se encuentra en las otras fuentes, sin agregar el contenido de dicha fuente.
+- Simpre priorizar mostrar listas con bullet-points en lugar de usar prosa.
