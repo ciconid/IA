@@ -55,6 +55,28 @@ Siguiendo la definición de problema de búsqueda del punto 2 [García, Episodio
 
 Una solución es entonces una secuencia de movimientos que, partiendo del tablero vacío, lleva a un estado meta. Dado que el ta-te-ti es un juego de dos jugadores con turnos alternados, una modelización más realista debe considerar las jugadas del oponente; esto se aborda con la búsqueda adversarial (juegos) [RN10, cap. 5].
 
+## 5. Estrategias para recorrer un espacio de búsqueda
+
+Tener un método o una estrategia de búsqueda implica establecer un **orden determinado para seleccionar y expandir los nodos de la frontera**: decidir cuál de los nodos que aún no fueron explorados es el próximo a expandir. Todos los algoritmos de búsqueda comparten la misma estructura básica y se diferencian "primarily according to how they choose which state to expand next—the so-called search strategy" [RN10, sec. 3.3, p. 75]. El nodo elegido define qué caminos se exploran primero, y por lo tanto las propiedades del algoritmo, que se evalúan según cuatro criterios: 
+- **completitud** (¿garantiza hallar una solución cuando existe?), 
+- **optimalidad** (¿encuentra la solución óptima?), 
+- **complejidad temporal** y 
+- **complejidad espacial** [RN10, sec. 3.3.2, p. 80].
+
+Un buen método garantiza que la exploración sea *sistemática* y no desperdicie recursos. En cambio, visitar estados en cualquier momento, sin ningún orden o criterio definido, puede generar problemas graves:
+
+- **Ciclos (caminos con lazos):** si no se controlan, se pueden volver a generar estados ya visitados. Al poder recorrer un ciclo una cantidad ilimitada de veces, el árbol de búsqueda se vuelve infinito incluso cuando el espacio de estados es finito ("the complete search tree for Romania is infinite because there is no limit to how often one can traverse a loop"), y "loops can cause certain algorithms to fail, making otherwise solvable problems unsolvable" [RN10, sec. 3.3, pp. 75-76].
+
+- **Caminos redundantes y explosión combinatoria:** seguir caminos redundantes (que vuelven a un mismo estado) multiplica innecesariamente los nodos y puede convertir un problema tratable en intratable. En una grilla rectangular, un árbol de búsqueda de profundidad *d* que incluye estados repetidos tiene 4\^d hojas, pero solo hay ~2*d*\^2 estados distintos; para *d* = 20, cerca de un trillón de nodos frente a unos 800 estados [RN10, sec. 3.3, p. 77].
+
+- **Falta de garantías de terminación o de completitud:** una exploración sin estrategia puede quedarse infinitamente en una rama que no contiene la meta, o no llegar nunca a la solución aunque exista, además de consumir memoria y tiempo sin control.
+
+Estos problemas se evitan de dos maneras complementarias: 
+- (1) aplicando **control de visitados** (explored set o closed list); y 
+- (2) eligiendo una **estrategia concreta** cuyas propiedades (completitud, optimalidad, complejidad) sean adecuadas al problema, en lugar de seleccionar nodos arbitrariamente.
+
+El control de visitados convierte la búsqueda de *tree search* en *graph search*: no se vuelven a considerar caminos redundantes ni ciclos ("algorithms that forget their history are doomed to repeat it" [RN10, sec. 3.3, p. 77]). El algoritmo sigue construyendo un árbol de búsqueda, pero al descartar estados repetidos ese árbol crece directamente sobre el grafo del espacio de estados ("the search tree constructed by the GRAPH-SEARCH algorithm contains at most one copy of each state, so we can think of it as growing a tree directly on the state-space graph" [RN10, sec. 3.3, p. 77]). La diferencia entre ambos es que el *tree search* considera todos los caminos posibles, mientras que el *graph search* evita caminos redundantes [RN10, sec. 3.7, p. 108].
+
 ---
 
 **Fuentes consultadas:**
