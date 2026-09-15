@@ -105,11 +105,42 @@ La estrategia implementada es **búsqueda en profundidad (DFS)**. Se determina p
 - **`seleccionar/3`:** siempre toma el **primer** elemento de la frontera (`seleccionar([Nodo|FronteraSinNodo],Nodo,FronteraSinNodo)`).
 - **`agregar/3`:** los vecinos recién generados se colocan **al principio** de la frontera (`append(Vecinos, Frontera, FronteraNueva)`).
 
-Con `seleccionar` = primero de la frontera, si `agregar` pone los vecinos al **principio** se obtiene búsqueda en profundidad (DFS, comportamiento de **pila/LIFO**); si los pusiera al **final** se obtendría BFS (cola/FIFO) [García, Episodio II, sec. Estrategia de búsqueda; ver punto 8 de este TP]. Al expandirse siempre el nodo más recientemente generado, la frontera desciende en profundidad hasta encontrar una meta (en este caso `H`, alcanzando la solución `A → B → E → G → H`, o bien `J` si la búsqueda la encontrara antes).
+Con `seleccionar` = primero de la frontera, si `agregar` pone los vecinos al **principio** se obtiene búsqueda en profundidad (DFS, comportamiento de **pila/LIFO**); si los pusiera al **final** se obtendría BFS (cola/FIFO) [García, Episodio II, sec. Estrategia de búsqueda; ver punto 8 de este TP]. Al expandirse siempre el nodo más recientemente generado, la frontera desciende en profundidad hasta encontrar una meta. En la traza del programa la solución hallada es `A → B → E → G → H` (costo 4).
 
-Nota sobre el orden de los hechos `ady/3`: los sucesores se generan con `findall` respetando el orden en que están escritas las cláusulas, y como el nodo que entra primero a la frontera se expande primero (DFS), ese orden decide **cuál vecino se explora antes** y, en consecuencia, **qué solución** se encuentra. Por ejemplo, intercambiar `ady('B','E',1)` y `ady('B','D',1)` cambiaría si se desciende por `E` o por `D` desde `B`, y por lo tanto cuál de las metas se visita primero.
+### 9-b. ¿Por qué importa el orden de las relaciones `ady/3`?
 
-(*) tipográfico; corrección: **DFS**.
+Los sucesores de un nodo se generan con `findall/3` en `generarVecinos/2`, que enumera los vecinos **en el orden en que están escritas las cláusulas `ady/3`**. Como `seleccionar/3` toma el primer nodo de la frontera y `agregar/3` pone los vecinos nuevos al principio, el vecino que aparece primero en `findall` es el que DFS explora primero. El orden de las cláusulas decide, entonces, **por qué rama se desciende primero** y, en consecuencia, **qué solución se encuentra** (y si se encuentra).
+
+**¿Qué pasa si cambiamos el orden?** Intercambiar `ady('B','E',1)` y `ady('B','D',1)` hace que desde `B` los vecinos se generen como `D`, `E`, `A` (en lugar de `E`, `D`, `A`). La búsqueda desciende entonces por `D`; como `D` solo es adyacente a `B` (ciclo `B ↔ D`), los vecinos de `D` vuelven a incluir a `B`, que a su vez regenera `D`, y así indefinidamente. Como `busqueda.pl` implementa *tree search* sin control de visitados, DFS queda atrapada en el ciclo `B ↔ D`, nunca explora la rama de `E` (que lleva a la meta `H`) ni la de `C` (que lleva a `J`), y **no termina**. Es la debilidad conocida del *tree search* DFS: en espacios con ciclos o caminos infinitos puede no ser completa [RN10, sec. 3.4.3, pp. 86-87]. El hecho de que la versión original "funcione" se debe a que el orden de las cláusulas hace que DFS primero descienda por la rama afortunada.
+
+**¿Cómo solucionarlo?** Aplicando **control de visitados** (*explored set* / *closed list*), es decir, pasando de *tree search* a *graph search* (ver punto 8): los estados ya generados no se vuelven a expandir ni a re-agregar a la frontera. Con eso, desde `D` el vecino `B` es descartado por ya estar visitado, la búsqueda continúa con el siguiente nodo de la frontera (`E`) y alcanza una meta; así el resultado deja de depender de ciclos y de la suerte del orden de las cláusulas. Reordenar las cláusulas de a mano para cada problema solo funciona para ese caso puntual, por lo que no es una solución general.
+
+### 9-c. Modificaciones para convertir la búsqueda en BFS
+
+La única modificación necesaria es en **`agregar/3`** (y el comentario que la acompaña), para que los vecinos nuevos se coloquen **al final** de la frontera en lugar del principio:
+
+```prolog
+agregar(Vecinos,Frontera,FronteraNueva):-
+    append(Frontera, Vecinos, FronteraNueva).
+```
+
+`seleccionar/3` queda igual (sigue tomando el primer nodo). Con `seleccionar` = primero y `agregar` que encola al final, la frontera se comporta como una **cola (FIFO)**: se expanden todos los nodos de una profundidad antes de pasar a la siguiente, es decir, BFS.
+
+**¿En qué momento se diferencian DFS y BFS?** En la forma de manipular la frontera, que es donde se determina la estrategia (punto 8): ambos usan el **mismo `seleccionar`** (primero de la frontera) y solo cambia **`agregar/3`** — DFS antepone los vecinos (pila), BFS los pospone (cola). En este esquema, DFS y BFS son intercambiables con una única línea de código.
+
+### 9-d. Comparación del DFS original contra BFS
+
+Ninguna de las dos es *mejor* en abstracto: la elección depende del problema y de qué se priorice. Sus propiedades se describen en el punto 7 de este TP [RN10, secs. 3.4.1–3.4.3; García, Episodio II]:
+
+- **Completitud:** BFS es completa (con costos iguales, siempre encuentra la meta más superficial). El *tree search* DFS aquí no es completo, como se vio en 9-b (puede entrar en un ciclo infinito).
+- **Optimalidad:** BFS es **óptima** cuando todos los costos son iguales, como en `busqueda.pl` (cada movimiento cuesta 1). DFS **no garantiza** optimalidad: en este laberinto encontró `A → B → E → G → H` (costo 4), que coincide con el mínimo porque `H` está a profundidad 4, pero en general puede hallar caminos más largos.
+- **Memoria:** DFS necesita memoria **lineal** O(b·m) (la frontera son los "hermanos" de la rama actual); BFS necesita **exponencial** O(b^d) (todos los nodos de un nivel). En este laberinto pequeño la diferencia no se nota, pero en espacios grandes BFS se vuelve inviable en memoria.
+- **Tiempo:** ambos son exponenciales en el peor caso; BFS expande todos los nodos hasta la profundidad de la meta, mientras que DFS puede "acertar" la rama correcta rápido o perderse en una rama sin salida.
+
+**Escenarios convenientes:**
+
+- **DFS** conviene cuando la solución está **profunda** y/o el espacio de estados es **grande** y se dispone de **poca memoria**, y no se exige optimalidad (p. ej., verificar la existencia de una solución, laberintos con solución cerca del final).
+- **BFS** conviene cuando se necesita **la solución de mínimo costo** (optimalidad) y la meta está a poca profundidad desde el estado inicial, a costa de memoria (p. ej., caminos cortos en mapas, puzles con solución cercana).
 
 ---
 
