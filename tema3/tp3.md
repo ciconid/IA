@@ -142,6 +142,30 @@ Ninguna de las dos es *mejor* en abstracto: la elección depende del problema y 
 - **DFS** conviene cuando la solución está **profunda** y/o el espacio de estados es **grande** y se dispone de **poca memoria**, y no se exige optimalidad (p. ej., verificar la existencia de una solución, laberintos con solución cerca del final).
 - **BFS** conviene cuando se necesita **la solución de mínimo costo** (optimalidad) y la meta está a poca profundidad desde el estado inicial, a costa de memoria (p. ej., caminos cortos en mapas, puzles con solución cercana).
 
+## 10. Consecuencias para BFS de considerar costos de operadores diferentes
+
+**Consecuencia principal:** BFS expande los nodos en **orden de profundidad**, no de costo. Su optimalidad depende de que el costo de camino sea una función no decreciente de la profundidad, lo cual se cumple cuando "all actions have the same cost" [RN10, sec. 3.4.1, p. 82]: la meta menos profunda también es la de menor costo. Si los costos son **distintos entre sí**, eso deja de valer: BFS sigue encontrando la meta **menos profunda** (no la óptima), porque al aplicar el test de meta apenas se **genera** el nodo ("the shallowest goal node is not necessarily the optimal one" [RN10, sec. 3.4.1, p. 82]). En términos de las notas de clase, BFS no es apropiado cuando "el costo de los operadores no es 1" [García, Episodio II, sec. ¿Alguna conclusión?]. Además, el costo de las soluciones encontradas **deja de ser un reflejo** del número de pasos, por lo que BFS no aporta ninguna garantía sobre la calidad de la solución.
+
+**Espacio de búsqueda que ilustra el problema:**
+
+```
+              ┌────(1)──── X ────(1)──── M2  (meta)
+S (inicial) ──┤
+              └────(100)─── M1  (meta)
+```
+
+Con BFS (cola FIFO) se expande `S` y se **generan** sus dos vecinos `M1` y `X` (profundidad 1). Como el test de meta se aplica al generar, `M1` (que es meta y está a profundidad 1) es detectada de inmediato y la búsqueda retorna la solución `S → M1`, de **costo 100**. Sin embargo, la solución óptima es `S → X → M2`, de **costo 2** (costo total *g* = 1 + 1), aunque la meta esté a mayor profundidad. BFS nunca la considera porque ya se detuvo en la meta más superficial.
+
+**Estrategia que resuelve el problema:** **Uniform-Cost Search (UCS)**, también llamada *Lowest-Cost-First Search* (LCFS) [García, Episodio II, sec. "Lowest-cost-first Search (LCFS)"]. Se obtiene como una "simple extension" de BFS [RN10, sec. 3.4.2, p. 84]:
+
+- **Selección por costo, no por profundidad:** "Instead of expanding the shallowest node, uniform-cost search expands the node *n* with the lowest path cost *g*(n)", manteniendo la frontera como una **cola con prioridad** ordenada por *g*(n) [RN10, sec. 3.4.2, p. 84]. En el esquema de `busqueda.pl` debe modificarse `agregar/3` para que quede primero el nodo con menor `g(n)` [García, Episodio II, sec. LCFS].
+
+- **Test de meta al seleccionar, no al generar:** un nodo meta generado puede no ser aún el de menor costo; por eso UCS recién termina cuando el nodo meta es **seleccionado para expandir** ("the first goal node selected for expansion must be the optimal solution" [RN10, sec. 3.4.2, p. 85]).
+
+- **Garantías:** es **completa** y **óptima**, siempre que cada paso tenga un costo positivo mínimo *ε* > 0. A cambio, su complejidad se mide en función del costo óptimo *C*\* y puede ser elevada: *O(b^⌊1+C\*/ε⌋)*, mucho mayor que *b^d* cuando hay pasos muy baratos [RN10, sec. 3.4.2, pp. 84-85].
+
+En el ejemplo anterior, UCS expande `S`, luego `X` (g=1) antes que `M1` (g=100), después `M2` (g=2) y recién entonces selecciona la meta de menor costo, devolviendo la solución óptima `S → X → M2` (costo 2).
+
 ---
 
 **Fuentes consultadas:**
