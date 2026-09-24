@@ -181,9 +181,45 @@ Ambas son funciones que asignan un valor numérico no negativo a un nodo, pero m
 - *g*(n) depende del **camino** hasta *n*; *h*(n) depende **solo del estado** de *n* [RN10, sec. 3.5, p. 92].
 - Son las dos componentes que los métodos informados combinan para evaluar un nodo, siendo la **función de evaluación** típica *f*(n) = *g*(n) + *h*(n), usada por A* (punto 16 de este TP).
 
+## 14. Descripción de Best First Search (BestFS) y Heuristic Depth First Search (HDFS)
+
+Ambos son métodos de **búsqueda informada (heurística)**: usan la función h(N) —estimación del costo del camino menos costoso entre el nodo N y una meta alcanzable desde N— para decidir qué nodo explorar [García, Episodio III; RN10, sec. 3.5, p. 92].
+
+### Best First Search (BestFS) — "el mejor primero"
+
+- **Estrategia:** elegir de la frontera el nodo con **menor valor de h(N)**, el que "parece estar más cerca de la meta". La frontera se trata como una **cola con prioridad ordenada por h(N)** [García, Episodio III, sec. El mejor primero]. En AIMA se denomina *greedy best-first search*: "Greedy best-first search tries to expand the node that is closest to the goal, on the grounds that this is likely to lead to a solution quickly. Thus, it evaluates nodes by using just the heuristic function; that is, f(n) = h(n)" [RN10, sec. 3.5.1, p. 93]. La misma estrategia se encuentra en PMG [PMG, sec. 4.5, p. 133].
+- **Implementación** en el esquema de `busqueda.pl`: `seleccionar/3` toma el primero de la frontera y `agregar/3` reordena **la frontera completa** por h(N) [García, Episodio III, sec. El mejor primero; PMG, sec. 4.5, p. 133].
+- **Garantías:** no garantiza **optimalidad** ni **completitud**: "Greedy best-first tree search is also incomplete even in a finite state space, much like depth-first search" [RN10, sec. 3.5.1, p. 93]. Lo mismo en PMG: "unlike breadth-first search, it isn't guaranteed to find a solution even if one exists. It doesn't necessarily find the shortest path first" [PMG, sec. 4.5, p. 133].
+- **Complejidad:** peor caso O(b^m) en tiempo **y espacio**; "La complejidad espacial puede ser un grave problema ya que en el peor caso es exponencial" [García, Episodio III, sec. El mejor primero]. Con una buena heurística, el espacio efectivamente explorado se reduce sustancialmente [RN10, sec. 3.5.1, p. 93].
+
+### Heuristic Depth First Search (HDFS) — "profundidad heurístico"
+
+- **Estrategia:** como DFS, expande siempre el **nodo más profundo de la frontera** (comportamiento de pila), pero **ordena los vecinos del nodo recién expandido por h(N)** antes de agregarlos al principio de la frontera: "elije de los primeros vecinos del nodo elegido el de menor valor de h(N)" [García, Episodio III, sec. Heuristic Depth-First Search]. Otras palabras: "Heuristic depth-first is a way to use heuristic knowledge in depth-first search. It retains the space advantages of depth-first search, while using problem-specific information to guide the search. The idea is to make the locally best choice according to the heuristic function by ordering the neighbors before adding them to the front of the frontier" [PMG, sec. 4.5, p. 134].
+- **Diferencia clave con BestFS:** la elección es **local** y no global. BestFS considera toda la frontera; HDFS, en cambio, "locally chooses which subtree to develop. It chooses a neighbor of the current node to pursue, and it only considers other neighbors if all paths from the chosen node end without finding a solution" [PMG, sec. 4.5, p. 134].
+- **Garantías:** no es **completa** ni **óptima**; puede ser "llevado por el camino del jardín": "it pursues all paths from that choice before trying another path. Thus, it can be 'led up the garden path.' If there is an infinite path from the first neighbor chosen, it would never choose the second neighbor. This may preclude finding a solution" [PMG, sec. 4.5, p. 134].
+- **Complejidad espacial:** **lineal** en la profundidad (hereda la ventaja de memoria de DFS): "Esta estrategia tiene un mejor manejo de memoria que BestFS" [García, Episodio III, sec. Heuristic Depth-First Search].
+
+### Ventajas y desventajas frente a DFS y BFS
+
+| Propiedad | BFS | DFS | BestFS | HDFS |
+|---|---|---|---|---|
+| Completa (¿encuentra solución si existe?) | Sí (espacios finitos) | No (puede encerrarse en ciclos, punto 9-b de este TP) | No | No |
+| Óptima | Sí (si los costos de arco son iguales) | No | No | No |
+| Espacio | Exponencial O(b^d) | Lineal | Exponencial (peor caso) | Lineal |
+| Información usada | Ninguna (ciega) | Ninguna (ciega) | Heurística (global: toda la frontera) | Heurística (local: vecinos del nodo expandido) |
+
+Ningún método es *mejor* en abstracto; la tabla resume el compromiso (misma idea en [PMG, sec. 4.5, Fig. 4.6, p. 138]):
+
+- **Frente a BFS:** BFS garantiza **completitud y optimalidad** (con costos de arco uniformes, punto 7 de este TP) a costa de memoria y tiempo exponenciales [RN10, sec. 3.4.1]. BestFS, con una buena heurística, suele alcanzar una meta explorando mucho menos espacio —"the amount of the reduction depends on the particular problem and on the quality of the heuristic" [RN10, sec. 3.5.1, p. 94]— pero **pierde garantías**: puede no encontrar solución, no encuentra necesariamente la óptima, y su frontera puede seguir creciendo exponencialmente. HDFS combina el guiado heurístico con el **uso lineal de memoria**, pero tampoco garantiza optimalidad ni completitud [PMG, sec. 4.5, pp. 133-135].
+
+- **Frente a DFS:** DFS desciende a ciegas por la primera rama que encuentra; HDFS mantiene las propiedades de memoria y "profundidad" de DFS pero **orienta el descenso** hacia los vecinos más promisorios según h(N) [PMG, sec. 4.5, p. 134]. Comparten, sin embargo, las mismas debilidades: pueden no terminar (ramas infinitas o ciclos) y no garantizan la solución óptima; HDFS agrega el riesgo de que la heurística **engañe** a la búsqueda (como se expresó recién), llevándola por un subárbol promisorio pero sin salida [PMG, sec. 4.5, pp. 134-135].
+
+- **Caso extremo:** con heurísticas perfectas, BestFS y HDFS van directo a una meta; sin heurística (h(N)=0 para todo N), HDFS **degenera en DFS** y BestFS en una elección casi aleatoria de la frontera ("with no heuristics they degenerate to depth-first search, random search (any node on the frontier could be chosen), …") [PMG, sec. 4.5, p. 138]. En síntesis, estas estrategias informadas intercambian **garantías formales** (de BFS) por **menor esfuerzo de exploración** cuando se dispone de un buen conocimiento heurístico del dominio.
+
 ---
 
 **Fuentes consultadas:**
 
 - **RN10:** Russell, S. y Norvig, P. *Artificial Intelligence: A Modern Approach*, 3ra ed., Pearson, 2010, capítulo 3 ("Solving Problems by Searching").
-- **García:** García, A. J. *Inteligencia Artificial - Notas de Clase*, Episodio II: "Resolución automática de problemas utilizando búsqueda ciega y búsqueda informada", DCIC - Universidad Nacional del Sur, 08/09/2026.
+- **García:** García, A. J. *Inteligencia Artificial - Notas de Clase*, DCIC - Universidad Nacional del Sur: Episodio II: "Resolución automática de problemas utilizando búsqueda ciega", 08/09/2026; Episodio III: "Búsqueda informada", 10/09/2026.
+- **PMG:** Poole, D.; Mackworth, A. y Goebel, R. *Computational Intelligence: A Logical Approach*, Oxford University Press, 1998, capítulo 4 ("Searching").
