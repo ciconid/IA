@@ -166,6 +166,21 @@ Con BFS (cola FIFO) se expande `S` y se **generan** sus dos vecinos `M1` y `X` (
 
 En el ejemplo anterior, UCS expande `S`, luego `X` (g=1) antes que `M1` (g=100), después `M2` (g=2) y recién entonces selecciona la meta de menor costo, devolviendo la solución óptima `S → X → M2` (costo 2).
 
+## 13. Diferencia entre costo de camino y heurística
+
+Ambas son funciones que asignan un valor numérico no negativo a un nodo, pero miden cosas distintas:
+
+- **Costo de camino *g*(n):** es el costo **acumulado real** del camino que va desde el estado inicial hasta el nodo *n* [RN10, sec. 3.4, p. 78, Fig. 3.7]. Es parte de la **definición del problema** (función de costo de camino, punto 2 de este TP) y se **conoce con exactitud** a medida que se construye el camino, sumando los costos de los operadores aplicados. Depende del camino recorrido: dos nodos con el mismo estado pueden tener distinto *g*(n) según por dónde se llegó.
+
+- **Heurística *h*(n):** es una **estimación** del costo del camino menos costoso entre el nodo *n* y una meta alcanzable desde *n* [García, Episodio II, sec. Función heurística]. En AIMA: "h(n) = estimated cost of the cheapest path from the state at node n to a goal state", y a diferencia de *g*(n), "it depends only on the state at that node" [RN10, sec. 3.5, p. 92]. No proviene de la definición del problema: es información **particular del dominio** ("in general, each problem has its own h(N) and for each problem several h(N) can be defined" [García, Episodio II, sec. Función heurística]), por lo que puede **subestimar o sobrestimar** el costo real restante. Vale además que *h*(n)=0 cuando *n* es un estado meta [RN10, sec. 3.5, p. 92].
+
+**Diferencias fundamentales:**
+
+- *g*(n) es **real y exacto** (lo ya recorrido); *h*(n) es una **estimación** (lo que falta).
+- *g*(n) surge de la **definición del problema** y se puede calcular; *h*(n) es un **conocimiento adicional del dominio**, no computable a partir de la definición del problema [RN10, sec. 3.5, p. 92].
+- *g*(n) depende del **camino** hasta *n*; *h*(n) depende **solo del estado** de *n* [RN10, sec. 3.5, p. 92].
+- Son las dos componentes que los métodos informados combinan para evaluar un nodo, siendo la **función de evaluación** típica *f*(n) = *g*(n) + *h*(n), usada por A* (punto 16 de este TP).
+
 ---
 
 **Fuentes consultadas:**
