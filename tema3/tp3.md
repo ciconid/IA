@@ -216,6 +216,63 @@ Ningún método es *mejor* en abstracto; la tabla resume el compromiso (misma id
 
 - **Caso extremo:** con heurísticas perfectas, BestFS y HDFS van directo a una meta; sin heurística (h(N)=0 para todo N), HDFS **degenera en DFS** y BestFS en una elección casi aleatoria de la frontera ("with no heuristics they degenerate to depth-first search, random search (any node on the frontier could be chosen), …") [PMG, sec. 4.5, p. 138]. En síntesis, estas estrategias informadas intercambian **garantías formales** (de BFS) por **menor esfuerzo de exploración** cuando se dispone de un buen conocimiento heurístico del dominio.
 
+## 15. Espacio de búsqueda donde BestFS y HDFS llegan a metas diferentes
+
+La diferencia es que BestFS elige **globalmente** (mínimo h(N) de toda la frontera) mientras que HDFS elige **localmente** (mínimo h(N) entre los vecinos del nodo recién expandido) y se compromete con esa rama [PMG, sec. 4.5, p. 134] (la misma distinción está en [RN10, sec. 3.5.1, p. 93]). Basta un espacio donde, tras expandir un nodo, un nodo **viejo** de la frontera tenga menor h(N) que el mejor hijo:
+
+```
+                 A (h=2)
+                /       \
+           B (h=1)     C (h=2)
+           /     \        \
+      D (h=4)  E (h=3)   F (h=1)
+       |         |         |
+     D1 (h=3)  E1 (h=2)  G2 (meta)
+       |         |
+     D2 (h=2)  E2 (h=1)
+       |         |
+     D3 (h=1)  G1 (meta)
+       |
+     G3 (meta)
+```
+
+- Estado inicial **A**; metas **G1**, **G2** y **G3**; todos los arcos tienen costo 1.
+- Los valores de h(N) son **admisibles** (incluso consistentes: h(N) ≤ 1 + h(N') en todo arco), de modo que la diferencia entre ambos métodos no se debe a una heurística mala, sino a las estrategias mismas. No hace falta control de visitados: el grafo es un árbol.
+
+**Traza de BestFS** (frontera = cola con prioridad por h(N)):
+
+| Paso | Nodo expandido | Frontera resultante (h) | ¿Meta? |
+|---|---|---|---|
+| 1 | A (h=2) | B (1), C (2) | No |
+| 2 | B (h=1) — mínimo global | C (2), E (3), D (4) | No |
+| 3 | **C (h=2)** — mínimo global | E (3), D (4), F (1) | No |
+| 4 | F (h=1) | E (3), D (4), G2 (0) | No |
+| 5 | G2 (h=0) | — | **Sí** |
+
+- **Solución: A → C → F → G2**, costo **3**.
+
+**Traza de HDFS** (pila; al expandir, los vecinos se ordenan por h(N) y se agregan al frente):
+
+| Paso | Nodo expandido | Vecinos agregados (ordenados por h) | ¿Meta? |
+|---|---|---|---|
+| 1 | A (h=2) | B (1), C (2) | No |
+| 2 | B (h=1) | E (3), D (4) | No |
+| 3 | **E (h=3)** — mejor hijo de B | E1 (2) | No |
+| 4 | E1 (h=2) | E2 (1) | No |
+| 5 | E2 (h=1) | G1 (0) | No |
+| 6 | G1 (h=0) | — | **Sí** |
+
+- **Solución: A → B → E → E1 → E2 → G1**, costo **5**.
+
+(En ambos casos el test de meta se aplica al **seleccionar** el nodo, como en `busqueda.pl` [García, Episodio III, sec. El mejor primero]. Si se aplicara al generarlo, las soluciones obtenidas son las mismas.)
+
+**Conclusión:**
+
+- Ambos llegan a **metas distintas**: BestFS a `G2`, HDFS a `G1`.
+- El punto de divergencia es el paso 2→3: al expandir `B`, HDFS se compromete con `E` (h=3) aunque en la frontera sigue `C` (h=2), que **nunca vuelve a evaluar** porque su elección es local. BestFS, en cambio, reordena la frontera completa y salta a `C`.
+- La rama `D → … → G3` no es explorada por ninguno de los dos: `D` tiene h=4, el peor valor de la frontera, así que nunca llega a ser seleccionado.
+- BestFS encontró la solución óptima (costo 3) y HDFS una de costo 5, pero esto es **casual**: ninguno de los dos garantiza optimalidad ni completitud (punto 14).
+
 ---
 
 **Fuentes consultadas:**
