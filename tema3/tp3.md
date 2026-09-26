@@ -338,6 +338,25 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 - **Por qué:** la sobreestimación infla el *f* de `A` por encima del costo real de `G2`. Es justamente lo que impide la condición (1) del punto 16: con *h* admisible, ningún nodo del camino óptimo puede tener *f* > C\* = 2, y la meta subóptima (f = 5) nunca habría sido seleccionada primero.
 - Consecuencia: A* **no garantiza optimalidad sin heurística admisible**, aunque sí **completitud**, que depende solo de que el factor de ramificación sea finito y los costos de arco estén acotados inferiormente por ε > 0 [García, Episodio III, sec. Admisibilidad del Algoritmo A*].
 
+## 19. Influencia de la heurística en el uso de memoria y el tiempo de A*
+
+**Sí: la heurística afecta a ambos.** El mecanismo es que A* expande en orden no decreciente de *f*, expande todos los nodos con *f*(*n*) < C\*, algunos con *f*(*n*) = C\* y **ninguno** con *f*(*n*) > C\* [RN10, sec. 3.5.2, p. 97]. O sea, la calidad de *h* decide cuántos nodos quedan dentro de esas "bandas" de expansión: "*With more accurate heuristics, the bands will stretch toward the goal state and become more narrowly focused around the optimal path*" [RN10, sec. 3.5.2, p. 97].
+
+- **Memoria:** el espacio está dominado por la frontera, y su tamaño es proporcional a la cantidad de nodos con *f* < C\*. En el extremo, con *h* = *h*\* (heurística perfecta) A* va directo a la meta expanding solo el camino óptimo [PMG, sec. 4.5, p. 138]; en el otro extremo, con *h* ≡ 0, A* degenera en UCS y la frontera es exponencial (punto 17).
+- **Tiempo:** el tiempo total es aproximadamente *nodos expandidos* × (*costo de generar sucesores* + *costo de calcular h(N)*). Una heurística mejor reduce el primer factor y aumenta el segundo: hay que comparar ambos, no solo la exactitud.
+
+**Ejemplo con 8-tejas** [García, Episodio III, sec. Ejemplos de funciones heurísticas para 8-tejas]:
+
+- *h*<sub>d</sub>(*N*) = cantidad de fichas **desacomodadas**: muy barata de computar (basta contarlas), pero poco informativa.
+- *h*<sub>s</sub>(*N*) = suma de las **distancias taxicab** (Manhattan) de cada ficha a su lugar: más costosa (hay que recorrer las 8 fichas y sumar |Δfila| + |Δcolumna|), pero más informativa. Para N3: *h*<sub>d</sub> = 2 vs. *h*<sub>s</sub> = 6; para N4: *h*<sub>d</sub> = 5 vs. *h*<sub>s</sub> = 12.
+- Con *h*<sub>s</sub> se expanden **menos nodos** (frontera más chica, menos memoria) pero cada expansión es más cara; con *h*<sub>d</sub> ocurre lo inverso.
+
+**¿Conviene una heurística muy buena pero costosa?** **En general sí**, y es un compromiso (trade-off) explícito:
+
+- "*If the relaxed problem is hard to solve, then the values of the corresponding heuristic will be expensive to obtain*" [RN10, sec. 3.6.2, p. 104]. Y al pie: "*Note that a perfect heuristic can be obtained simply by allowing h to run a full breadth-ﬁrst search "on the sly." Thus, there is a tradeoff between accuracy and computation time for heuristic functions*" [RN10, sec. 3.6.2, p. 105, nota 12].
+- **Criterio práctico:** conviene cuando la reducción del número de nodos expandidos compensa el costo extra de evaluar *h*, es decir, cuando *h* es cara pero **no más cara que el propio problema que se quiere resolver** (un *h* que internamente corre un BFS completo solo transfiere el costo de BFS a A*, sin ganancia neta).
+- **Herramientas para mejorar *h* sin pagar el costo de *h*:** si se dispone de varias heurísticas admisibles, se toma la máxima, *h*(*n*) = *m*áx{*h*<sub>1</sub>(*n*), …, *h*<sub>m</sub>(*n*)}, que es más informada que cualquiera de ellas [RN10, sec. 3.6.2, p. 105].
+
 ---
 
 **Fuentes consultadas:**
