@@ -357,6 +357,20 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 - **Criterio práctico:** conviene cuando la reducción del número de nodos expandidos compensa el costo extra de evaluar *h*, es decir, cuando *h* es cara pero **no más cara que el propio problema que se quiere resolver** (un *h* que internamente corre un BFS completo solo transfiere el costo de BFS a A*, sin ganancia neta).
 - **Herramientas para mejorar *h* sin pagar el costo de *h*:** si se dispone de varias heurísticas admisibles, se toma la máxima, *h*(*n*) = *m*áx{*h*<sub>1</sub>(*n*), …, *h*<sub>m</sub>(*n*)}, que es más informada que cualquiera de ellas [RN10, sec. 3.6.2, p. 105].
 
+## 20. Por qué A* no debe finalizar al generar un nodo meta
+
+- **Razón:** en un nodo meta *h* = 0, de modo que *f* = costo real *g*; pero un nodo meta **generado** puede tener un *f* **mayor** que el de otros nodos que aún están en la frontera y que llevan a una solución más barata. Por eso A* no puede detenerse en la primera meta que aparece, sino en la primera meta que **selecciona** (orden no decreciente de *f*): la prueba de optimalidad (punto 16) garantiza que en ese momento ninguna solución mejor estaba disponible [RN10, sec. 3.5.2, p. 95]. Aceptar la primera meta generada equivaldría a devolver la solución más barata *entre las generadas hasta ese momento*, que no es necesariamente la óptima. Es la misma razón por la que UCS tampoco puede detenerse al generar la meta (punto 10 de este TP).
+
+- **Ejemplo (Bucarest, traza de A\* de AIMA):** en la Fig. 3.24, Bucarest aparece en la frontera en el paso (e) con *f* = 450, pero **no** es seleccionado en ese momento porque Pitesti tiene *f* = 417: "*there might be a solution through Pitesti whose cost is as low as 417, so the algorithm will not settle for a solution that costs 450*" [RN10, sec. 3.5.2, p. 95].
+
+  | Momento | Nodo | *f* | Comentario |
+  |---|---|---|---|
+  | Paso (e) | Bucharest | 450 | **Generada** (vía Fagaras); si A* parara aquí, devolvería costo 450 |
+  | Paso (e) | Pitesti | 417 | Menor *f*: A* sigue expandiendo |
+  | Paso (f) | Bucharest | 418 | **Seleccionada** (vía Pitesti): solución óptima |
+
+- **Conclusión:** finalizar al generar haría que A* perdiera la optimalidad (seguiría siendo completo bajo las condiciones 1 y 3 del punto 16). Con la traza de la Fig. 3.24: la meta generada primero es la suboptimal de costo 450, mientras que la meta seleccionada por A* es la óptima, de costo 418.
+
 ---
 
 **Fuentes consultadas:**
