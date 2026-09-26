@@ -294,6 +294,18 @@ La diferencia es que BestFS elige **globalmente** (mínimo h(N) de toda la front
 - **Eficiencia óptima:** entre los algoritmos que extienden caminos desde la raíz usando la misma heurística, "no other optimal algorithm is guaranteed to expand fewer nodes than A\*" [RN10, sec. 3.5.2, p. 98]. La misma idea se encuentra en PMG [PMG, sec. 4.5, pp. 135-136].
 - Si *h* **no** es admisible, A* sigue siendo completo (bajo la condición (3)) pero puede devolver una solución **subóptima** (punto 18 de este TP).
 
+## 17. A* con h(n) = 0 para todo nodo
+
+**Resultado: A* se reduce a UCS (Lowest-Cost-First Search).**
+
+- *f*(n) = *g*(n) + *h*(n) = *g*(n) + 0 = *g*(n). Ordenar la frontera por *f* es entonces **exactamente lo mismo** que ordenarla por *g*, que es la estrategia de UCS: "uniform-cost search expands the node *n* with the lowest path cost *g*(n)" [RN10, sec. 3.4.2, p. 84]. Es lo esperable, ya que A* está definido como una extensión de UCS: "The algorithm is identical to U NIFORM -C OST-S EARCH except that A∗ uses *g* + *h* instead of *g*" [RN10, sec. 3.5.2, p. 93].
+- En la tabla resumen de estrategias, la fila de A* indica "Minimal *f*(n*) — *h*(*n*) + *g*(*n*)"; con *h* ≡ 0 esa fila se reduce a la de *Lowest-cost-first*, "Minimal *g*(*n*)" [PMG, sec. 4.5, Fig. 4.6, p. 138].
+- **Qué se pierde y qué se conserva:**
+  - Se conserva la **completitud y la optimalidad**: *h* ≡ 0 es admisible y consistente trivialmente (0 ≤ *c*(*n*, *n*′) + 0), y cumple la condición (3) del punto 16 [RN10, sec. 3.5.2, pp. 94-97].
+  - Se pierde toda **guía heurística**: el método pasa a ser **ciego** (punto 6), porque ya no usa información del dominio; sólo se guía por el costo recorrido. Por eso las bandas de expansión se vuelven "circular" alrededor del estado inicial, en lugar de estirarse hacia la meta [RN10, sec. 3.5.2, p. 97].
+  - El costo computacional es el de UCS: exponencial, O(*b*<sup>⌈1+C*/ε⌉</sup>), y la frontera puede seguir creciendo exponencialmente [RN10, sec. 3.4.2, pp. 84-85].
+- **Contraste con el otro extremo:** si *h* fuera **perfecta** (*h*(*n*) = *h*\*(*n*), el costo real hasta la meta), entonces *f*(*n*) sería el costo real de la solución que pasa por *n* y A* iría **directo a la meta** sin ramificar [PMG, sec. 4.5, p. 138]. Entre ambos extremos, *h* = 0 es el caso degenerado: "*with no heuristics they degenerate to depth-first search, random search…, and lowest-cost-first search, respectively*" [PMG, sec. 4.5, p. 138].
+
 ---
 
 **Fuentes consultadas:**
