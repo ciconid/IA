@@ -430,6 +430,67 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 - **HDFS:** de `A` ordena los vecinos y elige `B` (h=2), luego `X` (h=3), luego `Y` (h=7), donde la rama se agota. Como la rama se agotó **retrocede** al hermano `C` y de ahí a `D` y a la meta `G`. Resultado: **solución `A → C → D → G`**.
 - **Conclusión:** en el mismo espacio HDFS encuentra la meta y HC se queda detenido. La diferencia no está en cómo eligen el mejor sucesor (ambos lo hacen), sino en qué hacen cuando la elección resulta ser mala: HDFS **retrocede**, HC **se detiene**.
 
+## 24. Recocido simulado (simulated annealing)
+
+**Para qué se usa en HC.** Para **escapar de los mínimos locales** (y de mesetas y crestas) en los que HC puro se detiene. La idea es combinar las dos técnicas que PMG contrapone:
+
+- HC "*keep moving uphill*" encuentra al menos un máximo local, "*but it may not find the mountain*"; la búsqueda aleatoria, en cambio, "*would tend to not find a local maximum, but at least it would locate a point on the mountain*". "*It would seem that a combination of these two techniques may be much better at finding global optima*" [PMG, sec. 4.7 "Randomized Algorithms", pp. 158-159].
+- En el TP: HC se detiene en `B` (punto 23) porque su sucesor `X` no mejora *h*. Con SA, `X` puede ser aceptado con cierta probabilidad, y la búsqueda puede seguir explorando hasta alcanzar `G`.
+- **Mecanismo:** se elige un vecino **al azar**; si mejora *h*, se acepta siempre; si empeora *h*, se acepta **con una probabilidad que depende de la temperatura y de la diferencia en los valores heurísticos** [PMG, sec. 4.7 "Randomized Algorithms", p. 160]. La temperatura se va reduciendo: al principio (T alta) casi todo movimiento es aceptable, y al final (T → 0) solo se aceptan los vecinos que mejoran, es decir, HC puro [PMG, p. 160].
+
+  ```
+  n ← un valor inicial (al azar);  T ← temperatura alta
+  repetir
+      n' ← un vecino de n elegido AL AZAR
+      si h(n') > h(n)      entonces n ← n'
+      si no                entonces n ← n' con probabilidad p(T)
+      reducir T
+  hasta cumplir un criterio de parada
+  ```
+
+  [PMG, sec. 4.7 "Randomized Algorithms", Fig. 4.11, p. 160]. En las notas, el mismo esquema: "*Al comienzo de la ejecución ("alta temperatura") elegir más veces (al azar) vecinos que no mejoren al nodo; y luego al ir avanzando ("enfriamiento") elegir menos a aquellos vecinos que no mejoran*" [García, Episodio III, sec. Hill Climbing con "recocido simulado"].
+
+- **Límite importante:** "*If the temperature is reduced slowly enough, this guarantees to find the optimal result. Unfortunately, reducing it slowly enough to guarantee optimal results may need to be as slow as generate-and-test, but often a quicker cooling results in good performance*" [PMG, sec. 4.7 "Randomized Algorithms", p. 160]. Es decir, la garantía de optimalidad existe pero en la práctica es tan lenta que se la cambia por un buen rendimiento empírico.
+- **Otras variantes** que atacan el mismo problema: *random-restart hill climbing* (repetir HC desde nodos iniciales aleatorios) y *two-phase search* (fase aleatoria y luego HC) [PMG, p. 159]; en las notas también *first-choice hill climbing* y HC en paralelo [García, Episodio III, sec. Variantes de Hill Climbing con aleatoriedad].
+
+**¿Por qué se denomina Stochastic Hill Climbing?**
+
+- **Por "stochastic":** porque el método **involucra azar y probabilidad** ("*Estocástico: que depende del azar / involucra probabilidad*" [García, Episodio III, sec. Hill Climbing con "recocido simulado"]): a diferencia del HC puro, que es determinista, en SA el vecino se elige al azar y la aceptación de un vecino que empeora *h* es una decisión aleatoria. Por eso el recorrido puede ser distinto en cada ejecución.
+- **Por "simulated annealing":** porque simula el **recocido metalúrgico**, en el que un metal se calienta y luego se enfría muy lentamente hasta alcanzar un estado cristalino de baja energía; el mapeo es temperatura alta ↔ azar (búsqueda aleatoria) y temperatura baja ↔ HC puro. En las notas: "*En metalurgia, recocido (en inglés annealing) es un proceso usado para endurecer o fortalecer un metal (o vidrio) mediante su calentamiento, y posterior enfriamiento gradual [...] SA es una variante de HC*" [García, Episodio III, sec. Hill Climbing con "recocido simulado"]. La misma explicación, en PMG: "*Annealing is a process in metallurgy where metals are slowly cooled to make them reach a state of low energy [...] Simulated annealing is a process where the temperature is reduced slowly, starting from a random search at high temperature and doing pure hill climbing at zero temperature*" [PMG, sec. 4.7 "Randomized Algorithms", p. 160]. Y el "simulated": "*involucra movimientos al azar, la teoría de probabilidades y se inspira en un análisis probabilístico de lo que sucede cuando se enfría lentamente el vidrio en la fabricación de botellas (de ahí el nombre recocido), y es simulado, porque se usa una computadora*" [García, Episodio III, sec. Hill Climbing con "recocido simulado", que cita a A. Paenza].
+
+## 25. HC en paralelo no es lo mismo que Local Beam Search (LBS)
+
+**Definiciones.**
+
+- **HC en paralelo:** *K* ejecuciones **independientes** de HC, cada una manteniendo un solo nodo. La definición de HC es la del punto 23: se mantiene un solo nodo por etapa y se elige su mejor sucesor [García, Episodio III, sec. Hill Climbing; PMG, sec. 4.7 "Hill Climbing", p. 156].
+- **LBS:** "*Comienza con K estados generados al azar. En cada paso se calculan todos los sucesores de los K nodos. Si uno de ellos es meta: lo retorna y para, si no: selecciona los mejores K sucesores de la lista completa y repite el proceso*" [García, Episodio III, sec. Local Beam Search]. En PMG: "*Beam search is a method that's like hill climbing, but where you maintain up to k nodes instead of just one [...] you find the set of all of the neighbors of all of the current nodes, select the k best of these (or all of them if there are less than k), and repeat*" [PMG, sec. 4.7 "Beam Search and Genetic Algorithms", p. 161].
+
+**Por qué no se comportan igual.**
+
+- **Los K HCs no se comunican.** Cada uno elige el mejor sucesor **de su propio nodo**, sin tener en cuenta lo que hacen los demás: "*cada HC elegirá el mejor sucesor sin tener en cuenta a los demás (siempre habrá un vecino de cada uno de los K nodos)*" [García, Episodio III, sec. Beam Search vs. HC en paralelo].
+- **Se pueden duplicar nodos.** Dos HCs pueden converge al mismo sucesor y quedar dos veces en el mismo nodo, **desperdiciando un lugar** del haz; en LBS la estructura es un **conjunto** de nodos, sin repeticiones, porque se toman "los k mejores" del conjunto de todos los sucesores [PMG, sec. 4.7 "Beam Search and Genetic Algorithms", p. 161].
+- **LBS compara todos los sucesores entre sí.** Mantiene los *k* mejores **globales**, de modo que nunca conserva un nodo peor que otro que descartó; el paralelo puede conservar un nodo mediocre (porque su padre no tenía mejores opciones) y descartar uno mejor que pertenece a otra rama. En el extremo, LBS con *k* = 1 **es** HC, y con *k* infinito **es** BFS [PMG, sec. 4.7 "Beam Search and Genetic Algorithms", p. 161]: es un punto intermedio entre memoria y exploración, mientras que los K HCs en paralelo son K problemas **independientes**, no un haz común.
+
+**Ejemplo (K = 3, h se minimiza):** nodo inicial del haz *A* (h=10), *B* (h=12) y *C* (h=11), con estos sucesores:
+
+```
+   A (h=10) ──► X (h=1)      B (h=12) ──► X (h=1)      C (h=11) ──► C1 (h=2)
+              └► A2 (h=6)                  └► B2 (h=2)                └► C2 (h=7)
+
+   X (h=1) ──► X1 (h=3)     B2 (h=2) ──► G (meta)     C1 (h=2) ──► C1a (h=3)
+              └► X2 (h=9)                                                   └► C1b (h=4)
+```
+
+| | **HC en paralelo (K = 3)** | **LBS (K = 3)** |
+|---|---|---|
+| Paso 1 | `A → X`, `B → X`, `C → C1` | sucesores de `A`, `B`, `C` = {`X`(1), `B2`(2), `C1`(2), `A2`(6), `C2`(7)}; se quedan los 3 mejores: {`X`(1), `B2`(2), `C1`(2)} |
+| Estado del haz | {`X`, `X`, `C1`}: **dos HCs en el mismo nodo** | {`X`, `B2`, `C1`}: tres nodos distintos |
+| Paso 2 | ni `X` (sucesor `X1` = 3 > 1) ni `C1` (`C1a` = 3 > 2) tienen un sucesor que mejore: **los tres HC se detienen** | `B2 → G`: **se encuentra la meta** y la búsqueda termina |
+| Resultado | **no encuentra solución** | **solución: meta `G`** |
+
+- Lo que muestra el ejemplo: el HC paralelo hubo que gastar dos de sus tres posiciones en el mismo nodo `X`, y por eso nunca exploró la rama `B2`, que era la única que llegaba a la meta. LBS, en cambio, mantiene siempre los 3 mejores sucesores del conjunto completo, así que conserva `B2` y encuentra la meta en el segundo paso.
+- En resumen: **el haz de LBS es un único conjunto de K nodos que se renueva globalmente**, mientras que **K HCs en paralelo son K recorridos independientes que pueden coincidir, desperdiciar su capacidad o atascarse en un mínimo local distinto**; por eso LBS explora de forma más productiva con la misma memoria (K nodos).
+
 ---
 
 **Fuentes consultadas:**
