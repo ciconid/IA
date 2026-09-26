@@ -386,6 +386,50 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
   - Si *h* **no** es admisible, A\* puede efectivamente devolver una solución subóptima (punto 18), pero en ese caso **no puede coincidir** con UCS, que siempre devuelve la óptima.
   - Si el problema **no tiene solución**, ambos devuelven "no hay solución"; eso no es una solución subóptima sino un fracaso de la búsqueda, que las condiciones (b finito y costos ≥ ε > 0) garantizan en UCS [RN10, sec. 3.4.2, p. 85].
 
+## 23. Diferencias entre HDFS y Hill Climbing (HC)
+
+**Definición de HC.** Método de búsqueda que **mantiene un solo nodo** en cada etapa: selecciona el mejor sucesor del nodo actual y continúa desde ahí; "*You stop when no neighbor has a higher value than the current node*" [PMG, sec. 4.7 "Hill Climbing", p. 156]. En las notas: "*HC solo mantiene un nodo, pero no garantiza ser completo*", "*Está pensado para encontrar una meta rápido, en un espacio de búsqueda muy grande donde almacenar la frontera es prohibitivo*"; además "*no almacena, ni retorna el camino recorrido desde el nodo inicial al nodo meta*", solo el nodo meta [García, Episodio III, sec. Hill Climbing (Escalador o Trepada)]. La misma caracterización se encuentra en PMG: "*Hill Climbing: A heuristic search strategy that maintains a single node. At each stage, it chooses the most promising neighbor of the node*" [PMG, sec. 4.7 "Hill Climbing", p. 156].
+
+**En qué difieren.** La diferencia es estructural: **HDFS es HC más backtracking**. En PMG: "*Heuristic best search can be seen as a variant of hill climbing that searches the space by backtracking*" [PMG, sec. 4.7 "Hill Climbing", p. 158].
+
+| | **HDFS** | **HC** |
+|---|---|---|
+| Frontera | mantiene la frontera (pila): los hermanos de la rama en curso | **no** mantiene frontera: un único nodo actual |
+| Elección | el sucesor de menor h(N) del nodo expandido, y sigue en profundidad | el sucesor de mejor h(N) del nodo actual |
+| Si la elección no lleva a una meta | **retrocede** a los hermanos y prueba el siguiente | **se detiene**: es un mínimo local, una meseta o una cresta |
+| Memoria | lineal en la profundidad | constante (un solo nodo) |
+| Salida | el camino desde el estado inicial hasta la meta | solo el nodo meta (no el camino) |
+| ¿Completo? | No | No |
+
+- En HC solo se continúa si el mejor sucesor *mejora* al nodo actual; si ningún sucesor mejora, se detiene [PMG, sec. 4.7 "Hill Climbing", p. 156]. Esa es exactamente la condición que HDFS no impone: HDFS elige el mejor sucesor sin importar si mejora, y si la rama se agota prueba el siguiente hermano.
+- En el esquema genérico del TP (punto 8), HC es el caso degenerado en que la frontera **nunca acumula alternativas**: `agregar/3` deja solo al mejor vecino y no hay forma de volver atrás.
+
+**¿Cuándo conviene HC en lugar de HDFS?**
+
+- Cuando **la frontera es demasiado grande para almacenarla** y el objetivo es llegar rápido a *alguna* meta, aceptando que pueda no alcanzarse: ese es el motivo de diseño de HC [García, Episodio III, sec. Hill Climbing].
+- Cuando **no importa el camino**, solo el nodo meta (o el valor óptimo de una función): HC no necesita construir ni devolver la solución [García, Episodio III, sec. Hill Climbing].
+- Cuando el problema es de **optimización** más que decamino: HC es "greedy local search" y también se aplica a problemas donde se busca el máximo de una función [García, Episodio III; PMG, sec. 4.7 "Hill Climbing", p. 156].
+- Cuando *h* es una guía **confiable** y se está dispuesto a arriesgarse a atascarse; en ese caso conviene combinarlo con aleatoriedad (random-restart hill climbing o recocido simulado, punto 24) para escapar de mínimos locales [García, Episodio III, sec. Variantes de Hill Climbing con aleatoriedad].
+- En cambio, HDFS puede ser contraproducente: "*This is often not a good idea, as typically the spaces are much too big for an exhaustive search*" [PMG, sec. 4.7 "Hill Climbing", p. 158].
+
+**Espacio de estados donde se comportan distinto:**
+
+```
+              A (h=4)
+             /       \
+        B (h=2)     C (h=5)
+        |            |
+     X (h=3)      D (h=1)
+        |            |
+     Y (h=7)      G (meta, h=0)
+```
+
+(La heurística no necesita ser admisible para HDFS ni para HC: ninguno de los dos garantiza optimalidad, punto 14. El grafo es un árbol, así que no hace falta control de visitados.)
+
+- **HC:** de `A` (h=4) el único sucesor que **mejora** es `B` (h=2), así que pasa a `B`. Desde `B`, su único sucesor `X` tiene h=3, que **no mejora** a `B` (h=2), de modo que **se detiene ahí**: mínimo local. Resultado: **no encuentra solución**.
+- **HDFS:** de `A` ordena los vecinos y elige `B` (h=2), luego `X` (h=3), luego `Y` (h=7), donde la rama se agota. Como la rama se agotó **retrocede** al hermano `C` y de ahí a `D` y a la meta `G`. Resultado: **solución `A → C → D → G`**.
+- **Conclusión:** en el mismo espacio HDFS encuentra la meta y HC se queda detenido. La diferencia no está en cómo eligen el mejor sucesor (ambos lo hacen), sino en qué hacen cuando la elección resulta ser mala: HDFS **retrocede**, HC **se detiene**.
+
 ---
 
 **Fuentes consultadas:**
