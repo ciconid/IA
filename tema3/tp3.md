@@ -491,6 +491,25 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 - Lo que muestra el ejemplo: el HC paralelo hubo que gastar dos de sus tres posiciones en el mismo nodo `X`, y por eso nunca exploró la rama `B2`, que era la única que llegaba a la meta. LBS, en cambio, mantiene siempre los 3 mejores sucesores del conjunto completo, así que conserva `B2` y encuentra la meta en el segundo paso.
 - En resumen: **el haz de LBS es un único conjunto de K nodos que se renueva globalmente**, mientras que **K HCs en paralelo son K recorridos independientes que pueden coincidir, desperdiciar su capacidad o atascarse en un mínimo local distinto**; por eso LBS explora de forma más productiva con la misma memoria (K nodos).
 
+## 28. A* y UCS llegan a soluciones diferentes — preguntas finales
+
+### ¿Cuál de los algoritmos brinda la solución óptima?
+
+- **UCS (Lowest-Cost-First Search).** Su optimalidad no depende de la heurística: "It is easy to see that uniform-cost search is optimal in general. First, we observe that whenever uniform-cost search selects a node *n* for expansion, the optimal path to that node has been found [...]. Then, because step costs are nonnegative, paths never get shorter as nodes are added. These two facts together imply that uniform-cost search expands nodes in order of their optimal path cost. Hence, the **first goal node selected for expansion must be the optimal solution**" [RN10, sec. 3.4.2, p. 85]. O sea, UCS **siempre** devuelve la solución de menor costo (con costos de paso no negativos), con independencia de cómo se haya construido el espacio del ejercicio.
+- **A\*** sólo garantiza la óptima bajo las tres condiciones de admisibilidad: "Si la solución existe, y se cumplen las siguientes tres condiciones, la primera solución encontrada por A\* será la óptima: 1. el factor de ramificación es finito, 2. El costo de los arcos es estrictamente positivo y 3. h(n) es admisible" [García, Episodio III, sec. Admisibilidad del Algoritmo A*].
+- **Por lo tanto, si en el espacio del ejercicio A\* y UCS llegan a soluciones diferentes, la de UCS es la óptima y la de A\* es subóptima.** Eso solo puede ocurrir si se violó alguna condición de A\*:
+  - ***h* no es admisible** (sobreestima el costo de llegar a una meta), como en el punto 18: A\* sigue siendo completo, pero puede seleccionar primero una meta más cara.
+  - ***h* es admisible pero inconsistente** y el **control de visitados es "cerrado"**: si un estado ya expandido se regenera por un camino más barato, hay que **reconsiderarlo** (reabrirlo), como exige el punto 21 del TP. Sin esa reapertura, A\* puede quedarse con un *g* mayor que el óptimo y devolver una solución subóptima [RN10, sec. 3.5.2, pp. 95-96].
+- **Aclaración:** si las dos soluciones difieren sólo porque hay **dos soluciones óptimas de igual costo** (empate, o dos metas al mismo costo mínimo), entonces **ambos algoritmos son óptimos** y la diferencia está en el criterio de desempate, no en la calidad de la solución. En ese caso la respuesta a "¿cuál brindará la óptima?" es: los dos.
+
+### ¿Qué cambios realizaría para que ambos alcancen la misma solución?
+
+- **Usar *h*(n) = 0 para todo nodo.** Es el cambio más directo: *f*(*n*) = *g*(*n*) + *h*(*n*) = *g*(*n*), de modo que ordenar la frontera por *f* es **exactamente lo mismo** que ordenarla por *g*, y A* se reduce a UCS: "The algorithm is identical to U NIFORM -C OST-S EARCH except that A∗ uses *g* + *h* instead of *g*" [RN10, sec. 3.5.2, p. 93] (punto 17 del TP). Ambos recorren entonces la misma secuencia de expansiones.
+- **Usar una *h* admisible y consistente, con control de visitados que reabre los nodos.** Así A\* vuelve a garantizar la solución óptima (punto 16), y como la óptima es la misma que devuelve UCS, ambos coinciden. Requiere que el algoritmo trate correctamente el caso del inciso 21: "si un estado del espacio de estados es generado nuevamente, pero a partir de un mejor camino, entonces debe volver a considerarse".
+- **Que la solución óptima sea única** en el espacio de búsqueda (una sola meta y un solo camino más barato). Esto elimina la fuente de desempate: si ambos algoritmos son óptimos, cualquier Camino óptimo que devuelvan es el mismo.
+- **Unificar el criterio de desempate** en la frontera (por ejemplo, orden lexicográfico entre nodos con igual *f* o igual *g*), de modo que ante un empate A\* y UCS elijan el mismo nodo.
+- Ojo: cambiar sólo los **costos de los arcos** o la **estructura del grafo** hace que ambos cambien, pero no garantiza que coincidan: mientras *h* sea informativa, A\* y UCS siguen guiándose por criterios distintos (*f* vs. *g*).
+
 ---
 
 **Fuentes consultadas:**
