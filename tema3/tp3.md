@@ -371,6 +371,21 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 
 - **Conclusión:** finalizar al generar haría que A* perdiera la optimalidad (seguiría siendo completo bajo las condiciones 1 y 3 del punto 16). Con la traza de la Fig. 3.24: la meta generada primero es la suboptimal de costo 450, mientras que la meta seleccionada por A* es la óptima, de costo 418.
 
+## 21. SKIP
+
+
+## 22. ¿Pueden A* y UCS llegar a la misma solución no óptima?
+
+**No, no puede ocurrir** (mientras se cumplan las condiciones de completitud y optimalidad del punto 16).
+
+- **UCS siempre es óptimo:** "*whenever uniform-cost search selects a node n for expansion, the optimal path to that node has been found* [...] *Hence, the ﬁrst goal node selected for expansion must be the optimal solution*" [RN10, sec. 3.4.2, p. 85]. Toda solución que UCS devuelve tiene costo C\*.
+- **A\* también es óptimo** con *h* admisible (tree search) o consistente (graph search) [RN10, sec. 3.5.2, pp. 94-96]: la primera meta que selecciona tiene *f* = *g* = C\*.
+- **Argumento:** si A\* devolviera una solución subóptima (costo mayor que C\*), UCS devolvería la de costo C\*, que es distinta; y si ambos devuelven la misma, su costo es C\*. Es decir, **la coincidencia no se puede deber a una suboptimalidad compartida: la optimalidad de UCS por sí sola ya alcanza para concluir que la solución coincidente es óptima**, sin necesidad de suponer nada sobre *h*.
+- **Matices:**
+  - Lo que sí puede diferir es el **trabajo realizado** y **qué** solución óptima se devuelve cuando hay empate. En el ejemplo de Bucarest, UCS desde Sibiu genera primero una ruta de costo 310 y sigue expandiendo hasta encontrar la de 278, mientras que A\* (con *f* = *g* + *h*) puede decidirse antes [RN10, sec. 3.4.2, pp. 84-85].
+  - Si *h* **no** es admisible, A\* puede efectivamente devolver una solución subóptima (punto 18), pero en ese caso **no puede coincidir** con UCS, que siempre devuelve la óptima.
+  - Si el problema **no tiene solución**, ambos devuelven "no hay solución"; eso no es una solución subóptima sino un fracaso de la búsqueda, que las condiciones (b finito y costos ≥ ε > 0) garantizan en UCS [RN10, sec. 3.4.2, p. 85].
+
 ---
 
 **Fuentes consultadas:**
@@ -378,3 +393,5 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 - **RN10:** Russell, S. y Norvig, P. *Artificial Intelligence: A Modern Approach*, 3ra ed., Pearson, 2010, capítulo 3 ("Solving Problems by Searching").
 - **García:** García, A. J. *Inteligencia Artificial - Notas de Clase*, DCIC - Universidad Nacional del Sur: Episodio II: "Resolución automática de problemas utilizando búsqueda ciega", 08/09/2026; Episodio III: "Búsqueda informada", 10/09/2026.
 - **PMG:** Poole, D.; Mackworth, A. y Goebel, R. *Computational Intelligence: A Logical Approach*, Oxford University Press, 1998, capítulo 4 ("Searching").
+
+
