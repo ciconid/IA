@@ -306,6 +306,38 @@ La diferencia es que BestFS elige **globalmente** (mínimo h(N) de toda la front
   - El costo computacional es el de UCS: exponencial, O(*b*<sup>⌈1+C*/ε⌉</sup>), y la frontera puede seguir creciendo exponencialmente [RN10, sec. 3.4.2, pp. 84-85].
 - **Contraste con el otro extremo:** si *h* fuera **perfecta** (*h*(*n*) = *h*\*(*n*), el costo real hasta la meta), entonces *f*(*n*) sería el costo real de la solución que pasa por *n* y A* iría **directo a la meta** sin ramificar [PMG, sec. 4.5, p. 138]. Entre ambos extremos, *h* = 0 es el caso degenerado: "*with no heuristics they degenerate to depth-first search, random search…, and lowest-cost-first search, respectively*" [PMG, sec. 4.5, p. 138].
 
+## 18. Ejemplo en el que A* no encuentra la solución óptima
+
+Basta una heurística que **sobreestime** en el camino que lleva a la solución óptima: A* sigue siendo completo, pero puede detenerse en una meta más cara [RN10, sec. 3.5.2, pp. 94-97].
+
+```
+                 S
+               /   \
+        A (h=5)     B (h=0)
+          |           |
+        G1 (meta)    C (h=0)
+                      |
+                   G2 (meta)
+```
+
+- Arcos y costos: `S → A` = 1, `A → G1` = 1, `S → B` = 1, `B → C` = 1, `C → G2` = 3.
+- **Solución óptima:** `S → A → G1`, costo **2**. Solución subóptima: `S → B → C → G2`, costo **5**.
+- La heurística **no es admisible** en `A`: *h*(*A*) = 5, pero el costo real de `A` hasta una meta es 1 (lo sobrestima).
+
+**Traza de A\*** (frontera ordenada por *f* = *g* + *h*):
+
+| Nodo expandido | *g* | *h* | *f* | Frontera (*f*) |
+|---|---|---|---|---|
+| S | 0 | 0 | 0 | — |
+| B | 1 | 0 | 1 | A (6) |
+| C | 2 | 0 | 2 | A (6) |
+| **G2** | 5 | 0 | 5 | A (6) |
+| — | | | | **META: `S → B → C → G2`, costo 5** |
+
+- **Qué pasó:** en el paso 3 la frontera contiene `A` (f = 1 + 5 = **6**) y `G2` (f = 5 + 0 = **5**). Como A* elige el menor *f*, selecciona la meta `G2` **antes** de mirar `A`, que era el nodo del camino óptimo. El mismo resultado se obtiene aplicando el test de meta al generar el nodo.
+- **Por qué:** la sobreestimación infla el *f* de `A` por encima del costo real de `G2`. Es justamente lo que impide la condición (1) del punto 16: con *h* admisible, ningún nodo del camino óptimo puede tener *f* > C\* = 2, y la meta subóptima (f = 5) nunca habría sido seleccionada primero.
+- Consecuencia: A* **no garantiza optimalidad sin heurística admisible**, aunque sí **completitud**, que depende solo de que el factor de ramificación sea finito y los costos de arco estén acotados inferiormente por ε > 0 [García, Episodio III, sec. Admisibilidad del Algoritmo A*].
+
 ---
 
 **Fuentes consultadas:**
