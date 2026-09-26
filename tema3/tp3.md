@@ -273,6 +273,27 @@ La diferencia es que BestFS elige **globalmente** (mínimo h(N) de toda la front
 - La rama `D → … → G3` no es explorada por ninguno de los dos: `D` tiene h=4, el peor valor de la frontera, así que nunca llega a ser seleccionado.
 - BestFS encontró la solución óptima (costo 3) y HDFS una de costo 5, pero esto es **casual**: ninguno de los dos garantiza optimalidad ni completitud (punto 14).
 
+## 16. Estrategia A* y condiciones para que halle la mejor solución
+
+**Descripción.** A* es una estrategia de **búsqueda informada**: es idéntica a UCS (LCFS) salvo que, en lugar de ordenar la frontera por *g*(n), la ordena por la **función de evaluación** *f*(n) = *g*(n) + *h*(n), expandiendo siempre el nodo con menor *f* [RN10, sec. 3.5.2, p. 93]: "*f*(n) = estimated cost of the cheapest solution through *n*". Combina "*lowest-cost-first*" con "*best-first*" [García, Episodio III, sec. Método de búsqueda A*]; en el esquema de `busqueda.pl`, `seleccionar/3` toma el primero de la frontera y `agregar/3` ordena la frontera **completa** por *f*(n).
+
+- Se expande en **orden no decreciente de *f*(n)** y no expande ningún nodo con *f*(n) > C\* (C\* = costo de la solución óptima).
+- El **test de meta se aplica al seleccionar** el nodo, no al generarlo: en una meta *h* = 0, así que *f* = costo real de la solución.
+- Al depender de *h*, hereda de BestFS la dependencia del conocimiento del dominio y la frontera potencialmente exponencial (puntos 14 y 19).
+
+**Condiciones para que halle la mejor solución, y por qué cada una:**
+
+- **(1) *h* es admisible:** *h*(n) nunca sobrestima el costo real de llegar de *n* a una meta, es decir, *h*(n) ≤ *h*\*(*n*), donde *h*\* es el costo del camino más barato real hasta una meta [RN10, sec. 3.5.2, p. 94]. Como *g*(n) es el costo real ya recorrido, se sigue que *f*(n) **nunca sobrestima** el costo de una solución que pasa por *n*: todo nodo del camino óptimo tiene *f*(n) ≤ C\*, mientras que una meta no óptima tiene *f* = su costo real > C\*. Por eso, mientras quede en la frontera un nodo del camino óptimo, A* no puede seleccionar la meta subóptima [RN10, sec. 3.5.2, pp. 94-95]. Es la condición suficiente para ***tree search***.
+- **(2) *h* es consistente (o monótona):** *h*(n) ≤ *c*(n, a, n′) + *h*(n′) para todo sucesor *n′* [RN10, sec. 3.5.2, p. 95]. Implica que *f* es **no decreciente a lo largo de todo camino**: *f*(n′) = *g*(n) + *c*(n, a, n′) + *h*(n′) ≥ *g*(n) + *h*(n) = *f*(n). Gracias a eso, cuando A* selecciona un nodo *n*, **el camino óptimo hasta *n* ya fue encontrado** (si faltara un tramo, el nodo siguiente de ese camino tendría *f* menor y se habría seleccionado antes). Hace falta para ***graph search***, donde un mismo estado puede alcanzarse por caminos distintos y reinsertarse en la frontera al aparecer un camino más barato que el ya expandido [RN10, sec. 3.5.2, pp. 95-96]. Nótese que toda heurística consistente es admisible, por lo que (2) implica (1) [RN10, sec. 3.5.2, p. 95].
+- **(3) Factor de ramificación finito y costos de arco acotados inferiormente** (∃ ε > 0 tal que todo costo de arco > ε) [García, Episodio III, sec. Admisibilidad del Algoritmo A*]. Es lo que garantiza la **completitud** (que A* halle una solución si existe, aun con espacio de estados infinito): de este modo hay solo **finitos nodos con *f*(n) ≤ C\***, así que la búsqueda necesariamente alcanza la frontera óptima; sin esta condición podría haber infinitos nodos por debajo de C\* y la búsqueda no terminaría [RN10, sec. 3.5.2, p. 97]. La misma formulación se encuentra en PMG: "*the branching factor is finite (each node has only a finite number of neighbors)*", "*arc costs are bounded above zero (there is some ε > 0 such that all of the arc costs are greater than ε)*" y "*h(n) is a lower bound on the actual minimum cost of the shortest path from n to a goal node*" [PMG, sec. 4.5, Prop. 4.1, pp. 136-137].
+
+**Detalles de terminología y propiedades:**
+
+- En las notas, **admisibilidad** es la propiedad del **algoritmo**: "Si la solución existe, y se cumplen las siguientes tres condiciones, la primera solución encontrada por A* será la óptima" [García, Episodio III, sec. Admisibilidad del Algoritmo A*]. No debe confundirse con ***h* admisible**, que es la condición (1) sobre la heurística [RN10, sec. 3.5.2, p. 94].
+- **Poda:** al no expandir nodos con *f* > C\*, A* elimina ramas enteras; en la búsqueda de Bucarest con *h*<sub>SLD</sub>, Timisoara (*f* = 447) nunca se expande al ser C\* = 418 [RN10, sec. 3.5.2, pp. 97-98].
+- **Eficiencia óptima:** entre los algoritmos que extienden caminos desde la raíz usando la misma heurística, "no other optimal algorithm is guaranteed to expand fewer nodes than A\*" [RN10, sec. 3.5.2, p. 98]. La misma idea se encuentra en PMG [PMG, sec. 4.5, pp. 135-136].
+- Si *h* **no** es admisible, A* sigue siendo completo (bajo la condición (3)) pero puede devolver una solución **subóptima** (punto 18 de este TP).
+
 ---
 
 **Fuentes consultadas:**
