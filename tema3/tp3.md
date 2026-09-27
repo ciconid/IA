@@ -510,6 +510,47 @@ Basta una heurística que **sobreestime** en el camino que lleva a la solución 
 - **Unificar el criterio de desempate** en la frontera (por ejemplo, orden lexicográfico entre nodos con igual *f* o igual *g*), de modo que ante un empate A\* y UCS elijan el mismo nodo.
 - Ojo: cambiar sólo los **costos de los arcos** o la **estructura del grafo** hace que ambos cambien, pero no garantiza que coincidan: mientras *h* sea informativa, A\* y UCS siguen guiándose por criterios distintos (*f* vs. *g*).
 
+## 29-b. UCS sobre el espacio del ejercicio 29
+
+**¿La solución de UCS sería óptima? Sí**, porque no depende de la heurística: con costos de arco positivos (las distancias entre ciudades) y ramificación finita, UCS expande en orden no decreciente de *g*(*n*), de modo que la primera meta seleccionada es la de menor costo: "Hence, the first goal node selected for expansion must be the optimal solution" [RN10, sec. 3.4.2, p. 85].
+
+**¿Cuál es el problema de usar UCS?**
+
+- Es un método **ciego**: solo mira *g*(*n*) e **ignora la heurística** que el enunciado ya provee en el grafo, así que expande ramas que no llevan a ninguna meta.
+- Su peor caso es exponencial y depende de C\*, no de la profundidad: "the algorithm's worst-case time and space complexity is O(b<sup>1+⌊C*/ε⌋</sup>), which can be much greater than b<sup>d</sup>. This is because uniform-cost search can explore large trees of small steps before exploring paths involving large and perhaps useful steps" [RN10, sec. 3.4.2, p. 85].
+- Debe **almacenar toda la frontera**, y "cuando el espacio de búsqueda es muy grande, almacenar la frontera puede no ser una opción" [García, Episodio III, sec. Conclusiones hasta acá…].
+- Hace más trabajo que BFS con costos uniformes: "breadth-first search stops as soon as it generates a goal, whereas uniform-cost search examines all the nodes at the goal's depth to see if one has a lower cost" [RN10, sec. 3.4.2, p. 85].
+
+En síntesis: UCS da la solución óptima, pero a un **costo exponencial de tiempo y memoria**, mientras A\* con la misma *h* del enunciado logra el mismo resultado expandiendo muchísimos menos nodos.
+
+## 29-c. Hill Climbing sobre el espacio de estados de la figura
+
+**¿Cuál es la utilidad de HC?**
+
+- Es un método de búsqueda **para dominios con función heurística**, pensado para **encontrar una meta rápido** en espacios de búsqueda muy grandes: "Está pensado para encontrar una meta rápido, en un espacio de búsqueda muy grande donde almacenar la frontera es prohibitivo" [García, Episodio III, sec. Hill Climbing (Escalador o Trepada)].
+- Su ventaja es de **memoria**: "HC solo mantiene un nodo, pero no garantiza ser completo" [García, Episodio III, sec. Hill Climbing], y "tampoco almacena la frontera de búsqueda" [García,Episodio III, sec. Hill Climbing]. En PMG: "A heuristic search strategy that maintains a single node. At each stage, it chooses the most promising neighbor of the node. It is used for optimization and satisfiability problems" [PMG, Glossary, p. 469; sec. 4.7, p. 156].
+- El recorrido es puramente local: "maintaining a single node at each stage, you select the neighbor of the node with the highest heuristic value and use that as the next node to search from. You stop when no neighbor has a higher value than the current node" [PMG, sec. 4.7, p. 156]. Su costo es O(1) en memoria, pero **no devuelve el camino** recorrido, sólo el nodo meta [García, Episodio III, sec. Hill Climbing].
+
+**PENDIENTE: la traza de HC sobre el grafo del enunciado.** Requiere los datos de la figura (estados, valores de *h* y costos de cada arco), que está embebida como imagen en el PDF y no se puede leer desde este repositorio. Cuando me pases el grafo (o una foto con los valores legibles) completo la traza.
+
+**¿Qué problema surge durante la ejecución?**
+
+- El algoritmo **se detiene en un máximo local** (o en una meseta), sin haber alcanzado ninguna meta: "The search has reached a point where no neighbor is better, but some are the same as the current node. Maybe stepping in one of those directions will then lead to a path up. No single step can improve the situation" [PMG, sec. 4.7, p. 158]. La intuición de las notas ("En la mayoría de las colinas, seguir la mayor pendiente te lleva inevitablemente a la cima" [García, Episodio III, sec. Hill Climbing]) es justamente la que no se cumple en un espacio de búsqueda con heurística *h*, y por eso HC no es completo.
+- Las tres dificultades clásicas de PMG [PMG, sec. 4.7, p. 158]:
+  - **Foothills (laderas):** "The search has found a local maxima, but hasn't found a global maximum. Every direction you look in may be downhill, but this doesn't mean that you have found the maximum value".
+  - **Plateaus (mesetas):** ningún vecino mejora, pero algunos son iguales; hace falta un paso lateral para poder seguir subiendo.
+  - **Ridges (crestas):** "all of the directions point down, but by making a combination of steps you may be able to do better"; se corrige mirando **dos pasos** en lugar de uno ("myopic or greedy").
+- Como además **no guarda historial**, no puede volver atrás: es *greedy* y se queda con el primer máximo local que encuentra, que puede ser una solución **subóptima** [García, Episodio III, sec. Hill Climbing; PMG, sec. 4.7, p. 158].
+
+**Estrategias para sobreponerse a este problema:**
+
+- **Reinicios aleatorios (random-restart hill climbing):** "values are chosen at random, and from each of these values, you do hill climbing to find the corresponding local maxima [...] when the hill climbing finds a local maxima, restarting at another random position" [PMG, sec. 4.7, p. 159]. Es la combinación de hill climbing con búsqueda aleatoria pura.
+- **Búsqueda en dos fases:** "you first select values at random, and then do hill climbing from the maximum value found" [PMG, sec. 4.7, pp. 158-159].
+- **Recocido simulado (SA):** acepta un vecino que empeora *h* con probabilidad decreciente con la temperatura, de modo que puede "salir" de mínimos locales: "The randomness will tend to find the mountains and to jump out of local maxima, and the hill climbing will tend to find the peak" [PMG, sec. 4.7, p. 160] (punto 24).
+- **Búsqueda por haz local (LBS)** con *k* > 1: "you maintain up to *k* nodes instead of just one" [PMG, sec. 4.7, p. 161] (punto 25), que es HC con memoria para escapar de mínimos locales.
+- **Mejor primero (BestFS):** "One of the ways to overcome these problems is to systematically search the space when a goal isn't reached, as does heuristic best search. Heuristic best search can be seen as a variant of hill climbing that searches the space by backtracking" [PMG, sec. 4.7, p. 158].
+- **Mirar dos pasos por delante** (para el caso de las crestas): "With two step look ahead, a northeast ridge can be detected" [PMG, sec. 4.7, p. 158].
+
 ---
 
 **Fuentes consultadas:**
