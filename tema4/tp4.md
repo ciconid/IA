@@ -89,6 +89,78 @@ Un problema de planificación se define indicando **tres componentes (I, G, A) e
 
 ---
 
+## 2. Mundo de Bloques
+
+### 2.a. Funcionamiento de los operadores `apilar(A,B)` y `desapilar(A,B)`
+
+#### Cómo se ve el mundo
+
+- Un **estado** es un conjunto finito de literales que dice qué es verdad en ese momento; lo que no se menciona se asume falso (Suposición del Mundo Cerrado) [García, Episodio V, sec. "Lenguaje STRIPS"]. Con las tres relaciones del enunciado:
+  - `mesa(X)`: el bloque X está apoyado en la mesa;
+  - `sobre(X,Y)`: el bloque X está apoyado sobre el bloque Y;
+  - `libre(X)`: el bloque X no tiene ningún bloque encima.
+- `libre(X)` hace falta porque en lógica de primer orden la condición "nada está sobre X" sería `¬∃Z sobre(Z,X)`, y el lenguaje usado no tiene cuantificadores; en su lugar se declara explícitamente un predicado `libre` que los operadores se encargan de mantener actualizado [RN10, sec. 10.1.3, p. 371]. Además así se respeta la restricción física del entorno: un bloque no puede estar sobre dos bloques, ni dos bloques sobre uno [García, Episodio V, sec. "Mundo de Bloques"].
+
+#### Los dos operadores en una tabla
+
+| Operador | Precondiciones | Add-list | Del-list |
+|---|---|---|---|
+| `apilar(X,Y)` | {`mesa(X)`, `libre(X)`, `libre(Y)`} | {`sobre(X,Y)`} | {`libre(Y)`, `mesa(X)`} |
+| `desapilar(X,Y)` | {`libre(X)`, `sobre(X,Y)`} | {`libre(Y)`, `mesa(X)`} | {`sobre(X,Y)`} |
+
+[ García, Episodio V, sec. "Especificación en el lenguaje STRIPS"]. A ambos se les puede agregar `X ≠ Y` para evitar acciones espurias como `apilar(a,a)` [ibidem].
+
+#### `apilar(X,Y)`: tomar un bloque de la mesa y ponerlo sobre otro
+
+- **Qué hace, intuitivamente:** "tomar un bloque B1 que se encuentra sobre la mesa y poner B1 sobre el bloque B2. Ninguno de los dos bloques debe tener otro encima" [García, Episodio V, sec. "Dominio de planificación: Mundo de Bloques"]. Es la acción del brazo robot: agarra el bloque de arriba y lo apoya encima del otro.
+- **Condiciones que deben cumplirse (precondiciones):**
+  - `mesa(X)`: **X debe estar en la mesa**. O sea, el bloque que se mueve tiene que ser un bloque "de abajo"; si X estuviera apoyado sobre otro bloque, primero habría que desapilarlo. Esto es coherente con el único brazo robot, que sólo manipula un bloque por vez.
+  - `libre(X)`: **nada debe estar encima de X**, porque si no, al mover X se llevaría encima lo que tiene encima y el resultado ya no sería un solo bloque sobre Y.
+  - `libre(Y)`: **nada debe estar encima de Y**, porque si no, Y ya no tiene lugar para recibir a X (violaría "un bloque no puede estar sobre dos bloques").
+- **Resultado que produce (efectos):**
+  - se agrega `sobre(X,Y)`: ahora X está sobre Y;
+  - se borra `mesa(X)`: X ya no está en la mesa, porque fue levantado;
+  - se borra `libre(Y)`: Y dejó de estar libre, porque tiene un bloque encima.
+  - lo que **no** aparece en la lista es `libre(X)`: **X sigue estando libre** después de apilar, porque nada quedó encima de él. Y como no se menciona nada más, todo lo demás del estado queda igual (es la *STRIPS assumption*) [García, Episodio V, sec. "Representación de acciones"; PMG, sec. 8.2, p. 288].
+- **Nota:** la precondición es `libre(Y)`, no `mesa(Y)`: Y puede estar en la mesa o sobre otro bloque, lo que se exige es que tenga espacio libre arriba.
+
+#### `desapilar(X,Y)`: tomar el bloque de arriba y poner abajo el que estaba debajo
+
+- **Qué hace, intuitivamente:** "tomar un bloque B1 que se encuentra sobre otro B2 y poner a B2 sobre la mesa. El bloque B1 no debe tener otro encima" [García, Episodio V, sec. "Dominio de planificación: Mundo de Bloques"]. O sea: se retira el bloque de arriba y se apoya en la mesa el que estaba abajo.
+- **Condiciones que deben cumplirse (precondiciones):**
+  - `sobre(X,Y)`: X tiene que estar efectivamente apoyado sobre Y; si no, no hay nada que desapilar entre esos dos bloques.
+  - `libre(X)`: **X no debe tener nada encima**, porque el brazo tiene que poder sujetar a X para moverlo. Si X tuviera un bloque encima, primero habría que desapilar ese bloque.
+  - No se exige `mesa(X)` justamente porque X está *sobre* Y, no en la mesa: es la condición opuesta a la de `apilar`.
+- **Resultado que produce (efectos):**
+  - se borra `sobre(X,Y)`: X ya no está sobre Y;
+  - se agrega `libre(Y)`: Y quedó sin nada encima;
+  - se agrega `mesa(Y)`: Y ahora está apoyado en la mesa.
+  - `libre(X)` no se borra: **X sigue libre**, ya que no se le puso nada encima.
+- **Simetría:** `apilar` y `desapilar` son operaciones inversas: si `apilar(X,Y)` lleva un estado E a E', entonces `desapilar(X,Y)` lleva E' de vuelta a E. Es por eso que el espacio de estados del Mundo de Bloques se puede recorrer en ambos sentidos.
+
+#### Cómo se comprueba y se aplica un operador
+
+- **Aplicabilidad:** una acción `A = (Pre, Add, Del)` es aplicable en el estado E si todas sus precondiciones se satisfacen en E, lo que se verifica simplemente comprobando la inclusión de conjuntos `Pre ⊆ E` [García, Episodio V, sec. "Acciones aplicables en un estado"]. Si no se cumple alguna, la acción no existe para ese estado: el planificador no la genera y sigue con otras.
+- **Nuevo estado:** se obtiene con operaciones de conjuntos, `E' = (E \ Del) ∪ Add` [García, ibidem]; en AIMA, `RESULT(s, a) = (s − DEL(a)) ∪ ADD(a)` [RN10, sec. 10.1, p. 368, ec. 10.1]. O sea: primero se borra todo lo de la del-list, después se agrega todo lo de la add-list, y todo lo demás se arrastra sin cambios.
+
+#### Ejemplo de aplicación paso a paso [García, Episodio V, sec. "Dominio de planificación: Mundo de Bloques"]
+
+Sea `E1 = {mesa(a), mesa(d), libre(a), libre(b), sobre(c,d), sobre(b,c)}` (d y a en la mesa, c sobre d, b sobre c).
+
+1. **¿Es aplicable `desapilar(b,c)`?** Pre = {`libre(b)`, `sobre(b,c)`}; los dos literales están en E1 → **sí**.
+   `E2 = (E1 \ {sobre(b,c)}) ∪ {libre(c), mesa(b)} = {mesa(a), mesa(d), mesa(b), libre(a), libre(b), libre(c), sobre(c,d)}`.
+   Ahora: a y d sueltos en la mesa, b encima de c, y c encima de d. Coherente: se despejó el bloque que estaba sobre c.
+2. **¿Es aplicable `apilar(b,c)` en E2?** Pre = {`mesa(b)`, `libre(b)`, `libre(c)`}; los tres están en E2 → **sí**.
+   `E1 = (E2 \ {libre(c), mesa(b)}) ∪ {sobre(b,c)}` → se recupera exactamente E1: los dos operadores son reversibles.
+3. **Acciones que NO son aplicables en E1**, y por qué:
+   - `apilar(c,d)`: falla `libre(d)`, porque `sobre(b,c)` implica que d tiene encima a c, o sea d no está libre;
+   - `apilar(b,c)`: falla `mesa(b)`, porque b no está en la mesa sino sobre c;
+   - `desapilar(c,d)`: falla `libre(c)`, porque c tiene a b encima;
+   - `desapilar(a,d)`: falla `sobre(a,d)`, porque a no está sobre d.
+   Obsérvese que el planificador no necesita "saber" estas reglas: simplemente no puede aplicarlas, porque sus precondiciones no están en el estado.
+
+---
+
 **Fuentes consultadas:**
 
 - **RN10:** Russell, S. y Norvig, P. *Artificial Intelligence: A Modern Approach*, 3ra ed., Pearson, 2010. Capítulo 3 ("Solving Problems by Searching", sec. 3.1.2) y capítulo 10 ("Classical Planning", secs. 10.1, 10.1.3, 10.1.4).
