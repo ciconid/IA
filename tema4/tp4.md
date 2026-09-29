@@ -196,12 +196,104 @@ Sea `E1 = {mesa(a), mesa(d), libre(a), libre(b), sobre(c,d), sobre(b,c)}` (d y a
 
 - **Es factible:** "we can solve planning problems with any of the heuristic search algorithms from Chapter 3 **or a local search algorithm from Chapter 4** (provided we keep track of the actions used to reach the goal)" [RN10, sec. 10.2.1, pp. 372-373]; en PMG: "In a forward planner, you search the state-space graph from the initial state looking for a state that satisfies a goal description. You can use any of the search strategies described in Chapter 4" [PMG, sec. 8.3, p. 299]. De hecho, un planificador-forward muy usado, FF, "uses hill-climbing search (modified to keep track of the plan) with the heuristic to find a solution" [RN10, sec. 10.2.3, p. 378].
 - **Pero hay que modificarlo y aceptar las siguientes condiciones:**
-  - **Hay que registrar el plan a mano:** "La solución de este método es un nodo meta. No almacena, ni retorna el camino recorrido desde el nodo inicial al nodo meta" [García, Episodio III, sec. "Hill Climbing (Escalador o Trepada)"], y en planificación la salida debe ser el plan, no el nodo. De ahí el "modified to keep track of the plan" de FF [RN10, sec. 10.2.3, p. 378].
+  - **Hay que registrar el plan explícitamente:** "La solución de este método es un nodo meta. No almacena, ni retorna el camino recorrido desde el nodo inicial al nodo meta" [García, Episodio III, sec. "Hill Climbing (Escalador o Trepada)"], y en planificación la salida debe ser el plan, no el nodo. De ahí el "modified to keep track of the plan" de FF [RN10, sec. 10.2.3, p. 378].
   - **Se pierde la completitud:** el método "no garantiza ser completo" [García, Episodio III, sec. "Hill Climbing (Escalador o Trepada)"]; puede quedar atrapado en un máximo local o en una meseta, y no puede afirmar que "no hay solución" (algo que un planificador debe poder asegurar). FF lo resuelve con un parche: "When it hits a plateau or local maximum—when no action leads to a state with better heuristic score—then FF uses iterative deepening search until it finds a state that is better, or it gives up and restarts hill-climbing" [RN10, sec. 10.2.3, p. 378].
   - **Se pierde la optimalidad:** el plan obtenido puede no ser el más corto [RN10, sec. 10.2.3, p. 377].
   - **Hace falta una heurística muy buena, obtenida de la representación:** "This complexity may be reduced by finding good heuristics (see Exercise 8.4), but the heuristics have to be very good to overcome the combinatorial explosion" [PMG, sec. 8.3, p. 299]. Con la heurística relajada *ignore delete lists* el paisaje es favorable: "In both these problems, there is a wide path to the goal. There are no dead ends, so no need for backtracking; a simple hill-climbing search will easily find a solution to these problems (although it may not be an optimal solution)" [RN10, sec. 10.2.3, p. 377].
   - **Ventaja a su favor:** memoria constante, sin frontera ni lista de visitados, lo que lo hace apto cuando almacenar la frontera es prohibitivo [García, Episodio III, sec. "Hill Climbing (Escalador o Trepada)"].
 - **Conclusión:** si sólo se busca *algún* plan (no el óptimo) y se dispone de una buena heurística derivada de la representación, un método sin frontera es una opción válida y ahorra memoria; si se necesita garantiza de encontrar la solución cuando existe y de optimalidad, corresponde un método con frontera: "Primero a lo Ancho, Profundización Iterativa o A* garantizan encontrar un plan" [García, Episodio V, sec. "Forward Planning"].
+
+---
+
+## 4. Lenguaje de representación y planificador STRIPS
+
+### 4.a. ¿En qué consiste el lenguaje de representación de STRIPS?
+
+- **Qué significa la sigla:** STRIPS = **ST**anford **R**esearch **I**nstitute **P**roblem **S**olver [García, Episodio V, sec. "Lenguaje de representación STRIPS"]. Históricamente fue el solucionador de problemas del robot Shakey, uno de los primeros robots construidos con técnicas de IA [PMG, sec. 8.2, p. 288].
+- **Sobre qué se define:** "El lenguaje de representación STRIPS se define sobre tres conjuntos disjuntos y finitos de símbolos: un conjunto de variables V, un conjunto de constantes C y un conjunto de predicados P. Una convención habitual para distinguir los elementos del lenguaje consiste en denotar las variables con una letra mayúscula inicial" [García, ibidem]. Para el Mundo de Bloques: `C = {a, b, c, d}` y `P = {libre, mesa, sobre}` [ibidem].
+- **Qué permite expresar:** es un lenguaje para describir *qué es verdad en cada estado* y *qué cambia cuando se ejecuta cada acción*. "The representation is used for specifying the following problem: Given a state and an action, determine whether the action can be carried out in that state and, if it can, determine what is true in the state resulting from carrying out the action" [PMG, sec. 8.2, p. 288].
+- **Elementos que define** (los tres del enunciado):
+  - **Estados:** un conjunto finito de literales fijos positivos, que representa todo lo que es verdadero en ese estado, más la **Suposición del Mundo Cerrado** [García, Episodio V, sec. "Lenguaje STRIPS: estados, metas y estados que satisfacen metas"].
+  - **Metas:** un estado parcialmente especificado, es decir una conjunción de literales fijos positivos [ibidem].
+  - **Operadores (esquemas de acción):** nombre, lista de parámetros (variables), precondiciones y efectos; los efectos se separan en **add-list** y **del-list** [García, Episodio V, sec. "Especificación de operadores"].
+- **Restricciones del lenguaje (lo que lo hace simple y computable):**
+  - Un **literal** es *fijo* si no contiene variables, y *positivo* si no está precedido por negación [García, ibidem]. En los estados y metas no aparecen literales negativos.
+  - **Las precondiciones y las metas no pueden contener literales negativos**: "PDDL was derived from the original STRIPS planning language (Fikes and Nilsson, 1971), which is slightly more restricted than PDDL: STRIPS preconditions and goals cannot contain negative literals" [RN10, sec. 10.1, p. 368]. Si un problema necesita "¬P", se reemplaza por un predicado nuevo positivo P' [RN10, sec. 10.2.3, p. 377, nota 3].
+  - **Toda variable que aparece en los efectos debe aparecer también en las precondiciones**, para que al instanciar la acción queden todos los valores determinados [RN10, sec. 10.1, p. 368].
+  - Lo que **no** cambia no se menciona: es la *STRIPS assumption*, "All of the primitive relations not mentioned in the description of the action stay unchanged" [PMG, sec. 8.2, p. 288], que resuelve el problema de marco permitiendo descripciones acotadas [RN10, sec. 10.1, p. 367].
+- **Importante: el lenguaje y el planificador son cosas distintas.** "You can use the STRIPS representation with other planners, and you can use the STRIPS planner with other representations" [PMG, sec. 8.2, p. 288]. Es decir, el STRIPS *Planner* (4.d) es un algoritmo que usa (o puede no usar) esta representación.
+
+### 4.b. ¿Cómo se representan los estados, las metas y los operadores?
+
+**Estados** — conjuntos finitos de literales fijos positivos [García, Episodio V, sec. "Lenguaje STRIPS: estados, metas y estados que satisfacen metas"]:
+
+- Mundo de Bloques, usando las relaciones `libre(X)`, `mesa(X)` y `sobre(X,Y)`:
+  - `E1 = {mesa(a), mesa(d), libre(a), libre(b), sobre(c,d), sobre(b,c)}` (a y d en la mesa, c sobre d, b sobre c);
+  - `E2 = {mesa(a), libre(c), sobre(b,a), sobre(c,b)}` (b sobre a, c sobre b) [García, Episodio V, secs. "Ejemplos de estados y metas" y "Especificación de operadores"].
+- Con la Suposición del Mundo Cerrado, todo literal que no aparece en el conjunto se considera **falso**; por eso no hace falta decir que `libre(c)` es falsa en E2 [García, ibidem]. En AIMA esto es la semántica de base de datos: "the closed-world assumption means that any fluents that are not mentioned are false, and the unique names assumption means that Truck 1 and Truck 2 are distinct" [RN10, sec. 10.1, p. 367].
+
+**Metas** — estados parcialmente especificados, escritos como conjunciones de literales fijos positivos [García, Episodio V, sec. "Lenguaje STRIPS: estados, metas y estados que satisfacen metas"]:
+
+- `G1 = {mesa(a)}`, `G2 = {libre(a), mesa(a)}`, `G3 = {sobre(c,b), sobre(b,a)}` [García, Episodio V, sec. "Ejemplos de estados y metas"].
+- La meta **no describe el estado final completo**, sólo lo que debe ser cierto: no importa qué pase con los bloques que no se mencionan.
+
+**Operadores** — nombre, parámetros, precondiciones y efectos separados en add-list y del-list [García, Episodio V, sec. "Especificación de operadores"]:
+
+| Operador | Precondiciones | Add-list | Del-list |
+|---|---|---|---|
+| `apilar(X,Y)` | {`mesa(X)`, `libre(X)`, `libre(Y)`} | {`sobre(X,Y)`} | {`libre(Y)`, `mesa(X)`} |
+| `desapilar(X,Y)` | {`libre(X)`, `sobre(X,Y)`} | {`libre(Y)`, `mesa(X)`} | {`sobre(X,Y)`} |
+
+[García, Episodio V, sec. "Especificación en el lenguaje STRIPS"].
+
+- **Verificación y aplicación** (todo con operaciones de conjuntos):
+  - una acción es **aplicable** en E si `Pre ⊆ E`; en caso contrario no existe como sucesora de E;
+  - el **nuevo estado** es `E' = (E \ Del) ∪ Add` [García, Episodio V, sec. "Acciones aplicables en un estado"], que en AIMA es `RESULT(s, a) = (s − DEL(a)) ∪ ADD(a)` [RN10, sec. 10.1, p. 368, ec. 10.1].
+  - Ejemplo: `apilar(c,i)` es aplicable en `E1 = {mesa(i), mesa(c), libre(c), libre(i)}` y produce `E2 = {mesa(i), libre(c), sobre(c,i)}`; `desapilar(c,i)` no es aplicable en E1 [García, Episodio V, sec. "Acciones aplicables en un estado"].
+
+### 4.c. ¿Bajo qué condición se dice que un estado satisface una meta?
+
+- **Condición:** "Un estado E satisface una meta G si **G ⊆ E**" [García, Episodio V, sec. "Lenguaje STRIPS: estados, metas y estados que satisfacen metas"]. Es decir, **todos** los literales de la meta deben estar presentes en la descripción del estado; gracias a la Suposición del Mundo Cerrado, alcanza con verificar la inclusión (lo que no está en G no se exige nada) [ibidem].
+- Ejemplos con los estados del punto anterior [García, Episodio V, sec. "Ejemplos de estados y metas"]:
+  - `E1 = {mesa(c), mesa(b), mesa(a), libre(c), libre(a), libre(b)}` satisface `G1 = {mesa(a)}` y `G2 = {libre(a), mesa(a)}`, pero **no** satisface `G3 = {sobre(c,b), sobre(b,a)}` (le falta `sobre(c,b)` y `sobre(b,a)`);
+  - `E2 = {mesa(a), libre(c), sobre(b,a), sobre(c,b)}` satisface `G1` y `G3`, pero **no** satisface `G2` (le falta `libre(a)`);
+  - con el otro juego de ejemplos, `E1 = {mesa(a), mesa(d), libre(a), libre(b), sobre(c,d), sobre(b,c)}` satisface `G1 = {mesa(a), libre(a)}` pero no `G2 = {libre(c), sobre(c,d)}` (le falta `libre(c)`) [García, Episodio V, sec. "Lenguaje STRIPS: estados, metas y estados que satisfacen metas"].
+- **Interpretación:** la meta define un **conjunto de estados meta**; un estado pertenece a ese conjunto si y sólo si contiene todos sus literales. Por eso el test de meta de un planificador es una simple prueba de inclusión `G ⊆ E` [García, ibidem; RN10, sec. 10.1, p. 369].
+- En AIMA la condición equivalente es que el estado **implicue** la meta: "The problem is solved when we can find a sequence of actions that end in a state s that entails the goal" [RN10, sec. 10.1, p. 369].
+
+### 4.d. Algoritmo de planificación "STRIPS Planner"
+
+**Idea general (divide and conquer sobre las metas):** "The basic idea behind the STRIPS planner is divide and conquer: to create a plan to achieve a conjunction of goals, create a plan to achieve one goal, and then create a plan to achieve the rest of the goals" [PMG, sec. 8.3, p. 301]. En palabras: "To achieve a list of goals choose one of them to achieve. If it is not already achieved, choose an action that makes the goal true, achieve the preconditions of the action, carry out the action, and then achieve the rest of the goals" [PMG, ibidem].
+
+**Algoritmo** (especificación de la Figura 8.2 de PMG, que usa la representación STRIPS) [PMG, sec. 8.3, pp. 301-302]:
+
+```
+% achieve_all(Gs, W0, Wf):  Wf es el mundo resultante luego de lograr cada meta de la lista Gs desde W0
+achieve_all([],     W0, W0)
+achieve_all(Goals, W0, W2)  :-  remove(G, Goals, RestGoals),
+                                achieve(G, W0, W1),
+                                achieve_all(RestGoals, W1, W2)
+
+% achieve(G, W0, Wf):  Wf es el mundo resultante luego de lograr la meta G desde el mundo W0
+achieve(G, W, W)                  :- holds(G, W).                      % (1) la meta ya es cierta
+achieve(G, W0, Wj)                :- clause(G, B),
+                                    achieve_all(B, W0, Wi).             % (2) G es relación derivada
+achieve(G, W0, do(Action, Wi))    :- achieves(Action, G),
+                                    preconditions(Action, Pre),
+                                    achieve_all(Pre, W0, Wi).           % (3) G es relación primitiva
+```
+
+- **Cómo se lee:**
+  - `achieve_all` toma una lista de metas y las va resolviendo **de a una**, en el orden en que aparecen en la lista, **sobre el mismo mundo** que va actualizando: si la lista de metas está vacía, el problema está resuelto sin ejecutar nada más.
+  - `achieve` para una meta G tiene tres casos: (1) si G ya es verdadera en W, no hay nada que hacer; (2) si G es una **relación derivada** (tiene una cláusula que la define), se lograrán todos los átomos del cuerpo de esa cláusula; (3) si G es una **relación primitiva** y no es verdadera, se elige una acción A cuyo *add-list* contiene G, se `achieve` primero todas sus **precondiciones** y recién entonces se ejecuta A, produciendo `do(Action, Wi)`.
+  - Los predicados auxiliares: `holds(G, W)` indica que G es cierta en W; `achieves(A, G)` indica que G está en el add-list de A; `preconditions(A, Pre)` devuelve la lista de precondiciones de A [PMG, sec. 8.3, p. 303].
+  - El plan que devuelve es la concatenación de las acciones **en el orden en que se van aplicando**, y el mundo final se va construyendo con `do(Action, W')`, es decir aplicando add-list y del-list [PMG, sec. 8.3, pp. 302-303].
+- **Ejemplo (delivery robot de PMG):** ante las metas `[carrying(rob, parcel), sitting_at(rob, lab2)]`, el algoritmo elige lograr primero `carrying(rob, parcel)`, que no es cierta inicialmente; busca la acción que la logra, `pickup(rob, parcel)`, y tiene que lograr sus precondiciones `[autonomous(rob), sitting_at(parcel, Pos), at(rob, Pos)]`; entre ellas `at(rob, storage)`, que se logra con `move(rob, Pos1, storage)`, y así siguiendo recursivamente hasta que todas las precondiciones valen [PMG, sec. 8.3, p. 303].
+- **Características y limitaciones:**
+  - Es un **planificador hacia atrás en su razonamiento pero hacia adelante en su ejecución**: elige acciones por lo que agregan (add-list) y luego las ejecuta, acumulando el mundo [PMG, sec. 8.3, pp. 301-302].
+  - Es **sencillo y de divide y conquer**, pero **no es completo**: no contempla backtracking cuando hay varias acciones candidatas ni verifica al final que las metas ya logradas sigan siendo ciertas. Si al lograr una meta posterior una acción borra (del-list) un literal de una meta anterior, el plan devuelto no soluciona el problema. De hecho, elegir un mal orden de resolución de las metas puede hacer que la versión más simple no retorne solución, como se estudia en los puntos 5.b y 5.c del enunciado.
+  - "El algoritmo STRIPS Planner no debe confundirse con el lenguaje STRIPS: se puede usar la representación STRIPS con otros planificadores, y el planificador STRIPS con otras representaciones" [PMG, sec. 8.2, p. 288].
+  - Para dominios más grandes, AIMA muestra que se le pueden aplicar las heurísticas y estructuras de la sección 10.2/10.3 (FF usa búsqueda hacia adelante con *hill climbing* modificado sobre esta representación) [RN10, sec. 10.2.3, p. 378].
 
 ---
 
