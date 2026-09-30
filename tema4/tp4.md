@@ -295,10 +295,33 @@ achieve(G, W0, do(Action, Wi))    :- achieves(Action, G),
   - "El algoritmo STRIPS Planner no debe confundirse con el lenguaje STRIPS: se puede usar la representación STRIPS con otros planificadores, y el planificador STRIPS con otras representaciones" [PMG, sec. 8.2, p. 288].
   - Para dominios más grandes, AIMA muestra que se le pueden aplicar las heurísticas y estructuras de la sección 10.2/10.3 (FF usa búsqueda hacia adelante con *hill climbing* modificado sobre esta representación) [RN10, sec. 10.2.3, p. 378].
 
+## 6. Planificador de Orden Parcial
+
+### 6.a. ¿Qué es un plan parcial? ¿Qué elementos lo forman? ¿En qué se diferencia de un plan total? ¿Cuál es su ventaja?
+
+- **Plan parcial:** cada nodo del espacio de búsqueda de POP es un plan parcial, formado por **cuatro elementos** `(As, Os, Ls, Goals)` [García, VI, PDF p. 11]:
+  - `As`: conjunto de acciones (o pasos) del plan;
+  - `Os`: conjunto de restricciones de orden (orden parcial) sobre los pasos; se escribe `A < B` cuando el paso `A` debe preceder al `B`. **Todo vínculo causal es una restricción de orden** [ibidem];
+  - `Ls`: conjunto de vínculos (*links*) causales entre pasos;
+  - `Goals` ("agenda"): lista de (pre)condiciones pendientes o sub-metas que el planificador aún debe resolver por regresión [ibidem].
+- **Plan inicial:** dado un problema `(I, G, A)`, es `As = {start, finish}`, `Os = {start < finish}`, `Ls = {}`, `Goals = G`, donde `start` tiene como efecto el estado inicial `I` y `finish` tiene como precondiciones la meta `G` [García, VI, PDF pp. 12-13].
+- **Diferencia con el plan total:** los planificadores vistos mantienen un **orden total** en los planes que generan, y "al ir formando la secuencia de acciones... el planificador se compromete al orden total de las acciones que ya están en esta secuencia". "El orden total es impuesto por el algoritmo, **aún cuando ese orden no sea realmente necesario**" [García, VI, PDF p. 3].
+- **Ventaja:** no hace falta decidir el orden de acciones que no se relacionan. En el problema de cambiar los cartuchos de una impresora hay **6 planes totalmente ordenados** posibles, pero alcanza con indicar las **2 restricciones de orden** que impone el vínculo causal: `sacar(negro,viejo)` antes de `poner(negro,nuevo)`, y `sacar(color,viejo)` antes de `poner(color,nuevo)` [García, VI, PDF pp. 7-8]. En general, la solución de POP es un conjunto de pasos `As` más un conjunto de restricciones `Os`: puede haber **más de una secuencia** de elementos de `As` que cumpla las restricciones de `Os`, y cada una de esas secuencias es un plan (totalmente ordenado) [García, VI, PDF p. 33].
+
+#### EXTRAS
+
+- **Definición formal:** "A partial-order plan is a set of actions together with a partial ordering, representing a 'before' relation on actions, such that any total ordering of the actions, consistent with the partial ordering, will solve the goal from the initial state" [PMG, sec. 8.3, p. 309]. La idea equivalente también se encuentra en RN10 [sec. 10.4.4, p. 390].
+- **Formalización en PMG:** un plan parcial es `plan(As, Os, Ls)`; un plan completo es un plan parcial seguro con la agenda vacía, y corresponde a un plan de orden parcial [PMG, sec. 8.3, pp. 310-311]. También se lo llama *nonlinear planner*, "but this is a misnomer as such planners often produce a linear plan" [ibidem].
+- **Costo del orden total:** el planificador debe probar cada permutación de las acciones, "when it may be possible to show that all orderings don't succeed" [PMG, sec. 8.3, p. 308].
+- **Least commitment:** el refinamiento agrega a cada paso la mínima cantidad de restricciones necesarias: "At every step, we make the least commitment possible to fix the flaw" [RN10, sec. 10.4.4, p. 391].
+- **Búsqueda en el espacio de planes:** POP no busca en el espacio de estados sino en el espacio de planes, partiendo del plan vacío (sólo estado inicial y meta, sin acciones) y reparando *flaws*: "A flaw is anything that keeps the partial plan from being a solution" [RN10, sec. 10.4.4, pp. 390-391].
+- **Ganancia por descomposición:** si el problema es totalmente descomponible en subproblemas independientes, se obtiene una aceleración exponencial frente a la búsqueda en el espacio de estados: "the identification of independent subproblems can be a powerful weapon. In the best case—full decomposability of the problem—we get an exponential speedup" [RN10, sec. 10.5, p. 392].
+- **Contras:** no tiene representación explícita de estados, lo que vuelve incómodos algunos cálculos: "it has the disadvantage of not having an explicit representation of states in the state-transition model" [RN10, sec. 10.4.4, p. 391]. Por eso hoy no es competitivo en planificación clásica completamente automatizada, aunque se sigue usando en planificación de operaciones y en dominios donde es importante que **humanos entiendan los planes** [ibidem].
+
 ---
 
 **Fuentes consultadas:**
 
-- **RN10:** Russell, S. y Norvig, P. *Artificial Intelligence: A Modern Approach*, 3ra ed., Pearson, 2010. Capítulo 3 ("Solving Problems by Searching", sec. 3.1.2) y capítulo 10 ("Classical Planning", secs. 10.1, 10.1.3, 10.1.4).
-- **García:** García, A. J. *Inteligencia Artificial - Notas de Clase*, DCIC - Universidad Nacional del Sur: Episodio V: "Agentes BDI. Representación de acciones y planificación automática", 15/09/2026; Episodio VI: "Planificación de Orden Parcial (POP)", 22/09/2026.
+- **RN10:** Russell, S. y Norvig, P. *Artificial Intelligence: A Modern Approach*, 3ra ed., Pearson, 2010. Capítulo 3 ("Solving Problems by Searching", sec. 3.1.2) y capítulo 10 ("Classical Planning", secs. 10.1, 10.1.3, 10.1.4, 10.4.4 y 10.5).
+- **García:** García, A. J. *Inteligencia Artificial - Notas de Clase*, DCIC - Universidad Nacional del Sur: Episodio V: "Agentes BDI. Representación de acciones y planificación automática", 15/09/2026 (`tema4/ale-2026-IA-06-Agentes-BDI-Acciones-y-planes.pdf`); Episodio VI: "Planificación de Orden Parcial (POP)", 22/09/2026 (`tema4/ale-2026-IA-07-Planificación-Orden-Parcial (POP).pdf`).
 - **PMG:** Poole, D.; Mackworth, A. y Goebel, R. *Computational Intelligence: A Logical Approach*, Oxford University Press, 1998, capítulo 8 ("Actions and Planning", secs. 8.2 y 8.3).
