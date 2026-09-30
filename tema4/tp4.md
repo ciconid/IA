@@ -318,6 +318,90 @@ achieve(G, W0, do(Action, Wi))    :- achieves(Action, G),
 - **Ganancia por descomposición:** si el problema es totalmente descomponible en subproblemas independientes, se obtiene una aceleración exponencial frente a la búsqueda en el espacio de estados: "the identification of independent subproblems can be a powerful weapon. In the best case—full decomposability of the problem—we get an exponential speedup" [RN10, sec. 10.5, p. 392].
 - **Contras:** no tiene representación explícita de estados, lo que vuelve incómodos algunos cálculos: "it has the disadvantage of not having an explicit representation of states in the state-transition model" [RN10, sec. 10.4.4, p. 391]. Por eso hoy no es competitivo en planificación clásica completamente automatizada, aunque se sigue usando en planificación de operaciones y en dominios donde es importante que **humanos entiendan los planes** [ibidem].
 
+### 6.b. Describa con sus palabras el funcionamiento del algoritmo de Planificación de Orden Parcial
+
+- Es una **búsqueda regresiva sobre el espacio de planes**: cada nodo es un plan, posiblemente incompleto, con metas sin resolver [García, VI, PDF p. 10].
+- Se parte del plan inicial `As = {start, finish}`, `Os = {start < finish}`, `Ls = {}`, `Goals = G` [García, VI, PDF pp. 12-13].
+- Se repite hasta que `Goals` esté vacío o no haya plan [García, VI, PDF p. 32]:
+  1. sacar una submeta `M` de la agenda `Goals`;
+  2. elegir un paso que logre `M`: puede ser un paso **ya existente** en `As` (incluido `start`) o uno **nuevo** que se agrega a `As` [García, VI, PDF p. 35];
+  3. agregar a `Os` y `Ls` el vínculo causal y las restricciones de orden correspondientes (todo vínculo causal es una restricción de orden);
+  4. verificar y resolver las amenazas;
+  5. agregar a `Goals` las nuevas submetas, es decir las precondiciones del paso nuevo.
+- Hay **dos puntos de elección** y por lo tanto de backtracking: qué acción se elige para lograr la precondición `P`, y si la amenaza se resuelve por demotion o por promotion [García, VI, PDF p. 36].
+- Si no hay ningún paso que logre `M`, o la amenaza no se puede resolver, se vuelve a un punto de backtracking; si no queda ninguno, **no hay plan** [García, VI, PDF p. 32].
+
+#### EXTRAS
+
+- PMG escribe el algoritmo en Prolog [PMG, sec. 8.3, pp. 310-311]: `pop(Plan, [], Plan).` y `pop(CPlan, Agenda, FPlan) :- select(Goal, Agenda, Agenda'), solve_goal(Goal, CPlan, NPlan, Agenda', NAgenda), pop(NPlan, NAgenda, FPlan).`
+- `solve_goal` tiene dos cláusulas, que corresponden a los dos casos del paso 2: si la acción `Ao` que logra `P` ya está en `As`, sólo se agrega la restricción `Ao < Ai` y el vínculo causal; si es nueva, se agrega a `As`, se agregan `start < Ao` y `Ao < Ai`, el vínculo causal y sus precondiciones a la agenda (`add_preconds`) [PMG, sec. 8.3, p. 311].
+- En PMG la elección de **qué** submeta sacar de la agenda es un predicado aparte, `select`, con la nota "Here is one of many possible selection algorithms" [PMG, sec. 8.3, p. 311].
+- Los predicados que resuelven amenazas son `threatens`, `enforce_order` y `protect` [PMG, sec. 8.3, p. 313].
+
+### 6.c. ¿Qué diferencia fundamental hay entre el espacio de búsqueda de STRIPS y el de POP?
+
+- **STRIPS (forward):** la búsqueda es en el **espacio de estados**: los nodos son estados y las aristas son la aplicación de un operador [García, VI, PDF pp. 5-6].
+- **POP:** la búsqueda es en el **espacio de planes**: los nodos son planes (posiblemente incompletos, con metas sin resolver) [García, VI, PDF p. 10]. Más aún, cada nodo del espacio de búsqueda es a su vez un grafo —el propio plan parcial, con los pasos como nodos y los vínculos causales como aristas—: "el espacio de búsqueda es un grafo, donde cada nodo de este espacio es a su vez un grafo (plan parcial)" [García, VI, PDF p. 36].
+- **Consecuencia:** en STRIPS lo que se busca es un camino, es decir una secuencia de acciones; en POP lo que se busca es un plan al que se le van agregando pasos y restricciones de orden [ibidem].
+
+#### EXTRAS
+
+- El problema que POP viene a resolver: los planificadores iniciales ("linear planning") calculaban un subplan por submeta y los concatenaban, y resultaron **incompletos**: no podían resolver problemas simples como la *Sussman anomaly*. "A complete planner must allow for interleaving of actions from different subplans within a single sequence" [RN10, sec. 10.6, p. 394].
+- Relacionado: "The notion of serializable subgoals (Korf, 1987) corresponds exactly to the set of problems for which noninterleaved planners are complete" [RN10, sec. 10.6, p. 394].
+- En POP este problema desaparece porque las ramas independientes del plan quedan representadas de forma explícita [RN10, sec. 10.4.4, p. 391].
+
+### 6.d. ¿Qué se obtiene como resultado de la ejecución de un planificador de orden parcial? ¿Bajo qué condiciones ese resultado permite obtener una solución?
+
+- El resultado es un **plan parcial** `(As, Os, Ls, Goals)`. Provee una solución si cumple dos condiciones [García, VI, PDF p. 33]:
+  1. **no hay amenazas**, y
+  2. para toda precondición `P` de un paso `S` incluido en `As`, existe en `As` un paso `S1` que logra `P`, y además existe en `Ls` un vínculo causal que indica que `S1` logra `P` para `S`.
+- Es decir, agenda vacía y sin amenazas [García, VI, PDF p. 32].
+
+#### EXTRAS
+
+- "A complete plan is a safe partial plan with an empty agenda. A complete plan corresponds to a partial order plan" [PMG, sec. 8.3, p. 311] (misma condición que en la cátedra).
+- El refinamiento se expresa con la noción de extensión: `plan(As2, Os2, Ls2)` es extensión de `plan(As1, Os1, Ls1)` si `As1 ⊆ As2`, `Os1 ⊆ Os2` y `Ls1 ⊆ Ls2` [PMG, sec. 8.3, p. 310].
+- Razón de ser de `start` y `finish` como pseudo-acciones: "The use of these as actions will mean that you don't have special cases for the initial situation and for the goals" [PMG, sec. 8.3, p. 309].
+
+### 6.e. ¿Qué es una solución en POP y qué diferencia hay con una solución en STRIPS?
+
+- **Solución en POP:** un plan parcial, es decir un conjunto de pasos `As` junto con un conjunto de restricciones de orden `Os` [García, VI, PDF p. 33]. De ella pueden extraerse **varias** secuencias de elementos de `As` que respetan las restricciones de `Os`, y cada una de esas secuencias es un plan (totalmente ordenado) [ibidem].
+- **Solución en STRIPS:** un plan, es decir una **secuencia de acciones** en un orden fijo [García, VI, PDF p. 2].
+- **Diferencia:** la solución de POP dice *qué* pasos hay y *qué* pares de pasos deben ir en qué orden relativo; la de STRIPS además dice en qué posición exacta va cada paso. Por eso la solución de POP es más compacta cuando hay partes del plan que no se relacionan entre sí.
+
+#### EXTRAS
+
+- Ejemplo de RN10: si se están cargando 30 paquetes en un avión en un aeropuerto y 50 paquetes en otro avión en otro aeropuerto, "it seems pointless to come up with a strict linear ordering of 80 load actions; the two subsets of actions should be thought of independently" [RN10, sec. 10.4.4, p. 390].
+- Otro ejemplo (la rueda de repuesto): `Remove(Spare,Trunk)` y `Remove(Flat,Axle)` pueden ejecutarse en cualquier orden, siempre que ambas terminen antes de `PutOn(Spare,Axle)`, que es la única restricción que hace falta [RN10, sec. 10.4.4, p. 390].
+
+### 6.f. Amenazas
+
+- **Qué es:** si `S1` tiene como efecto `c`, y `c` es precondición de `S2`, hay un vínculo causal entre `S1` y `S2`. Entonces **cualquier paso `S3` que por las restricciones de orden pudiera ejecutarse entre `S1` y `S2`, y que tenga como efecto borrar el literal `c`, es una amenaza** para ese vínculo causal: si `S3` se ejecutara entre ambos, borraría `c`, que es necesario para `S2` [García, VI, PDF p. 30].
+- **Cuándo se producen:** cada vez que se agrega un nuevo paso al conjunto `As` hay que controlarlas y resolverlas [ibidem]. Por eso el algoritmo POP verifica amenazas después de cada paso agregado [García, VI, PDF p. 32].
+- **Cómo se resuelven:** hay dos formas [García, VI, PDF p. 31]:
+  - (a) **Demotion:** agregar la restricción de orden `S3 < S1`, que obliga a `S3` a aparecer antes que `S1`;
+  - (b) **Promotion:** agregar la restricción de orden `S2 < S3`, que obliga a `S3` a aparecer después que `S2`.
+- **¿Son siempre resolubles?** No. Si el planificador no puede resolver la amenaza por ninguna de las dos alternativas, debe buscar otro camino por backtracking, si es que fuera posible, o de lo contrario **no habrá plan** [ibidem].
+
+#### EXTRAS
+
+- El origen histórico: "The ideas underlying partial-order planning include the detection of conflicts (Tate, 1975a) and the protection of achieved conditions from interference (Sussman, 1975)" [RN10, sec. 10.6, p. 394].
+
+### 6.g. ¿El planificador POP siempre encuentra un plan? ¿En qué situaciones no lo encontraría?
+
+- No siempre. El proceso de planificación **termina sin plan** cuando se dan estas situaciones [García, VI, PDF p. 32]:
+  - no hay ningún paso que logre la submeta `M` elegida de la agenda; o
+  - no se puede resolver una amenaza por ninguna de las dos vías; y
+  - no queda ningún punto de backtracking al cual volver.
+- Mientras haya un camino alternativo, el backtracking permite recuperarlo: los puntos de backtracking son la elección de la acción que logra la precondición `P` y la elección entre demotion y promotion [García, VI, PDF p. 36].
+- Si se llega a `Goals` vacío sin amenazas, en cambio, se obtuvo un plan completo [García, VI, PDF pp. 32-33].
+
+#### EXTRAS
+
+- POP sí es **completo y sound** para el caso clásico: la primera descripción formal de un planificador de orden parcial completo fue la de McAllester y Rosenblitt (1991) y de ahí salieron implementaciones como UCPOP, "A sound, complete, partial order planner for ADL" [RN10, sec. 10.6, p. 394, y Bibliografía]. Es decir, si existe un plan, el backtracking exhaustivo lo encuentra; lo que falla son los caminos elegidos, no la completitud. (En PMG el procedimiento se presenta como no determinista, con los dos puntos de elección, y la búsqueda se hace sobre ellos [PMG, sec. 8.3, pp. 308-309].)
+- Un caso concreto de incorrección: al agregar un vínculo causal hay que poder insertar la restricción de orden correspondiente, y `add_constraint` "fails if Ao < Ai is incompatible with Os", es decir, si la restricción contradice el orden parcial ya construido [PMG, sec. 8.3, p. 312].
+- A diferencia de los planificadores de orden total, que son incompletos (ver 6.c), POP no sufre el problema de las secuencias entrelazadas.
+
 ---
 
 **Fuentes consultadas:**
