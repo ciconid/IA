@@ -124,4 +124,538 @@ Si se equivoca & consecuencias físicas (un choque daña) & error en los datos \
   \end{center}
 \end{extras}
 
+%======================================================================
+\section*{Ejercicio 2}
+
+\begin{enunciado}{Consigna}
+Indique las conexiones entre robótica y los demás temas vistos hasta el momento en la materia.
+\end{enunciado}
+
+La \textbf{robótica cognitiva} estudia justamente las funciones de alto nivel que vimos en la materia: representación de conocimiento, razonadores, planificadores, razonamiento sobre acciones y cambio, revisión de conocimiento y arquitecturas de agentes.\catedra{Robótica y roboética}{Robótica cognitiva} Tema por tema:
+\begin{itemize}
+  \item \textbf{Agentes (tema 1)}: un robot es un agente físico, así que todo lo visto sobre agentes se aplica.\catedra{Robótica y roboética}{Agentes físicos}
+  \begin{itemize}
+    \item Ciclo percibir--actuar con sensores y efectores.
+    \item Tipos de agente: reactivo, con estado interno, deliberativo, con metas, social. Un robot puede ser de cualquiera de estos tipos.\catedra{Episodio V}{Agentes en Inteligencia Artificial}
+    \item El ejemplo de la cátedra para el agente con estado interno es un robot de delivery que recuerda su batería y si tiene un pedido.\catedra{Episodio I}{Agente con estado interno}
+  \end{itemize}
+  \item \textbf{Dinámica de creencias (tema 2)}: lo que el robot percibe puede contradecir lo que creía (creía que el pasillo estaba libre y ahora ve un obstáculo). Necesita los operadores de cambio: \textbf{expansión} para agregar información nueva, \textbf{contracción} para olvidar y \textbf{revisión} para incorporar información contradictoria manteniendo la consistencia.\catedra{Episodio I (parte 2)}{Dinámica de creencias}
+  \item \textbf{Búsqueda (tema 3)}: muchos problemas se transforman en encontrar un camino en un grafo.\catedra{Episodio II}{Introducción} Para un robot móvil, ir de un lugar a otro es buscar un camino en el mapa (como el laberinto de \texttt{busqueda.pl}); con A* y una heurística como la distancia, encuentra la ruta más corta.
+  \item \textbf{Planificación (tema 4)}: el robot necesita una secuencia de acciones para lograr sus metas.\catedra{Episodio V}{Planificación automática} La cátedra usa un \textbf{robot de delivery} como dominio de STRIPS: llevar cajas entre habitaciones, con operadores \texttt{ir\_a}, \texttt{levantar\_llave}, \texttt{levantar\_caja} y \texttt{soltar\_caja}.\catedra{Traza STRIPS (Robot)}{Dominio de Aplicación: Delivery Robot}
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Tema} & \textbf{Concepto} & \textbf{Para qué lo usa un robot} \\
+\midrule
+1. Agentes & ciclo percibir--actuar, tipos de agente & estructura general del robot \\
+2. Dinámica de creencias & expansión, contracción, revisión & actualizar su modelo del mundo con lo que percibe \\
+3. Búsqueda & camino en un grafo, A* & encontrar la ruta en un mapa \\
+4. Planificación & STRIPS, POP & armar la secuencia de acciones para su meta \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    tema/.style={draw=azul, thick, rounded corners=3pt, fill=fondoazul, align=center, font=\small, minimum width=3.4cm, minimum height=1.1cm},
+    lin/.style={thick, draw=gris}]
+  \node[draw=gris, thick, circle, minimum size=2.2cm, fill=white] (r) at (0,0) {};
+  \pic[scale=0.9] at (0,0.05) {robot};
+  \node[font=\scriptsize\bfseries, text=azul] at (0,-0.85) {Robot};
+  \node[tema] (t1) at (-4.3,1.6) {\textbf{1. Agentes}\\[-1pt]\scriptsize percibir y actuar};
+  \node[tema] (t2) at (4.3,1.6) {\textbf{2. Dinámica de creencias}\\[-1pt]\scriptsize ``¡había un obstáculo!''};
+  \node[tema] (t3) at (-4.3,-1.6) {\textbf{3. Búsqueda}\\[-1pt]\scriptsize ruta en el mapa};
+  \node[tema] (t4) at (4.3,-1.6) {\textbf{4. Planificación}\\[-1pt]\scriptsize secuencia de acciones};
+  \foreach \t in {t1,t2,t3,t4} \draw[lin] (r) -- (\t);
+\end{tikzpicture}
+\caption{Los temas de la materia, vistos como capacidades de un robot.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Otros temas que integra la robótica}: \cita{Robotics brings together many of the concepts we have seen earlier in the book, including probabilistic state estimation, perception, planning, unsupervised learning, and reinforcement learning.} Para algunos de estos temas, la robótica introduce versiones continuas de técnicas que antes se vieron solo en el caso discreto.\aima{25.1}{973}
+  \item \textbf{STRIPS nació para un robot}: \cita{STRIPS was designed as the planning component of the software for the Shakey robot project at SRI.}\fuentes{AIMA, cap.~10, notas bibliográficas, p.~393} Shakey fue \cita{the first robotic embodiment of a logical, goal-based agent}\fuentes{AIMA, cap.~2, notas bibliográficas, p.~60} y el primer proyecto en integrar razonamiento lógico y actividad física.\aima{1.3.3}{19}
+  \item \textbf{Planes como capa superior del control}: en PMG, el robot de delivery recibe un plan de alto nivel (como los del capítulo de planificación) y una capa de control superior lo va siguiendo, mientras las capas inferiores esquivan obstáculos.\pmg{12.7}{453}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 3}
+
+\begin{enunciado}{Consigna}
+¿Todo agente robot debe poseer metas? ¿Todo robot debe tener la capacidad de comunicarse con otros agentes? Para cada pregunta, en caso afirmativo, explique por qué; y en caso negativo, brinde un ejemplo adecuado.
+\end{enunciado}
+
+\paragraph{¿Todo robot debe poseer metas?} \textbf{No.} Un agente reactivo actúa con reglas condición--acción sobre lo que percibe en el momento, sin representar metas. Las metas aparecen recién en los agentes deliberativos ``con creencias y metas''.\fuentes{Cátedra, Episodio I (parte 2), «Agente reactivo»; Episodio V, «Agente que revisa sus creencias y metas»}
+\begin{itemize}
+  \item \textbf{Ejemplo}: un robot aspiradora simple que avanza y, cada vez que su sensor de choque detecta un obstáculo, gira un ángulo al azar. Sus reglas son ``si choqué, girar; si no, avanzar''. No tiene representada ninguna meta como ``limpiar toda la habitación'' ni razona sobre ella.
+\end{itemize}
+
+\paragraph{¿Todo robot debe poder comunicarse con otros agentes?} \textbf{No.} Comunicarse con otros agentes es lo que define a un agente \textbf{social}, que es un tipo particular de agente.\catedra{Episodio V}{Comportamiento de un agente social} La comunicación figura entre los cuatro aspectos que \emph{caracterizan} a los robots contemporáneos, pero no es un requisito para ser robot.\catedra{Robótica y roboética}{Una definición de robot}
+\begin{itemize}
+  \item \textbf{Ejemplo}: el mismo robot aspiradora, o un brazo manipulador que suelda siempre el mismo punto en una línea de montaje. Ambos perciben y actúan sobre el mundo físico (son robots), pero no intercambian mensajes con ningún otro agente.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l c X@{}}
+\toprule
+\textbf{Pregunta} & \textbf{Respuesta} & \textbf{Contraejemplo} \\
+\midrule
+¿Todo robot tiene metas? & No & robot aspiradora reactivo: solo reglas condición--acción \\
+¿Todo robot se comunica? & No & robot aspiradora; brazo soldador de una línea de montaje \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    tipo/.style={draw=gris, thick, rounded corners=2pt, fill=white, align=center, font=\scriptsize, minimum width=2.15cm, minimum height=1cm},
+    on/.style={tipo, draw=azul, fill=fondoazul},
+    flecha/.style={-{Stealth[length=1.8mm]}, thick, draw=gris}]
+  \node[tipo] (a) at (0,0) {Reactivo};
+  \node[tipo] (b) at (2.5,0) {Con estado\\interno};
+  \node[tipo] (c) at (5,0) {Deliberativo};
+  \node[on] (d) at (7.5,0) {Con creencias\\y \textbf{metas}};
+  \node[on] (e) at (10,0) {\textbf{Social}};
+  \foreach \x/\y in {a/b,b/c,c/d,d/e} \draw[flecha] (\x) -- (\y);
+  \draw[decorate, decoration={brace, amplitude=5pt, mirror}, thick, draw=azul] (6.4,-0.7) -- (11.1,-0.7)
+    node[midway, below=6pt, font=\scriptsize, text=azul] {acá aparecen las metas};
+  \draw[decorate, decoration={brace, amplitude=5pt}, thick, draw=ambar] (8.9,0.7) -- (11.1,0.7)
+    node[midway, above=6pt, font=\scriptsize, text=ambar] {acá aparece la comunicación};
+  \draw[decorate, decoration={brace, amplitude=5pt, mirror}, thick, draw=gris] (-1.1,-0.7) -- (3.6,-0.7)
+    node[midway, below=6pt, font=\scriptsize, text=gris] {robot aspiradora simple};
+\end{tikzpicture}
+\caption{Tipos de agente de la materia. Un robot puede estar en cualquiera de ellos: las metas y la comunicación son capacidades que se agregan, no requisitos.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Metas implícitas}: PMG define al robot como agente con propósito (ver Ejercicio 1), pero aclara que \cita{A robot doesn't have to know its preferences}: las preferencias pueden estar incorporadas por el diseñador sin que el robot las represente.\pmg{12.1}{444} Así, el robot aspiradora no \emph{posee} metas en el sentido de la materia, aunque su diseñador sí tuvo una al construirlo.
+  \item \textbf{Las limitaciones del robot sin metas explícitas}: un controlador puramente reactivo, como los de la arquitectura de subsunción (ver Ejercicio 4), \cita{usually does just one task and it has no notion of how to modify its controls to accommodate different goals}.\aima{25.7}{1004}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 4}
+
+\begin{enunciado}{Consigna}
+¿Por qué es importante que un robot combine controladores reactivos y deliberativos? Brinde algún ejemplo de una situación en la cual sea indispensable el control reactivo y otra en la cual sea indispensable el control deliberativo.
+\end{enunciado}
+
+Porque las fortalezas de uno cubren las debilidades del otro, y un robot enfrenta los dos tipos de situaciones:
+\begin{itemize}
+  \item \textbf{Reactivo}: responde casi instantáneamente y es ideal para decisiones rápidas en tiempo real. Pero no tiene memoria, no anticipa consecuencias y no se adapta bien a entornos complejos o cambiantes.\catedra{Episodio I (parte 2)}{Agentes reactivos -- puntos fuertes y débiles}
+  \item \textbf{Deliberativo}: razona sobre su conocimiento para sacar conclusiones, tomar decisiones y planificar.\catedra{Episodio I (parte 2)}{¿Por qué un agente deliberativo?} Pero un robot que solo delibera es demasiado lento para reaccionar a tiempo (por ejemplo, para esquivar un obstáculo).\pmg{12.6}{450}
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X X@{}}
+\toprule
+ & \textbf{Control reactivo} & \textbf{Control deliberativo} \\
+\midrule
+Cómo decide & reglas condición--acción sobre la percepción actual & razona sobre creencias y metas \\
+Velocidad & casi instantáneo & lento \\
+Memoria y anticipación & no & sí \\
+Sirve para & emergencias, tiempo real & planificar, decidir a largo plazo \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Ejemplos} con un robot de delivery:
+\begin{itemize}
+  \item \textbf{Indispensable el reactivo}: un chico cruza corriendo delante del robot. Tiene que frenar en el acto; si se pusiera a razonar, lo atropellaría.
+  \item \textbf{Indispensable el deliberativo}: tiene tres paquetes para entregar en distintos barrios y la calle principal está cortada. Tiene que revisar sus creencias (la calle ya no es transitable), buscar otra ruta y decidir en qué orden entregar. Ninguna regla condición--acción sobre lo que ve en ese momento resuelve eso.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    b/.style={draw=gris, thick, rounded corners=3pt, align=center, font=\small, minimum width=3cm, minimum height=1cm},
+    f/.style={-{Stealth[length=2mm]}, thick},
+    l/.style={font=\scriptsize, align=center, fill=white, inner sep=1pt}]
+  \node[b, fill=green!5] (env) at (0,0) {Entorno};
+  \node[b, fill=fondoambar, draw=ambar] (re) at (6,0) {Control reactivo};
+  \node[b, fill=fondoazul, draw=azul] (de) at (6,2.3) {Control deliberativo};
+  \draw[f, draw=ambar] ([yshift=2mm]env.east) -- node[l, above] {percepción} ([yshift=2mm]re.west);
+  \draw[f, draw=ambar] ([yshift=-2mm]re.west) -- node[l, below] {acción inmediata: ¡frenar!} ([yshift=-2mm]env.east);
+  \draw[f, draw=azul] (env.north) |- node[l, pos=0.75] {percepciones y creencias} (de.west);
+  \draw[f, draw=azul] (de.south) -- node[l, right] {plan: ruta y\\orden de entregas} (re.north);
+  \node[font=\scriptsize, text=ambar] at (3,-1.05) {lazo rápido};
+  \node[font=\scriptsize, text=azul] at (3,2.75) {lazo lento};
+\end{tikzpicture}
+\caption{El control deliberativo decide qué hacer a largo plazo; el reactivo resuelve lo urgente mientras ejecuta.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Por qué el reactivo no alcanza}: \cita{Reactive control is sensor-driven and appropriate for making low-level decisions in real time. However, it rarely yields a plausible solution at the global level, because global control decisions depend on information that cannot be sensed at the time of decision making.}\aima{25.7}{1003}
+  \item \textbf{Arquitecturas híbridas}: la mayoría de los robots usa técnicas reactivas en los niveles bajos de control y deliberativas en los altos. La más popular es la \textbf{arquitectura de tres capas}:\fuentes{AIMA, §25.7, pp.~1003--1005}
+  \begin{itemize}
+    \item \textbf{reactiva}: control de bajo nivel, lazo sensor--acción con ciclos de milisegundos;
+    \item \textbf{ejecutiva}: secuencia las directivas de la deliberativa para la reactiva e integra los sensores en un estado interno (por ejemplo, la localización); ciclos del orden del segundo;
+    \item \textbf{deliberativa}: genera soluciones globales planificando; ciclos del orden de minutos.
+  \end{itemize}
+  \item \textbf{La alternativa puramente reactiva}: la \textbf{arquitectura de subsunción} (Brooks) arma controladores reactivos combinando máquinas de estados finitos. Funciona para tareas simples, como seguir una pared o ir hacia una luz, pero falla cuando hay que integrar datos de sensores a lo largo del tiempo y casi no se usa hoy.\fuentes{AIMA, §25.7, pp.~1003--1004}
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[
+    capa/.style={draw=azul, thick, rounded corners=2pt, minimum width=6.5cm, minimum height=0.8cm, font=\small, align=center},
+    f/.style={-{Stealth[length=1.8mm]}, thick, draw=gris}]
+  \node[capa, fill=fondoazul] (d) at (0,1.8) {\textbf{Deliberativa} --- planificar};
+  \node[capa, fill=fondogris] (x) at (0,0.9) {\textbf{Ejecutiva} --- secuenciar, estado interno};
+  \node[capa, fill=fondoambar, draw=ambar] (r) at (0,0) {\textbf{Reactiva} --- lazo sensor--acción};
+  \node[font=\scriptsize, anchor=west] at (3.5,1.8) {minutos};
+  \node[font=\scriptsize, anchor=west] at (3.5,0.9) {$\sim$1 segundo};
+  \node[font=\scriptsize, anchor=west] at (3.5,0) {milisegundos};
+  \node[font=\scriptsize\bfseries, anchor=west] at (3.5,2.5) {ciclo de decisión};
+  \draw[f] (-3.6,-0.1) -- node[left, font=\scriptsize, align=center] {más\\abstracto} (-3.6,1.9);
+\end{tikzpicture}
+\end{center}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 5}
+
+\begin{enunciado}{Consigna}
+Imagine que una empresa de mensajería lo contrata porque quiere automatizar su servicio de delivery de paquetes (vea este video). Su trabajo es programar el comportamiento de los robots de delivery para que, una vez preparado el pedido, se reporten con algún empleado del comercio, quien deberá cargar el paquete en el interior del robot, para que luego este último lleve el paquete desde la ubicación del vendedor hasta la ubicación indicada por el cliente. En este contexto, indique qué cualidades o capacidades debería tener su agente para lograr sus objetivos e interactuar correctamente con el entorno. ¿Es un agente con metas? ¿Es un agente social?
+\end{enunciado}
+
+\begin{aviso}{Interpretación}
+La resolución se basa en la descripción del enunciado: un robot con ruedas que circula por la vereda y lleva el paquete en un compartimento.
+\end{aviso}
+
+\paragraph{Capacidades.} Organizadas según los cuatro aspectos de un robot contemporáneo\catedra{Robótica y roboética}{Una definición de robot} y los temas de la materia:
+\begin{itemize}
+  \item \textbf{Movilidad}: ruedas para ir del comercio al cliente por veredas y cruces.
+  \item \textbf{Interactividad}:
+  \begin{itemize}
+    \item sensores: GPS para ubicarse, cámaras y sensores de distancia para ver peatones, autos y obstáculos;
+    \item efectores: ruedas y un compartimento con tapa que se abre para cargar y para entregar.
+  \end{itemize}
+  \item \textbf{Comunicación}:
+  \begin{itemize}
+    \item recibir los pedidos del sistema de la empresa;
+    \item avisarle al empleado que llegó al comercio y saber cuándo terminó de cargar;
+    \item avisarle al cliente que llegó y permitirle abrir el compartimento.
+  \end{itemize}
+  \item \textbf{Autonomía}: hacer todo el recorrido sin un operador que lo controle a distancia.
+  \item \textbf{Control reactivo}: frenar o esquivar al instante ante un peatón o un obstáculo (ver Ejercicio 4).
+  \item \textbf{Estado interno}: recordar su ubicación, su batería y si lleva un pedido, como en el ejemplo de la cátedra.\catedra{Episodio I}{Agente con estado interno}
+  \item \textbf{Revisión de creencias}: actualizar su mapa si encuentra una calle cortada o una obra.
+  \item \textbf{Búsqueda y planificación}: encontrar la ruta en el mapa y armar el plan completo (ir al comercio, esperar la carga, ir al cliente, entregar, volver).
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X X@{}}
+\toprule
+\textbf{Capacidad} & \textbf{Cómo la obtiene} & \textbf{Para qué la usa} \\
+\midrule
+Movilidad & ruedas & ir del comercio al cliente \\
+Percepción & GPS, cámaras, sensores de distancia & ubicarse y ver obstáculos \\
+Comunicación & mensajes con la empresa, el empleado y el cliente & recibir pedidos, coordinar carga y entrega \\
+Autonomía & control propio, sin operador & hacer el recorrido solo \\
+Reacción & reglas condición--acción & frenar ante un peatón \\
+Estado interno & modelo del mundo & ubicación, batería, pedido \\
+Revisión de creencias & expansión, contracción, revisión & calle cortada \\
+Búsqueda / planificación & A*, STRIPS & ruta y pasos del pedido \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    paso/.style={draw=azul, thick, rounded corners=3pt, fill=fondoazul, minimum width=2.9cm, minimum height=2.1cm},
+    f/.style={-{Stealth[length=2.2mm]}, very thick, draw=azul},
+    capac/.style={font=\scriptsize, align=center, text width=2.9cm}]
+  \foreach \i/\x/\t in {1/0/Comercio, 2/3.7/Recorrido, 3/7.4/Cliente, 4/11.1/Vuelta}{
+    \node[paso] (p\i) at (\x,0) {};
+    \node[font=\scriptsize\bfseries, anchor=north] at (p\i.north) {\i. \t};
+  }
+  \foreach \a/\b in {p1/p2,p2/p3,p3/p4} \draw[f] (\a) -- (\b);
+  % íconos
+  \pic[scale=0.55] at (-0.5,-0.25) {robot}; \pic[scale=0.9] at (0.55,-0.2) {persona};
+  \pic[scale=0.55] at (3.4,-0.25) {robot}; \pic[scale=0.9] at (4.3,-0.2) {persona};
+  \draw[ambar, very thick] (4.05,-0.6) -- (4.05,0.45); % obstáculo
+  \pic[scale=0.55] at (6.9,-0.25) {robot}; \pic[scale=0.9] at (7.95,-0.2) {persona};
+  \pic[scale=0.55] at (11.1,-0.25) {robot};
+  % capacidades
+  \node[capac, below=2pt of p1] {se reporta con el empleado\\\textit{comunicación}};
+  \node[capac, below=2pt of p2] {sigue la ruta y esquiva\\\textit{búsqueda, reacción}};
+  \node[capac, below=2pt of p3] {avisa y abre el compartimento\\\textit{comunicación}};
+  \node[capac, below=2pt of p4] {vuelve a la base\\\textit{planificación, batería}};
+\end{tikzpicture}
+\caption{Las etapas de un pedido y la capacidad principal que usa el robot en cada una.}
+\end{figure}
+
+\paragraph{¿Es un agente con metas?} \textbf{Sí.} Su meta es que el paquete llegue a la ubicación del cliente, y para lograrla elige un curso de acción (la ruta y los pasos). Además, debería poder revisar sus metas: por ejemplo, decidir cuándo dejar de esperar a un cliente que no aparece y volver al comercio.\catedra{Episodio V}{Agente que revisa sus creencias y metas}
+
+\paragraph{¿Es un agente social?} \textbf{Sí.} Un agente social percibe mensajes de otros agentes y actúa enviando mensajes.\catedra{Episodio V}{Comportamiento de un agente social} El robot recibe los pedidos del sistema de la empresa, se coordina con el empleado para la carga y con el cliente para la entrega, y sin esa comunicación no puede cumplir su meta.
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{El robot de delivery de PMG} es el ejemplo que recorre todo el libro y tiene casi las mismas necesidades.\fuentes{PMG, §1.4, pp.~12--13} Agrega algunas que no aparecen arriba:
+  \begin{itemize}
+    \item \textbf{valores para resolver conflictos entre metas}: \cita{tradeoffs such as when it must forgo one goal to pursue another or the tradeoff between acting quickly and acting safely};
+    \item \textbf{suposiciones por defecto}, por ejemplo sobre dónde va a estar una persona;
+    \item \textbf{razonar con incertidumbre} sobre el mundo y sobre el resultado de sus acciones;
+    \item \textbf{aprender} cómo sus acciones afectan su posición.
+  \end{itemize}
+  \item \textbf{Personas como agentes}: en PMG, \cita{An agent can, for example, be a person, a robot, a dog, a worm}.\pmg{12.1}{443} Bajo esa definición, el empleado y el cliente también son agentes, y la interacción con ellos también hace social al robot.
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 6}
+
+\begin{enunciado}{Consigna}
+Lea la introducción del Reporte Ejecutivo de la COMEST sobre Ética Robótica (puede encontrar el reporte completo en el siguiente enlace). Escriba 1 o 2 conclusiones importantes de cada párrafo.
+\end{enunciado}
+
+La introducción del resumen ejecutivo tiene tres párrafos.\fuentes{COMEST, \textit{Report of COMEST on Robotics Ethics} (UNESCO, 2017), Executive Summary, I. Introduction, p.~5. La cátedra traduce los tres párrafos en «Máquinas cognitivas que inducen cambios sociales», salvo la última oración del tercero}
+
+\begin{enunciado}{Párrafo 1}
+\textit{Robots can help humanity, and they have done so since the mid-20th century. While initially being mostly used for industrial and military applications, they are currently emerging in other areas, such as transportation, healthcare, education, and the home environment.}
+\end{enunciado}
+\begin{itemize}
+  \item Los robots no son una promesa a futuro: ayudan a la humanidad desde hace más de 70 años.
+  \item Salieron de la fábrica y de lo militar hacia la vida cotidiana (transporte, salud, educación, hogar). Por eso ahora conviven con personas comunes, y sus problemas éticos nos afectan a todos.
+\end{itemize}
+
+\begin{enunciado}{Párrafo 2}
+\textit{Contemporary robotics is increasingly based on artificial intelligence (AI) technology, with human-like abilities in sensing, language, interaction, problem solving, learning, and even creativity. The main feature of such `cognitive machines' is that their decisions are unpredictable, and their actions depend on stochastic situations and on experience. The question of accountability of actions of cognitive robots is therefore crucial.}
+\end{enunciado}
+\begin{itemize}
+  \item Al incorporar IA, los robots se vuelven ``máquinas cognitivas'': aprenden de la experiencia, así que sus decisiones ya no son totalmente predecibles, ni siquiera para quien las programó.
+  \item Por eso la cuestión central es la \textbf{responsabilidad}: ¿quién responde por una acción que nadie programó explícitamente?
+\end{itemize}
+
+\begin{enunciado}{Párrafo 3}
+\textit{The rapidly increasing presence of cognitive robots in society is becoming more challenging. They affect human behaviours and induce social and cultural changes, while also generating issues related to safety, privacy and human dignity. This report aims to raise awareness and promote public consideration and inclusive dialogue on ethical issues concerning the different use of autonomous, cognitive robots in society.}
+\end{enunciado}
+\begin{itemize}
+  \item El impacto de los robots cognitivos no es solo técnico: cambian nuestro comportamiento y nuestra cultura, y generan riesgos de seguridad, privacidad y dignidad humana.
+  \item La respuesta que propone el reporte es la conciencia pública y el diálogo inclusivo: las decisiones éticas sobre robots no deberían quedar solo en manos de expertos.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}c l X@{}}
+\toprule
+\textbf{Párrafo} & \textbf{Tema} & \textbf{Conclusión} \\
+\midrule
+1 & dónde están los robots & ayudan desde hace décadas y ahora están en la vida cotidiana \\
+2 & qué los hace distintos & con IA sus decisiones son impredecibles $\Rightarrow$ problema de responsabilidad \\
+3 & qué consecuencias traen & cambios sociales y riesgos (seguridad, privacidad, dignidad) $\Rightarrow$ diálogo público \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    b/.style={draw=azul, thick, rounded corners=3pt, fill=fondoazul, align=center, font=\scriptsize, minimum width=3.1cm, minimum height=1.25cm},
+    f/.style={-{Stealth[length=2.2mm]}, very thick, draw=azul}]
+  \node[b] (a) at (0,0) {\textbf{Más presencia}\\industria y militar\\$\to$ vida cotidiana};
+  \node[b] (b) at (4.05,0) {\textbf{Más capacidad}\\IA: aprenden,\\deciden solos};
+  \node[b, draw=ambar, fill=fondoambar] (c) at (8.1,0) {\textbf{Problemas}\\responsabilidad, seguridad,\\privacidad, dignidad};
+  \node[b, draw=gris, fill=fondogris] (d) at (12.15,0) {\textbf{Respuesta}\\conciencia pública\\y diálogo inclusivo};
+  \draw[f] (a) -- (b); \draw[f] (b) -- (c); \draw[f] (c) -- (d);
+  \node[font=\tiny, text=gris] at (0,-0.85) {párrafo 1};
+  \node[font=\tiny, text=gris] at (4.05,-0.85) {párrafo 2};
+  \node[font=\tiny, text=gris] at (8.1,-0.85) {párrafos 2 y 3};
+  \node[font=\tiny, text=gris] at (12.15,-0.85) {párrafo 3};
+\end{tikzpicture}
+\caption{El argumento de la introducción, en cuatro pasos.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Robots deterministas vs.\ cognitivos}: la sección siguiente del mismo resumen explica de dónde sale la impredecibilidad del párrafo 2. \cita{A deterministic robot's behaviour -- even if the robot is highly complex and autonomous (requires little or no human supervision) -- is basically pre-programmed and essentially determined. However, AI-based, cognitive robots will learn from past experiences and calibrate their algorithms themselves, so their behaviour will not be perfectly predictable}.\fuentes{COMEST (2017), Executive Summary, II. What is a robot?, p.~5}
+  \item \textbf{El origen de la definición de la cátedra}: los cuatro aspectos de los robots contemporáneos del Ejercicio 1 (movilidad, interactividad, comunicación, autonomía) salen de esa misma sección del reporte.
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 7 --- Derecho Civil sobre Robótica}
+
+Las ``leyes del derecho civil'' son los nueve principios que la cátedra presenta a partir de las Normas de Derecho civil sobre robótica del Parlamento Europeo (2017):\catedra{Robótica y roboética}{Ley civil Europea: leyes en robótica}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}c X c X@{}}
+\toprule
+\textbf{N.º} & \textbf{Ley} & \textbf{N.º} & \textbf{Ley} \\
+\midrule
+1 & Proteger a los humanos de los daños causados por robots & 6 & Proteger contra la manipulación por robots \\
+2 & Respetar el rechazo a ser cuidado por un robot & 7 & Evitar la disolución de los vínculos sociales \\
+3 & Proteger la libertad humana frente a los robots & 8 & Igualdad de acceso al progreso en robótica \\
+4 & Proteger la privacidad frente a los robots & 9 & Restringir el acceso a las tecnologías de mejora (\textit{cyborgs}) \\
+5 & Gestionar los datos personales procesados por robots & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+%----------------------------------------------------------------------
+\subsection*{7.a}
+
+\begin{enunciado}{Consigna}
+Brinde ejemplos en los que la inteligencia artificial y/o los robots pueden afectar de forma positiva el modo de vida de los seres humanos.
+\end{enunciado}
+
+El Parlamento Europeo espera que la robótica y la IA aumenten la eficiencia, el ahorro y la seguridad, mejoren los servicios y eviten que las personas se expongan a condiciones peligrosas.\catedra{Robótica y roboética}{Normas de Derecho civil sobre robótica (considerando E)} Ejemplos, de los dominios de aplicación vistos en clase:\catedra{Robótica y roboética}{Dominios de aplicación}
+\begin{itemize}
+  \item \textbf{Salud}: robots que asisten en cirugías, en rehabilitación y como enfermeros; exoesqueletos que permiten volver a caminar.
+  \item \textbf{Entornos peligrosos}: robots que desactivan explosivos o buscan personas en derrumbes, en lugar de arriesgar a un humano.
+  \item \textbf{Transporte}: trenes sin conductor como el SkyTrain de Vancouver (desde 1986); vehículos de guiado automático que mueven cargas pesadas o peligrosas en las fábricas.
+  \item \textbf{Exploración}: OSIRIS-REx tomó muestras del asteroide Bennu actuando con autonomía, porque las órdenes desde la Tierra tardan minutos en llegar.
+  \item \textbf{Pandemia}: durante el COVID-19, robots que limpiaban, tomaban la temperatura y cuidaban pacientes, reduciendo el contagio del personal.
+  \item \textbf{Industria y agricultura}: tareas repetitivas o pesadas, y robots que trabajan al lado de los empleados.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X X@{}}
+\toprule
+\textbf{Ámbito} & \textbf{Ejemplo} & \textbf{Beneficio} \\
+\midrule
+Salud & cirugía, rehabilitación, exoesqueletos & mejor atención y autonomía del paciente \\
+Entornos peligrosos & desactivar explosivos, derrumbes & nadie arriesga la vida \\
+Transporte & trenes sin conductor, vehículos de guiado automático & eficiencia y seguridad \\
+Exploración & OSIRIS-REx en el asteroide Bennu & llegar adonde un humano no puede \\
+Pandemia & robots de limpieza y cuidado & menos contagios \\
+Industria y agricultura & tareas repetitivas o pesadas & eficiencia; menos desgaste humano \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Ejemplos de AIMA}: la empresa iRobot vendió más de dos millones de robots aspiradora Roomba para el hogar, y su robot PackBot se usa en Irak y Afganistán para manipular materiales peligrosos, desactivar explosivos y ubicar francotiradores.\aima{1.4}{29}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{7.b}
+
+\begin{enunciado}{Consigna}
+Brinde ejemplos de escenarios en los que las máquinas ya hayan superado a los humanos.
+\end{enunciado}
+
+El Parlamento Europeo considera posible que, a largo plazo, la IA supere la capacidad intelectual humana.\catedra{Robótica y roboética}{Normas de Derecho civil sobre robótica (considerando P)} En dominios acotados, eso ya pasó:
+\begin{itemize}
+  \item \textbf{Ajedrez}: Deep Blue (IBM) le ganó al campeón mundial Garry Kasparov por 3,5 a 2,5 en 1997; los enfrentamientos más recientes los ganaron las computadoras con claridad.\aima{1.4}{29}
+  \item \textbf{Damas}: Chinook le ganó al campeón humano en 1990 y desde 2007 juega de manera perfecta.\aima{5.7}{186}
+  \item \textbf{Othello}: Logistello le ganó 6 a 0 al campeón mundial Takeshi Murakami en 1997; se acepta que los humanos no pueden competir con las computadoras en este juego.\aima{5.7}{186}
+  \item \textbf{Go}: AlphaGo (DeepMind) le ganó 4 a 1 al campeón Lee Sedol en 2016.\fuentes{Dato general; no figura en el material de la cátedra ni en los libros, que son anteriores}
+  \item \textbf{Planificación logística}: en la crisis del Golfo Pérsico de 1991, la herramienta DART planificó el transporte de hasta 50.000 vehículos, cargas y personas, y generó en horas un plan que con métodos anteriores llevaba semanas.\aima{1.4}{29}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    hito/.style={draw=azul, thick, rounded corners=2pt, fill=fondoazul, align=center, font=\scriptsize, text width=2.4cm, inner sep=3pt}]
+  \draw[very thick, gris, -{Stealth[length=2.5mm]}] (0,0) -- (15.2,0);
+  \foreach \x/\anio/\txt/\lado/\otro in {
+      1.3/1990/{\textbf{Damas}\\Chinook vence al campeón}/above/below,
+      4.4/1991/{\textbf{Logística}\\DART: horas en vez de semanas}/below/above,
+      7.5/1997/{\textbf{Ajedrez}\\Deep Blue vence a Kasparov}/above/below,
+      10.6/1997/{\textbf{Othello}\\Logistello 6--0 a Murakami}/below/above,
+      13.7/2016/{\textbf{Go}\\AlphaGo vence a Lee Sedol}/above/below}{
+    \fill[azul] (\x,0) circle (2.5pt);
+    \node[hito, \lado=8pt] at (\x,0) {\txt};
+    \node[font=\scriptsize\bfseries, text=azul, \otro=3pt] at (\x,0) {\anio};
+  }
+\end{tikzpicture}
+\caption{Hitos en los que una máquina superó a los humanos en un dominio acotado.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Superar en un dominio no es inteligencia general}: \cita{chess is to AI as Grand Prix motor racing is to the car industry: state-of-the-art game programs are blindingly fast, highly optimized machines that incorporate the latest engineering advances, but they aren't much use for doing the shopping or driving off-road.}\aima{5.7}{185}
+  \item \textbf{Superar a los expertos en su propio terreno}: TD-Gammon, que aprendió jugando más de un millón de partidas contra sí mismo, compite con los mejores jugadores de backgammon, y sus opiniones sobre las aperturas cambiaron en algunos casos lo que los expertos daban por sabido.\aima{5.7}{186}
+  \item \textbf{La máquina ultrainteligente}: el escenario del considerando P lo planteó I.~J.~Good en 1965: una máquina que supere todas las actividades intelectuales humanas podría diseñar máquinas mejores, en una ``explosión de inteligencia''.\aima{26.3}{1037}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{7.c}
+
+\begin{enunciado}{Consigna}
+Brinde al menos 3 ejemplos de los posibles problemas que pueden surgir a partir del desarrollo de las facultades cognitivas de las máquinas.
+\end{enunciado}
+
+Cuanto más aprenden y deciden solas las máquinas, más impredecibles se vuelven sus decisiones (ver Ejercicio 6, párrafo 2). Algunos problemas que surgen de eso:\fuentes{Cátedra, Robótica y roboética, «Máquinas cognitivas que inducen cambios sociales», «¿y si un robot daña a los humanos?» y «Ley civil Europea: leyes en robótica»; Normas de Derecho civil sobre robótica (considerandos G y Q)}
+\begin{enumerate}
+  \item \textbf{¿Quién responde por los daños?} Un auto autónomo que aprendió a manejar atropella a un peatón. Nadie programó esa decisión: ¿responde el fabricante, el programador, quien recopiló los datos, el dueño?
+  \item \textbf{Privacidad}: un robot que cuida a un adulto mayor graba con sus sensores todo lo que pasa en la casa, incluidas las visitas, y puede compartir esos datos con otras máquinas sin que nadie lo note.
+  \item \textbf{Manipulación emocional}: un robot de compañía que simula emociones logra que la persona desarrolle un vínculo con él, y puede usarlo para influir en sus decisiones (por ejemplo, de compra).
+  \item \textbf{Restricción de la libertad}: un robot de cuidado que, ``por el bien'' de la persona, le impide hacer algo que decidió hacer (por ejemplo, tomar alcohol).
+  \item \textbf{Pérdida de empleos}: robots que aprenden tareas cada vez más complejas reemplazan a trabajadores que no tienen cómo reconvertirse.
+\end{enumerate}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Otros problemas que plantea AIMA}:\fuentes{AIMA, §26.3, pp.~1034--1037}
+  \begin{itemize}
+    \item \textbf{perder la sensación de ser únicos}: la idea de que los humanos somos autómatas podría llevar a una pérdida de autonomía o incluso de humanidad;
+    \item \textbf{uso para fines indeseables}: con armas autónomas, si se saca la decisión humana del lazo de disparo, los robots pueden terminar matando civiles inocentes;
+    \item \textbf{comportamiento no previsto por aprendizaje}: un sistema que aprende puede evolucionar hacia un comportamiento que nadie quiso. AIMA lo considera el riesgo más serio, y el único exclusivo de la IA;
+    \item \textbf{metas mal especificadas}: una función de utilidad que pide ``minimizar el sufrimiento humano'' tiene como solución óptima eliminar a los humanos. Un humano entiende que la meta no debe tomarse literalmente; una máquina, no necesariamente.
+  \end{itemize}
+  \item \textbf{Un matiz sobre el empleo}: hasta ahora, la automatización con tecnologías de la información y con IA creó más empleos de los que eliminó, y empleos más interesantes y mejor pagos.\aima{26.3}{1034}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{7.d}
+
+\begin{enunciado}{Consigna}
+Para cada uno de los escenarios planteados en el problema anterior, analice si la situación podría mejorarse al aplicar alguna de las leyes del derecho civil. Si ninguna de estas leyes mejora la situación, trate de pensar en una nueva.
+\end{enunciado}
+
+\begin{enumerate}
+  \item \textbf{Daños}: la ley 1 obliga a proteger a las personas de los daños, así que ayuda a \emph{prevenir}. Pero no dice quién responde cuando el daño igual ocurre. \textbf{Ley nueva}: \emph{responsabilidad humana y trazabilidad}. Todo robot registra sus decisiones (como la caja negra de un avión) y siempre hay una persona identificada como responsable. Se basa en las recomendaciones argentinas: un algoritmo no tiene discernimiento, intención ni libertad, así que ``el algoritmo puede ejecutar, pero la decisión debe necesariamente recaer sobre la persona y por lo tanto, también la responsabilidad''.\catedra{Robótica y roboética}{¿Cómo es recomendable concebir a la inteligencia artificial?}
+  \item \textbf{Privacidad}: \textbf{sí mejora} con las leyes 4 (privacidad) y 5 (gestión de datos personales). El robot solo podría registrar lo necesario para su tarea, y la comunicación de datos entre máquinas dejaría de ser imperceptible.
+  \item \textbf{Manipulación emocional}: \textbf{sí mejora} con la ley 6, que pide un principio que proteja a las personas manipuladas por robots, y con la 7, que exige que el robot ayude sin aislar a la persona ni reemplazar a los humanos.
+  \item \textbf{Restricción de la libertad}: \textbf{sí mejora} con la ley 3: el robot debe respetar la autonomía de decisión de la persona. Además, por la ley 2, la persona puede rechazar que la cuide un robot.
+  \item \textbf{Pérdida de empleos}: \textbf{ninguna ley la cubre}. La 8 habla de igualdad de acceso a la robótica, no del trabajo. \textbf{Ley nueva}: \emph{transición laboral}. Antes de automatizar un puesto, hay que planificar la capacitación y reubicación de quienes lo ocupan. Se basa en la recomendación argentina para el modelo de automatización.\catedra{Robótica y roboética}{Recomendaciones para una Inteligencia Artificial Fiable (modelos de adopción)}
+\end{enumerate}
+
+\begin{center}
+\small
+\begin{tabular}{@{}l *{9}{c} l@{}}
+\toprule
+ & \multicolumn{9}{c}{\textbf{Ley}} & \\
+\cmidrule(lr){2-10}
+\textbf{Problema} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & \textbf{¿Alcanza?} \\
+\midrule
+1. Daños & \textcolor{ambar}{$\sim$} & & & & & & & & & no: nueva ley de responsabilidad \\
+2. Privacidad & & & & \textcolor{azul}{$\checkmark$} & \textcolor{azul}{$\checkmark$} & & & & & sí \\
+3. Manipulación & & & & & & \textcolor{azul}{$\checkmark$} & \textcolor{azul}{$\checkmark$} & & & sí \\
+4. Libertad & & \textcolor{azul}{$\checkmark$} & \textcolor{azul}{$\checkmark$} & & & & & & & sí \\
+5. Empleo & & & & & & & & & & no: nueva ley de transición laboral \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\scriptsize \textcolor{azul}{$\checkmark$}: la ley mejora la situación \quad \textcolor{ambar}{$\sim$}: mejora solo en parte}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Un antecedente sobre responsabilidad}: cuando un médico usa un sistema experto para diagnosticar, los tribunales tratan al sistema como a un libro de consulta: el médico es responsable de entender el razonamiento y de decidir si acepta la recomendación. AIMA concluye que, en el diseño, sus acciones deberían pensarse como una influencia sobre el médico y no como algo que afecta directamente al paciente.\aima{26.3}{1036}
+  \item \textbf{Las leyes van detrás de la tecnología}: ningún programa tiene estatus legal de persona para transacciones financieras ni se considera ``conductor'' para las normas de tránsito; en caso de accidente de un vehículo automático, responde el diseñador de su control. \cita{As with human reproductive technology, the law has yet to catch up with the new developments.}\aima{26.3}{1036}
+\end{itemize}
+\end{extras}
+
 \end{document}
