@@ -1,0 +1,127 @@
+\documentclass[11pt,a4paper]{article}
+\input{../plantilla/preambulo}
+
+\title{\vspace{-1.5cm}\textbf{Trabajo Práctico 5 --- Resolución}\\[3pt]
+\large Conceptos básicos de Robótica y Roboética}
+\author{\normalsize Inteligencia Artificial --- UNS --- 2026}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+\notafuentes
+
+%======================================================================
+\section*{Ejercicio 1}
+
+\begin{enunciado}{Consigna}
+¿Qué es un robot y qué diferencias tiene frente a un agente de software? Brinde algún ejemplo que muestre claramente la diferencia.
+\end{enunciado}
+
+\paragraph{Robot.} Un agente físico que lleva a cabo tareas manipulando el mundo físico: percibe su entorno con \textbf{sensores} (cámara, sonar, GPS, acelerómetro) y actúa sobre él con \textbf{efectores} (ruedas, piernas, brazos, pinzas, hélices).\fuentes{Cátedra, Robótica y roboética, «Agentes físicos». Misma definición en AIMA, §25.1, p.~971}
+
+\paragraph{Diferencia con un agente de software.} Los dos son agentes: entidades autónomas que perciben su entorno con sensores y actúan sobre él con efectores.\catedra{Episodio I}{Agentes en Inteligencia Artificial} Las diferencias están en el entorno:
+\begin{itemize}
+  \item \textbf{Qué entorno y con qué sensores y efectores}:\fuentes{Misma idea en AIMA, §2.1, p.~34}
+  \begin{itemize}
+    \item robot: el mundo físico, con sensores y efectores físicos;
+    \item agente de software: un entorno de software (sistema operativo, archivos, Internet). Percibe teclas, archivos y paquetes de red, y actúa mostrando en pantalla, escribiendo archivos y enviando mensajes.
+  \end{itemize}
+  \item \textbf{No es una diferencia de complejidad}: un agente de software en Internet puede tener un entorno tan complejo como el mundo físico.\aima{2.3.1}{41}
+  \item \textbf{Las limitaciones del mundo físico}: el robot real tiene que lidiar con un entorno parcialmente observable (la cámara no ve detrás de una esquina), estocástico (los motores patinan y tienen fricción), dinámico y continuo. Además, sus errores tienen consecuencias físicas: un choque real daña.\aima{25.1}{973}
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X@{}}
+\toprule
+ & \textbf{Robot} & \textbf{Agente de software} \\
+\midrule
+Entorno & mundo físico & sistema operativo, archivos, Internet \\
+Sensores & físicos: cámara, sonar, GPS & teclas, archivos, paquetes de red \\
+Efectores & físicos: ruedas, brazos, pinzas & pantalla, escritura de archivos, mensajes \\
+Complejidad & puede ser alta & puede ser alta (Internet) \\
+Limitaciones físicas & parcialmente observable, estocástico, dinámico, continuo & --- \\
+Si se equivoca & consecuencias físicas (un choque daña) & error en los datos \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    caja/.style={draw=gris, thick, rounded corners=3pt, minimum width=3.6cm, minimum height=2.3cm},
+    flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=azul},
+    rot/.style={font=\scriptsize, align=center, fill=white, inner sep=1pt}]
+  % --- Robot ---
+  \node[font=\bfseries\small, text=azul] at (4,2.1) {Robot};
+  \node[caja, fill=green!5] (m1) at (0,0) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (m1.north) {Mundo físico};
+  \pic[scale=0.9] at (-0.8,-0.35) {arbol};
+  \pic[scale=0.9] at (0,-0.35) {persona};
+  \pic[scale=0.9] at (0.8,-0.35) {arbol};
+  \node[caja, fill=fondoazul] (a1) at (8,0) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (a1.north) {Agente};
+  \pic[scale=0.9] at (8,-0.3) {robot};
+  \draw[flecha] (m1.north east) ++(0,-0.4) -- node[rot, above] {sensores\\cámara, sonar, GPS} ($(a1.north west)+(0,-0.4)$);
+  \draw[flecha] (a1.south west) ++(0,0.4) -- node[rot, below] {efectores\\ruedas, brazos, pinzas} ($(m1.south east)+(0,0.4)$);
+  % --- Agente de software ---
+  \node[font=\bfseries\small, text=azul] at (4,-2.6) {Agente de software};
+  \node[caja, fill=fondogris] (m2) at (0,-4.7) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (m2.north) {Entorno de software};
+  \pic at (-0.8,-5) {documento};
+  \pic at (0,-5) {sobre};
+  \pic at (0.8,-5) {documento};
+  \node[caja, fill=fondoazul] (a2) at (8,-4.7) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (a2.north) {Agente};
+  \pic at (8,-4.95) {compu};
+  \draw[flecha] (m2.north east) ++(0,-0.4) -- node[rot, above] {sensores\\teclas, archivos, paquetes} ($(a2.north west)+(0,-0.4)$);
+  \draw[flecha] (a2.south west) ++(0,0.4) -- node[rot, below] {efectores\\pantalla, archivos, mensajes} ($(m2.south east)+(0,0.4)$);
+\end{tikzpicture}
+\caption{Los dos son agentes que perciben con sensores y actúan con efectores; cambia el entorno.}
+\end{figure}
+
+\paragraph{Ejemplo.} La misma tarea, ``entregar un pedido'', hecha por dos agentes:
+\begin{itemize}
+  \item \textbf{Robot de delivery}: percibe la vereda con cámaras y GPS, y se mueve con ruedas. No ve al peatón que aparece detrás de un auto estacionado y, si frena tarde, puede atropellarlo.
+  \item \textbf{Agente de software de la tienda online}: percibe la orden de compra (un mensaje), consulta el stock, genera la factura y envía un mail de confirmación. Todo lo que hace es leer y escribir datos: si se equivoca, el error se corrige en los datos.
+\end{itemize}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Cuatro aspectos de los robots contemporáneos}:\catedra{Robótica y roboética}{Una definición de robot}
+  \begin{itemize}
+    \item \textbf{movilidad}: para funcionar en entornos humanos o peligrosos para los humanos;
+    \item \textbf{interactividad}: gracias a sensores y efectores;
+    \item \textbf{comunicación}: interfaces de reconocimiento y síntesis de voz;
+    \item \textbf{autonomía}: capacidad de ``razonar'' y tomar sus propias decisiones sin control externo directo.
+  \end{itemize}
+  \item \textbf{Un entorno físico puede ser simple}: un robot que inspecciona piezas en una cinta transportadora puede suponer que la iluminación es siempre la misma, que solo pasan piezas conocidas y que tiene dos acciones (aceptar o rechazar).\aima{2.3.1}{41}
+  \item \textbf{El tiempo real}: \cita{the real world stubbornly refuses to operate faster than real time}. En simulación, un algoritmo de aprendizaje por refuerzo aprende en pocas horas de CPU a partir de millones de pruebas; con un robot real, esas pruebas llevarían años.\aima{25.1}{973}
+  \item \textbf{Qué controla realmente el agente}: \cita{What an agent can control is what message (command) it sends to its actuators}. Lo que pase después depende del cuerpo y del mundo.\pmg{12.1}{444}
+  \item \textbf{Robot como agente con propósito}: \cita{A robot is an artificial purposive agent}. Actúa para lograr ciertos resultados; sus preferencias suelen ser las de su diseñador, aunque no las conozca: con esta definición, hasta un termostato es un robot.\fuentes{PMG, §12.1, pp.~443--444}
+  \item \textbf{Cuerpo y controlador}: \cita{A robot is made up of a body plus a controller. The controller receives percepts from the body and sends commands to the body.} El cuerpo convierte estímulos en percepciones (sensores) y comandos en acciones (actuadores).\pmg{12.2}{444}
+\end{itemize}
+
+  \begin{center}
+  \begin{tikzpicture}[scale=1.15, transform shape,
+      b/.style={draw=gris, thick, rounded corners=2pt, font=\scriptsize, minimum height=6mm, fill=white, inner sep=3pt},
+      f/.style={-{Stealth[length=1.8mm]}, thick, draw=azul},
+      l/.style={font=\tiny, fill=fondoazul, inner sep=1pt}]
+    \node[b, fill=green!5] (env) at (0,0) {Entorno};
+    \node[b] (sen) at (3,0.6) {Sensores};
+    \node[b] (act) at (3,-0.6) {Actuadores};
+    \node[b, fill=fondoazul!60!azul!20] (con) at (6,0) {Controlador};
+    \node[draw=azul, dashed, rounded corners=3pt, fit=(sen)(act)(con), inner sep=5pt,
+          label={[font=\tiny\bfseries, text=azul]above:Robot}] {};
+    \node[draw=gris, densely dashed, rounded corners=2pt, fit=(sen)(act), inner sep=3pt,
+          label={[font=\tiny, text=gris]left:cuerpo}] {};
+    \draw[f] (env) |- node[l, pos=0.75] {estímulos} (sen);
+    \draw[f] (sen) -| node[l, pos=0.25] {percepciones} (con);
+    \draw[f] (con) |- node[l, pos=0.75] {comandos} (act);
+    \draw[f] (act) -| node[l, pos=0.25] {acciones} (env);
+  \end{tikzpicture}
+  \end{center}
+\end{extras}
+
+\end{document}

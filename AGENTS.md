@@ -1,6 +1,0 @@
-- Buscar las respuestas primero en el material de la catedra y dar una respuesta simple. Luego, bajo el subtitulo "EXTRAS", agregar informacion que esté en los libros y que no este en las diapositivas de la catedra. Importantisimo: no repetir informacion.
-- Agregar fuentes siempre que se use alguno de los libros en libros/
-- Escribir respuestas sin mucha verbosidad innecesaria
-- En caso de citar fuentes en inglés, no traducir al español. Poner el texto original.
-- Si varias fuentes expresan la misma idea o definición, citar solo una de ellas. En todo caso, agregar una aclaración de que la información también se encuentra en las otras fuentes, sin agregar el contenido de dicha fuente.
-- Simpre priorizar mostrar listas con bullet-points en lugar de usar prosa.

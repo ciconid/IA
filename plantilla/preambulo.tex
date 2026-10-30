@@ -1,0 +1,110 @@
+% Preámbulo común de las resoluciones de TPs de IA.
+% Uso, desde temaN/resolucion-tpM.tex:  \input{../plantilla/preambulo}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage[hidelinks]{hyperref}
+
+\usetikzlibrary{babel,arrows.meta,positioning,calc,fit}
+\tcbuselibrary{skins,breakable}
+
+\definecolor{azul}{HTML}{1F4E79}
+\definecolor{gris}{HTML}{6B7280}
+\definecolor{ambar}{HTML}{B45309}
+\definecolor{fondoazul}{HTML}{F3F7FB}
+\definecolor{fondogris}{HTML}{F4F4F5}
+\definecolor{fondoambar}{HTML}{FFF7ED}
+
+\titleformat{\section}{\Large\bfseries\color{azul}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+
+% Enunciado de la consigna (gris).
+\newtcolorbox{enunciado}[1]{
+  breakable, enhanced, colback=fondogris, colframe=gris,
+  boxrule=0.4pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=gris, fonttitle=\small, fontupper=\small}
+% Ampliación de la respuesta (azul). No es una tcolorbox: las notas al pie dentro de
+% una tcolorbox que se parte entre páginas se superponen con el contenido.
+\newenvironment{extras}{%
+  \par\medskip\noindent
+  {\setlength{\fboxsep}{3pt}\colorbox{azul}{\color{white}\bfseries\small\ EXTRAS\ }}%
+  \par\nobreak\vspace{1pt}{\color{azul}\hrule height 0.6pt}\nobreak\vspace{3pt}}
+ {\par\vspace{3pt}{\color{azul}\hrule height 0.6pt}\medskip}
+% Advertencias, ambigüedades del enunciado, erratas (ámbar).
+\newtcolorbox{aviso}[1]{
+  breakable, enhanced, colback=fondoambar, colframe=ambar,
+  boxrule=0.5pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=ambar, fonttitle=\small}
+
+\setlist[itemize]{itemsep=2pt, topsep=3pt, parsep=0pt}
+\setlist[enumerate]{itemsep=2pt, topsep=3pt, parsep=0pt}
+\captionsetup{font=small, labelfont=bf}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+% Citas textuales (en el idioma original, sin traducir).
+\newcommand{\cita}[1]{``\textit{#1}''}
+
+% Fuentes, siempre en nota al pie.
+%   \catedra{Episodio I}{Agentes en Inteligencia Artificial}
+%   \aima{25.1}{973}     \pmg{12.1}{443}
+\newcommand{\catedra}[2]{\footnote{Cátedra, #1, «#2».}}
+\newcommand{\aima}[2]{\footnote{AIMA, §#1, p.~#2.}}
+\newcommand{\pmg}[2]{\footnote{PMG, §#1, p.~#2.}}
+% Para varias fuentes en una sola nota: \fuentes{AIMA, §2.1, p.~34; PMG, §12.1, p.~443}
+\newcommand{\fuentes}[1]{\footnote{#1.}}
+
+% Aclaración inicial de abreviaturas.
+\newcommand{\notafuentes}{%
+  {\small\color{gris} Las fuentes van en notas al pie. \textbf{Cátedra}: diapositivas de A.~J.~García (2026).
+  \textbf{AIMA}: Russell \& Norvig, \textit{Artificial Intelligence: A Modern Approach}, 3.ª ed. (2010).
+  \textbf{PMG}: Poole, Mackworth \& Goebel, \textit{Computational Intelligence: A Logical Approach} (1998).\par}}
+
+% Íconos reutilizables (pics de TikZ). Uso: \pic[scale=0.8] at (x,y) {robot};
+\tikzset{
+  pics/robot/.style={code={
+    \draw[thick, fill=azul!15] (-0.35,0.15) rectangle (0.35,0.65);            % cabeza
+    \fill[azul] (-0.15,0.42) circle (0.06) (0.15,0.42) circle (0.06);         % ojos
+    \draw[thick] (0,0.65) -- (0,0.8); \fill[ambar] (0,0.83) circle (0.05);    % antena
+    \draw[thick, fill=azul!15] (-0.45,-0.45) rectangle (0.45,0.12);           % cuerpo
+    \draw[thick] (-0.45,-0.1) -- (-0.65,0.1) (0.45,-0.1) -- (0.65,0.1);       % brazos
+    \draw[thick, fill=gris!40] (-0.25,-0.55) circle (0.12) (0.25,-0.55) circle (0.12); % ruedas
+  }},
+  pics/compu/.style={code={
+    \draw[thick, fill=azul!15, rounded corners=1pt] (-0.55,-0.25) rectangle (0.55,0.5); % pantalla
+    \node[font=\tiny\ttfamily\bfseries, text=azul] at (0,0.12) {</>};
+    \draw[thick] (0,-0.25) -- (0,-0.4); \draw[thick] (-0.25,-0.4) -- (0.25,-0.4);       % pie
+  }},
+  pics/persona/.style={code={
+    \draw[thick] (0,0.35) circle (0.1);
+    \draw[thick] (0,0.25) -- (0,-0.05) (-0.15,0.15) -- (0.15,0.15)
+                 (0,-0.05) -- (-0.12,-0.3) (0,-0.05) -- (0.12,-0.3);
+  }},
+  pics/arbol/.style={code={
+    \draw[thick, brown!60!black] (0,-0.3) -- (0,0);
+    \fill[green!50!black!70] (0,0.15) circle (0.2);
+  }},
+  pics/documento/.style={code={
+    \draw[thick, fill=white] (-0.2,-0.28) -- (-0.2,0.28) -- (0.1,0.28) -- (0.2,0.18) -- (0.2,-0.28) -- cycle;
+    \foreach \y in {0.1,0,-0.1} \draw[gris] (-0.12,\y) -- (0.12,\y);
+  }},
+  pics/sobre/.style={code={
+    \draw[thick, fill=white] (-0.25,-0.17) rectangle (0.25,0.17);
+    \draw[thick] (-0.25,0.17) -- (0,-0.02) -- (0.25,0.17);
+  }},
+}
