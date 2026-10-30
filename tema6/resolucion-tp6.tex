@@ -1,0 +1,859 @@
+\documentclass[11pt,a4paper]{article}
+\input{../plantilla/preambulo}
+
+\title{\vspace{-1.5cm}\textbf{Trabajo Práctico 6 --- Resolución}\\[3pt]
+\large Aprendizaje Automático}
+\author{\normalsize Inteligencia Artificial --- UNS --- 2026}
+\date{}
+
+\usetikzlibrary{shapes.geometric}
+% Estilos TikZ comunes a este TP.
+\tikzset{
+  caja/.style={draw=gris, thick, rounded corners=3pt, fill=fondogris, align=center, font=\small, inner sep=4pt},
+  cajaazul/.style={caja, fill=fondoazul, draw=azul},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=azul},
+  % Árbol de decisión
+  atr/.style={draw=azul, thick, rounded corners=2pt, fill=fondoazul, font=\small\bfseries, inner sep=3pt},
+  hoja/.style={draw=gris, fill=fondogris, font=\small, inner sep=3pt, line width=0.4pt},
+  val/.style={font=\scriptsize, fill=white, inner sep=1pt},
+  % Redes neuronales
+  neu/.style={circle, draw=azul, thick, fill=fondoazul, minimum size=5mm, inner sep=0pt},
+  con/.style={-{Stealth[length=1.5mm]}, gris},
+}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+\notafuentes
+
+%======================================================================
+\section*{Ejercicio 1 --- Aprendizaje}
+
+%----------------------------------------------------------------------
+\subsection*{1.a}
+
+\begin{enunciado}{Consigna}
+¿Cómo se define el Aprendizaje Automático (Machine Learning)? ¿En qué contextos se aplica? ¿Qué disciplinas científicas confluyen en él?
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{Definición}: área de la IA que estudia y construye algoritmos que, a partir de datos de entrenamiento:\catedra{Episodio VII, parte 1}{Machine Learning -- aprendizaje automático}
+  \begin{enumerate}
+    \item reconocen automáticamente patrones en los datos,
+    \item construyen un modelo, y
+    \item con ese modelo reconocen o hacen predicciones sobre datos no vistos en el entrenamiento.
+  \end{enumerate}
+  \item \textbf{Contextos}: problemas en los que diseñar y programar a mano un algoritmo explícito con buen rendimiento es difícil o imposible.\fuentes{Cátedra, Episodio VII, parte 1, «Aprendizaje automático (machine learning)». Misma idea en AIMA, cap.~18, p.~693 (reconocer caras: \cita{even the best programmers are unable to program a computer to accomplish that task except by using learning algorithms})} Ejemplos de la cátedra:
+  \begin{itemize}
+    \item reconocer señales de velocidad máxima en imágenes;
+    \item reconocer dígitos escritos a mano;
+    \item un asistente que sugiere qué impresora usar.
+  \end{itemize}
+  \item \textbf{Disciplinas}: está dentro de la IA y usa herramientas de la \textbf{estadística} y de las \textbf{ciencias de la computación}.\catedra{Episodio VII, parte 1}{Aprendizaje automático (machine learning)}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  \draw[thick, draw=gris, fill=fondogris, rounded corners=6pt] (-3.6,-1.6) rectangle (3.6,1.9);
+  \node[font=\small\bfseries, text=gris, anchor=north west] at (-3.5,1.85) {Inteligencia Artificial};
+  \fill[azul!20, opacity=0.8] (-0.8,0) circle (1.25);
+  \fill[ambar!25, opacity=0.8] (0.8,0) circle (1.25);
+  \draw[thick, azul] (-0.8,0) circle (1.25);
+  \draw[thick, ambar] (0.8,0) circle (1.25);
+  \node[font=\footnotesize, align=center] at (-1.35,0) {Compu-\\tación};
+  \node[font=\footnotesize, align=center] at (1.35,0) {Esta-\\dística};
+  \node[font=\bfseries] at (0,0) {ML};
+\end{tikzpicture}
+\caption{El aprendizaje automático está dentro de la IA, entre la estadística y la computación.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item El término \textit{machine learning} lo acuñó Arthur Samuel en 1959.\catedra{Episodio VII, parte 1}{Aprendizaje automático (machine learning)}
+  \item En AIMA:\fuentes{AIMA, cap.~18, p.~693}
+  \begin{itemize}
+    \item una definición centrada en el agente: \cita{An agent is learning if it improves its performance on future tasks after making observations about the world.}
+    \item otras dos razones para que un agente aprenda en lugar de recibir todo programado: los diseñadores no pueden prever todas las situaciones (un robot tiene que aprender el plano de cada laberinto nuevo) ni los cambios con el tiempo (un predictor de la bolsa tiene que adaptarse cuando el mercado pasa de auge a crisis).
+  \end{itemize}
+  \item Algunas técnicas de ML: árboles de decisión, redes neuronales, \textit{deep learning}, reglas de asociación, redes bayesianas, \textit{clustering}, algoritmos genéticos, SVM, programación lógica inductiva.\catedra{Episodio VII, parte 1}{(Algunas) áreas de Inteligencia Artificial}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{1.b}
+
+\begin{enunciado}{Consigna}
+¿Cuáles son las tres etapas del proceso de aprendizaje para la creación de un modelo?
+\end{enunciado}
+
+Son tres etapas:\catedra{Episodio VII, parte 1}{Modelo}
+\begin{enumerate}
+  \item \textbf{Elección (trabajo humano)}: los especialistas eligen el algoritmo de entrenamiento y el conjunto de datos de entrenamiento.
+  \item \textbf{Creación automática del modelo}: el algoritmo recorre los ejemplos del conjunto de entrenamiento, busca patrones y ajusta el modelo automáticamente.
+  \item \textbf{Evaluación (trabajo humano)}: los especialistas deciden si el resultado es satisfactorio, es decir, si el modelo sirve para la tarea (reconocer personas, generar texto, etc.).
+\end{enumerate}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}c l l X@{}}
+\toprule
+\textbf{Etapa} & \textbf{Quién} & \textbf{Entrada} & \textbf{Resultado} \\
+\midrule
+1 & especialistas & tarea a resolver & algoritmo y datos de entrenamiento elegidos \\
+2 & algoritmo (automático) & datos de entrenamiento & modelo ajustado \\
+3 & especialistas & modelo & decisión: ¿es un buen modelo para la tarea? \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.6cm]
+  \node[caja, minimum width=3.3cm, minimum height=1.9cm] (e1) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (e1.north) {1. Elegir};
+  \pic at ($(e1.center)+(-0.6,-0.15)$) {persona};
+  \node[font=\scriptsize, align=left, anchor=west] at ($(e1.center)+(-0.25,-0.15)$) {algoritmo\\+ datos};
+  \node[cajaazul, minimum width=3.3cm, minimum height=1.9cm, right=of e1] (e2) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (e2.north) {2. Entrenar};
+  \pic at ($(e2.center)+(-0.65,-0.15)$) {compu};
+  \node[font=\scriptsize, align=left, anchor=west] at ($(e2.center)+(-0.0,-0.15)$) {busca\\patrones};
+  \node[caja, minimum width=3.3cm, minimum height=1.9cm, right=of e2] (e3) {};
+  \node[font=\scriptsize\bfseries, anchor=north] at (e3.north) {3. Evaluar};
+  \pic at ($(e3.center)+(-0.6,-0.15)$) {persona};
+  \node[font=\scriptsize, align=left, anchor=west] at ($(e3.center)+(-0.25,-0.15)$) {¿satis-\\factorio?};
+  \draw[flecha] (e1) -- node[val, above] {datos} (e2);
+  \draw[flecha] (e2) -- node[val, above] {modelo} (e3);
+\end{tikzpicture}
+\caption{Etapas de la creación de un modelo: humano, automático, humano.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item Lo que se entrena es el modelo. Los algoritmos los diseñan de antemano equipos de científicos; el software que los implementa hace el trabajo computacional de entrenar.\catedra{Episodio VII, parte 1}{Modelo}
+  \item Los datos de entrenamiento son \textit{el combustible} del aprendizaje: el resultado muchas veces es tan bueno como los datos. Pueden ser imágenes, audio, video, texto o datos tabulares (una columna por atributo).\catedra{Episodio VII, parte 1}{Los datos de entrenamiento}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{1.c}
+
+\begin{enunciado}{Consigna}
+¿A qué nos referimos con el término ``modelo'' en el contexto de Machine Learning?
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{Modelo, en general}: una representación simplificada de un objeto, sistema, fenómeno o proceso de la realidad, para comprenderlo, analizarlo, explicarlo, predecirlo o simularlo.\catedra{Episodio VII, parte 1}{Modelo}
+  \item \textbf{Modelo, en ML}:\catedra{Episodio VII, parte 2}{Uso del árbol de decisión para clasificación de nuevos elementos}
+  \begin{itemize}
+    \item es el conjunto de reglas o patrones aprendidos;
+    \item es una \textbf{estructura matemática} que representa la relación entre las entradas (datos) y las salidas (predicciones);
+    \item es una abstracción de los datos de entrenamiento que permite \textbf{generalizar} y predecir sobre datos nuevos.
+  \end{itemize}
+  \item \textbf{Quién lo crea}: en otras disciplinas, los modelos los escriben personas (una fórmula, un texto). En ML los \textbf{genera un algoritmo} a partir de los datos de entrenamiento.\catedra{Episodio VII, parte 1}{Modelo}
+  \item \textbf{Ejemplos}: un árbol de decisión, o una red neuronal con los pesos de sus arcos (un grafo).\catedra{Episodio VII, parte 3}{Algoritmo de aprendizaje y modelo}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.4cm]
+  \node[caja, minimum height=1.3cm, minimum width=1.6cm, text depth=0.5cm] (d) {DATOS};
+  \pic at ($(d.center)+(-0.3,-0.25)$) {documento};
+  \pic at ($(d.center)+(0.3,-0.25)$) {documento};
+  \node[cajaazul, minimum height=1.3cm, right=of d] (a) {Algoritmo de\\aprendizaje};
+  \node[caja, minimum height=1.3cm, right=of a, fill=ambar!10, draw=ambar] (m) {MODELO\\{\scriptsize árbol, red neuronal}};
+  \node[caja, right=1.6cm of m] (p) {predicción};
+  \node[caja, above=0.7cm of m] (n) {dato nuevo};
+  \draw[flecha] (d) -- (a);
+  \draw[flecha] (a) -- node[val, above] {genera} (m);
+  \draw[flecha] (n) -- (m);
+  \draw[flecha] (m) -- (p);
+\end{tikzpicture}
+\caption{El algoritmo genera el modelo a partir de los datos. Después, el modelo predice sobre datos nuevos.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item Ejemplo de modelo no aprendido: $T = \text{distancia}/\text{velocidad}$. Ignora semáforos, tráfico y estado del camino, pero alcanza para no llegar tarde. Si sabemos que es un modelo, lo usamos con cuidado aunque tenga errores.\catedra{Episodio VII, parte 1}{Modelo}
+  \item En AIMA el modelo se llama \textbf{hipótesis} $h$: una función que aproxima la función verdadera y desconocida $f$ que generó los ejemplos. \cita{Learning is a search through the space of possible hypotheses for one that will perform well, even on new examples beyond the training set.}\fuentes{AIMA, §18.2, p.~695. Misma idea («learning as search») en PMG, §11.1, p.~401}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{1.d}
+
+\begin{enunciado}{Consigna}
+Investigue en qué se diferencian los tres paradigmas clásicos de aprendizaje: Supervisado, No Supervisado y por Refuerzo.
+\end{enunciado}
+
+La cátedra solo los nombra.\catedra{Episodio VII, parte 1}{(Algunas) áreas de Inteligencia Artificial} Se diferencian por el tipo de \textbf{retroalimentación} (\textit{feedback}) que recibe el que aprende:\fuentes{AIMA, §18.1, pp.~694--695. Misma clasificación en PMG, §11.1, p.~399}
+\begin{itemize}
+  \item \textbf{Supervisado}: observa pares entrada--salida (ejemplos \textbf{etiquetados} por un ``maestro'') y aprende una función que lleva de la entrada a la salida. Ejemplo: aprender a reconocer dígitos a partir de imágenes etiquetadas con el dígito.
+  \item \textbf{No supervisado}: no recibe ninguna retroalimentación explícita; descubre patrones en la entrada. La tarea más común es el \textbf{clustering} (agrupar ejemplos parecidos). Ejemplo: un taxi que, sin que nadie le dé ejemplos etiquetados, forma los conceptos ``días de buen tránsito'' y ``días de mal tránsito''.
+  \item \textbf{Por refuerzo}: aprende a partir de una serie de \textbf{recompensas o castigos}, que a menudo llegan después de una secuencia de acciones. El agente tiene que deducir cuáles de sus acciones fueron responsables (\textit{credit-assignment problem}). Ejemplo: el taxi que no recibe propina, o los dos puntos por ganar una partida de ajedrez.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X X@{}}
+\toprule
+ & \textbf{Supervisado} & \textbf{No supervisado} & \textbf{Por refuerzo} \\
+\midrule
+Retroalimentación & la salida correcta de cada ejemplo & ninguna & recompensa o castigo \\
+Datos & pares entrada--salida (etiquetados) & solo entradas & secuencias de acciones y recompensas \\
+Aprende & función entrada $\to$ salida & patrones, grupos (\textit{clustering}) & qué acciones conviene hacer \\
+Ejemplo & dígitos etiquetados & días de buen/mal tránsito & propina, partida ganada \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm]
+  % Supervisado
+  \node[font=\small\bfseries, text=azul] at (0,2.2) {Supervisado};
+  \foreach \x/\y/\c in {-1/1.2/azul, -0.6/0.5/azul, -1.2/0.3/azul, 0.8/1.3/ambar, 1.1/0.6/ambar, 0.5/0.2/ambar}
+    \node[circle, fill=\c, inner sep=2pt] at (\x,\y) {};
+  \node[font=\scriptsize, text=azul] at (-1,-0.25) {``A''};
+  \node[font=\scriptsize, text=ambar] at (0.9,-0.25) {``B''};
+  \draw[dashed, gris, thick] (-0.1,1.7) -- (0,-0.1);
+  \node[font=\scriptsize, align=center] at (0,-0.85) {ejemplos con etiqueta\\$\Rightarrow$ frontera entre clases};
+  % No supervisado
+  \node[font=\small\bfseries, text=azul] at (5,2.2) {No supervisado};
+  \foreach \x/\y in {4/1.2, 4.4/0.6, 3.8/0.4, 5.8/1.3, 6.1/0.7, 5.6/0.4}
+    \node[circle, fill=gris, inner sep=2pt] at (\x,\y) {};
+  \draw[thick, azul, dashed] (4.05,0.75) ellipse (0.55 and 0.7);
+  \draw[thick, ambar, dashed] (5.85,0.8) ellipse (0.55 and 0.7);
+  \node[font=\scriptsize, align=center] at (5,-0.85) {ejemplos sin etiqueta\\$\Rightarrow$ grupos (\textit{clusters})};
+  % Refuerzo
+  \node[font=\small\bfseries, text=azul] at (10,2.2) {Por refuerzo};
+  \pic[scale=0.8] at (8.7,0.75) {robot};
+  \node[caja, font=\scriptsize] (ent) at (11.4,0.75) {entorno};
+  \draw[flecha] (9.3,1.2) to[bend left=25] node[val, above] {acción} (ent.north);
+  \draw[flecha, draw=ambar] (ent.south) to[bend left=25] node[val, below] {recompensa} (9.3,0.2);
+  \node[font=\scriptsize, align=center] at (10,-0.85) {solo recompensas\\$\Rightarrow$ qué acciones convienen};
+\end{tikzpicture}
+\caption{Los tres paradigmas según la retroalimentación que reciben.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Semisupervisado}: pocos ejemplos etiquetados y muchos sin etiquetar. Las etiquetas pueden tener errores sistemáticos (personas que mienten su edad en fotos etiquetadas). Por eso el ruido y la falta de etiquetas forman un continuo entre supervisado y no supervisado.\aima{18.1}{695}
+  \item PMG distingue el supervisado \textbf{de conceptos} (un entrenador da la clase de cada ejemplo) del supervisado \textbf{de acciones} (el agente recibe retroalimentación inmediata sobre el valor de cada acción). El refuerzo queda entre el supervisado y el no supervisado.\pmg{11.1}{399}
+  \item Dentro del supervisado: si la salida es un valor de un conjunto finito, es \textbf{clasificación} (p.~ej. inkjet/laser); si es un número, es \textbf{regresión} (p.~ej. el precio de una casa).\fuentes{AIMA, §18.2, p.~696; Cátedra, Episodio VII, parte 2, «Algoritmos de Aprendizaje con Árboles de Decisión»}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 2 --- Medición de la performance}
+
+\begin{enunciado}{Consigna}
+Explique brevemente para qué se utiliza una métrica en el entrenamiento y en la evaluación. ¿Por qué es importante diferenciar entre el desempeño obtenido para el conjunto de entrenamiento y el obtenido para el conjunto de pruebas? ¿A qué nos referimos al hablar de overfitting del modelo de aprendizaje? ¿Cómo podemos identificarlo?
+\end{enunciado}
+
+\paragraph{Métrica.} Mide numéricamente qué tan bien predice el modelo (p.~ej. porcentaje de aciertos o tasa de error).
+\begin{itemize}
+  \item \textbf{En el entrenamiento}:\catedra{Episodio VII, parte 3}{Neuronas Artificiales}
+  \begin{itemize}
+    \item guía el ajuste: el algoritmo busca los parámetros que minimizan el error (en una red neuronal, el error cuadrático; ver Ejercicio~4.b);
+    \item sirve de criterio de corte: se entrena hasta llegar a un error aceptable (p.~ej. 97\% de aciertos).
+  \end{itemize}
+  \item \textbf{En la evaluación}: se calcula sobre datos reservados y sirve para decidir si el modelo es satisfactorio (etapa~3 del Ejercicio~1.b), es decir, cuántos fallos estamos dispuestos a aceptar.\fuentes{Cátedra, Episodio VII, parte 3, «Redes Neuronales Artificiales» (¿Cómo se evalúa una RNA?); Episodio VII, parte 1, «Machine Learning -- aprendizaje automático»}
+\end{itemize}
+
+\paragraph{Entrenamiento vs.\ prueba.} Un error bajo sobre el conjunto de entrenamiento no implica que el modelo generalice bien, porque el modelo ya vio esos ejemplos. Lo que importa es cómo predice ejemplos nuevos, y eso se estima con un conjunto de prueba \textbf{distinto} del de entrenamiento.\fuentes{AIMA, §18.4, p.~708. Misma idea en PMG, §11.1, p.~401}
+
+\paragraph{Overfitting (sobreajuste).} El modelo se ajusta a distinciones que aparecen en los datos de entrenamiento pero no en los ejemplos no vistos (correlaciones casuales o ruido). Clasifica muy bien el entrenamiento y mal los datos nuevos.\fuentes{PMG, §11.2, p.~408. Misma idea en AIMA, §18.3.5, p.~705}
+
+\paragraph{Cómo identificarlo.} Se comparan los dos errores mientras crece la complejidad del modelo: hay sobreajuste cuando el error de entrenamiento sigue bajando (o queda en casi cero) mientras que el error sobre datos no vistos empieza a subir.\aima{18.4}{711}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X@{}}
+\toprule
+ & \textbf{Conjunto de entrenamiento} & \textbf{Conjunto de prueba} \\
+\midrule
+¿El modelo lo vio? & sí & no (está reservado) \\
+Uso de la métrica & guiar el ajuste y decidir cuándo parar & decidir si el modelo es satisfactorio \\
+Qué mide & cuánto se ajustó a esos ejemplos & cuánto generaliza \\
+Con sobreajuste & error muy bajo & error alto \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=0.95cm, y=0.06cm]
+  \fill[ambar!10] (7.5,0) rectangle (10.4,60);
+  \node[font=\scriptsize, text=ambar, align=center] at (8.95,52) {sobreajuste};
+  \draw[-{Stealth}, thick] (0.6,0) -- (10.6,0) node[right, font=\scriptsize, align=left] {complejidad\\(tamaño del árbol)};
+  \draw[-{Stealth}, thick] (0.6,0) -- (0.6,62) node[above, font=\scriptsize] {error, en \%};
+  \foreach \y in {0,20,40,60} \node[font=\tiny, left] at (0.6,\y) {\y};
+  \foreach \x in {1,...,10} \node[font=\tiny, below] at (\x,0) {\x};
+  \draw[thick, azul] plot[mark=*, mark size=1.2pt] coordinates {(1,52) (2,42) (3,25) (4,13) (5,6) (6,4) (7,3) (8,4) (9,7) (10,18)};
+  \draw[thick, gris, dashed] plot[mark=x, mark size=1.8pt] coordinates {(1,39) (2,22) (3,16) (4,9) (5,4) (6,2) (7,1) (8,0.3) (9,0.2) (10,0.1)};
+  \draw[thick, azul] (3.6,50) -- (4.3,50) node[right, font=\scriptsize, text=azul] {datos no vistos};
+  \draw[thick, gris, dashed] (3.6,43) -- (4.3,43) node[right, font=\scriptsize, text=gris] {entrenamiento};
+  \draw[ambar, thick, densely dotted] (7,0) -- (7,58);
+  \node[font=\scriptsize, text=ambar, fill=white, inner sep=1pt] at (7,-9) {mínimo};
+\end{tikzpicture}
+\caption{Datos de AIMA, Fig.~18.9: al crecer el árbol, el error de entrenamiento tiende a 0, pero desde el tamaño 7 el error sobre datos no vistos sube.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item Analogía de AIMA: \cita{A professor knows that an exam will not accurately evaluate students if they have already seen the exam questions.}\aima{18.4}{708}
+  \item Ejemplo de PMG: dos agentes, P y N, clasifican bien todo el entrenamiento. P dice que todo lo no visto es positivo y N, que es negativo: no coinciden en ningún ejemplo nuevo. El desempeño en el entrenamiento no permite elegir entre los dos; hace falta un \textbf{sesgo} (\textit{bias}), es decir, una preferencia por ciertas hipótesis que no sale de los datos.\pmg{11.1}{401}
+  \item \textbf{Formas de separar los datos}:\fuentes{AIMA, §18.4, pp.~708--709}
+  \begin{itemize}
+    \item \textit{holdout}: una sola partición en entrenamiento y prueba. Desperdicia datos, y con pocos datos de prueba la estimación es poco confiable;
+    \item \textit{$k$-fold cross-validation}: $k$ rondas, en cada una se reserva $1/k$ de los datos para prueba, y se promedia (valores típicos de $k$: 5 y 10). Con $k=n$ se llama \textit{leave-one-out};
+    \item \textbf{conjunto de validación}: usar el error de prueba para elegir el modelo y también para evaluarlo (\textit{peeking}) filtra información de la prueba al aprendizaje. Para elegir se usa un conjunto de validación, y la prueba se guarda ``bajo llave'' hasta el final.
+  \end{itemize}
+  \item No todos los errores cuestan lo mismo: con una \textbf{función de pérdida} se puede decir que clasificar como spam un mail legítimo es 10 veces peor que lo contrario. Pérdidas típicas: $L_1 = |y-\hat y|$, $L_2 = (y-\hat y)^2$, $L_{0/1}$ (1 si se equivoca).\fuentes{AIMA, §18.4.2, pp.~710--711}
+  \item La cátedra muestra los dos tipos de error de un clasificador de señales: \textbf{falso positivo} (dice ``es señal de velocidad máxima'' y no lo es) y \textbf{falso negativo} (dice que no y sí lo es).\catedra{Episodio VII, parte 1}{Machine Learning -- aprendizaje automático}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 3 --- Árboles de Decisión}
+
+%----------------------------------------------------------------------
+\subsection*{3.a}
+
+\begin{enunciado}{Consigna}
+¿Qué es y cuál es la estructura formal de un árbol de decisión? ¿Qué tipo de aprendizaje permite desarrollar? ¿Qué propiedades debe satisfacer un conjunto de datos para poder usarse con un árbol de decisión?
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{Qué es}: un modelo que vincula los atributos relevantes de cada observación con la decisión que se tomó en el conjunto de entrenamiento. Una vez construido, se usa para responder o decidir ante casos nuevos.\catedra{Episodio VII, parte 2}{Árbol de decisión}
+  \item \textbf{Estructura formal}: un árbol en el que:\fuentes{Cátedra, Episodio VII, parte 2, «Árbol de decisión». Misma definición en PMG, §11.2, p.~403}
+  \begin{itemize}
+    \item los \textbf{nodos internos} se etiquetan con atributos de los datos;
+    \item los \textbf{arcos} que salen de un nodo con atributo $A$ se etiquetan con cada uno de los valores posibles de $A$;
+    \item las \textbf{hojas} se etiquetan con clasificaciones (p.~ej. inkjet/laser).
+  \end{itemize}
+  \item \textbf{Tipo de aprendizaje}: \textbf{supervisado}, de \textbf{clasificación} (cuando el resultado es una clase). También hay árboles de \textbf{regresión}, cuando el resultado es un número real.\fuentes{Cátedra, Episodio VII, parte 2, «Aprendizaje por clasificación supervisada: árboles de decisión» y «Algoritmos de Aprendizaje con Árboles de Decisión»}
+  \item \textbf{Propiedades del conjunto de datos}:\catedra{Episodio VII, parte 2}{Árbol de decisión}
+  \begin{itemize}
+    \item datos tabulares: todos los ejemplos se describen con los mismos atributos y cada uno trae su clasificación (etiqueta);
+    \item cada atributo tiene un rango de valores \textbf{finito y discreto};
+    \item el conjunto tiene que ser \textbf{adecuado} (ver 3.b).
+  \end{itemize}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[level distance=1.25cm,
+    level 1/.style={sibling distance=4.2cm},
+    level 2/.style={sibling distance=3.2cm},
+    level 3/.style={sibling distance=1.5cm},
+    edge from parent/.style={draw=gris, thick}]
+  \node[atr] (r) {páginas}
+    child {node[hoja] {inkjet} edge from parent node[val, left] {pocas}}
+    child {node[atr] {hora}
+      child {node[atr] {día}
+        child {node[hoja] {laser} edge from parent node[val, left] {L-V}}
+        child {node[hoja] {inkjet} edge from parent node[val, right] {Finde}}
+        edge from parent node[val, left] {mañana}}
+      child {node[atr] {día}
+        child {node[hoja] {laser} edge from parent node[val, left] {L-V}}
+        child {node[hoja] {inkjet} edge from parent node[val, right] {Finde}}
+        edge from parent node[val] {tarde}}
+      child {node[hoja] {inkjet} edge from parent node[val, right] {noche}}
+      edge from parent node[val, right] {muchas}};
+  \node[font=\scriptsize, text=azul, align=left, anchor=west] at (4.6,0) {\textbf{nodo interno}: atributo};
+  \node[font=\scriptsize, align=left, anchor=west] at (4.6,-0.45) {\textbf{arco}: un valor del atributo};
+  \node[font=\scriptsize, text=gris, align=left, anchor=west] at (4.6,-0.9) {\textbf{hoja}: clasificación};
+\end{tikzpicture}
+\caption{Árbol de decisión de la cátedra para el asistente de impresión.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item AIMA lo define como una función: recibe un vector de valores de atributos y devuelve una única salida, la ``decisión''. Admite entradas y salidas continuas; los atributos discretos son el caso más simple.\aima{18.3.1}{698}
+  \item Un árbol equivale a un conjunto de reglas, una por hoja: la clase de la hoja vale si se cumplen todas las condiciones del camino desde la raíz. En lógica, $\textit{Goal} \Leftrightarrow (\textit{Camino}_1 \lor \textit{Camino}_2 \lor \cdots)$, en forma normal disyuntiva. Ejemplo con el árbol de la figura: $\textit{páginas}=\text{muchas} \land \textit{hora}=\text{mañana} \land \textit{día}=\text{L-V} \Rightarrow \text{laser}$.\fuentes{PMG, §11.2, pp.~403--404; AIMA, §18.3.2, p.~698}
+  \item Algoritmos clásicos:\catedra{Episodio VII, parte 2}{Algoritmos de Aprendizaje con Árboles de Decisión}
+  \begin{itemize}
+    \item \textbf{ID3} (Quinlan, 1986): clasificación con variables objetivo categóricas;
+    \item \textbf{CART} (Breiman, Friedman, Olshen y Stone, 1984): clasificación y regresión, con variables objetivo categóricas o numéricas.
+  \end{itemize}
+  \item El algoritmo elige primero el atributo más ``importante''. Una heurística común es la \textbf{ganancia de información} (entropía): se parte por el atributo que más reduce la incertidumbre sobre la clase.\fuentes{PMG, §11.2, pp.~407--408; AIMA, §18.3.4, pp.~703--704}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{3.b}
+
+\begin{enunciado}{Consigna}
+¿Qué característica debe tener un conjunto de entrenamiento para ser ``adecuado''?
+\end{enunciado}
+
+No debe haber \textbf{dos ejemplos que coincidan en todos los atributos y tengan distinta clasificación}.\fuentes{Cátedra, Episodio VII, parte 2, «Árbol de decisión». Misma definición en PMG, §11.2, p.~407}
+\begin{itemize}
+  \item Ejemplo: si al conjunto de la impresora se le agregara un ejemplo \textit{e15} con los mismos atributos que \textit{e1} pero con decisión \textit{laser}, el conjunto dejaría de ser adecuado. Ningún árbol podría clasificar bien a los dos.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}l l l l l l l@{}}
+\toprule
+\textbf{Ejemplo} & \textbf{día} & \textbf{hora} & \textbf{páginas} & \textbf{tipo} & \textbf{tamaño} & \textbf{decisión} \\
+\midrule
+e1 & L-V & mañana & pocas & pdf & grande & \textbf{inkjet} \\
+e15 (hipotético) & L-V & mañana & pocas & pdf & grande & \textbf{\color{ambar}laser} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+{\footnotesize Mismos atributos, distinta clasificación $\Rightarrow$ conjunto no adecuado.}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item El conjunto de la impresora (e1--e14) es adecuado: el árbol de la cátedra clasifica bien los 14 ejemplos.\catedra{Episodio VII, parte 2}{Conjunto de entrenamiento (datos tabulares)}
+  \item Por qué puede pasar: \cita{there is an error or noise in the data; because the domain is nondeterministic; or because we can't observe an attribute that would distinguish the examples.} En ese caso AIMA devuelve la clase mayoritaria de esos ejemplos.\aima{18.3.3}{701}
+  \item PMG propone otra salida: que las hojas devuelvan una probabilidad en lugar de una clase.\pmg{11.2}{407}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{3.c}
+
+\begin{enunciado}{Consigna}
+¿Cómo se utiliza un árbol de decisión ya construido para clasificar una nueva observación y qué significado tiene que algunos atributos del conjunto de entrenamiento no figuren en la estructura del árbol?
+\end{enunciado}
+
+\paragraph{Clasificar.} Se parte de la raíz. En cada nodo se sigue el arco que corresponde al valor que tiene la observación en ese atributo, hasta llegar a una hoja: la etiqueta de la hoja es la clasificación.\fuentes{PMG, §11.2, p.~403; Cátedra, Episodio VII, parte 2, «Uso del árbol de decisión para clasificación de nuevos elementos»}
+\begin{itemize}
+  \item \textit{n1} = (L-V, mañana, muchas, doc, chico): páginas = muchas $\to$ hora = mañana $\to$ día = L-V $\to$ \textbf{laser}.
+  \item \textit{n2} = (Finde, noche, muchas, pdf, chico): páginas = muchas $\to$ hora = noche $\to$ \textbf{inkjet}.
+\end{itemize}
+
+\paragraph{Atributos que no figuran.} El algoritmo no los necesitó: pudo clasificar todos los ejemplos de entrenamiento sin consultarlos. Según esos datos, son \textbf{irrelevantes} para la decisión. En el ejemplo, \textit{tipo} y \textit{tamaño} no influyen en la elección de la impresora.\fuentes{AIMA, §18.3.3, p.~701; Cátedra, Episodio VII, parte 2, «Árbol de decisión» (el árbol vincula los atributos \textit{relevantes} con la decisión)}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[level distance=1.15cm,
+    level 1/.style={sibling distance=3.6cm},
+    level 2/.style={sibling distance=2.6cm},
+    level 3/.style={sibling distance=1.3cm},
+    edge from parent/.style={draw=gris, thick},
+    on/.style={edge from parent/.style={draw=azul, line width=2pt}}]
+  \node[atr] {páginas}
+    child {node[hoja] {inkjet} edge from parent node[val, left] {pocas}}
+    child[on] {node[atr] {hora}
+      child[on] {node[atr] {día}
+        child[on] {node[hoja, draw=azul, very thick] {\textbf{laser}} edge from parent node[val, left] {L-V}}
+        child[edge from parent/.style={draw=gris, thick}] {node[hoja] {inkjet} edge from parent node[val, right] {Finde}}
+        edge from parent node[val, left] {mañana}}
+      child[edge from parent/.style={draw=gris, thick}] {node[atr] {día}
+        child {node[hoja] {laser} edge from parent node[val, left] {L-V}}
+        child {node[hoja] {inkjet} edge from parent node[val, right] {Finde}}
+        edge from parent node[val] {tarde}}
+      child[edge from parent/.style={draw=gris, thick}] {node[hoja] {inkjet} edge from parent node[val, right] {noche}}
+      edge from parent node[val, right] {muchas}};
+  \node[caja, anchor=west, align=left, font=\scriptsize] at (5.3,-0.6) {\textbf{n1}: L-V, mañana, muchas,\\doc, chico};
+  \node[caja, anchor=west, align=left, font=\scriptsize, fill=white, draw=gris!50, text=gris] at (5.3,-1.9) {no figuran en el árbol:\\\textbf{tipo}, \textbf{tamaño}\\$\Rightarrow$ irrelevantes};
+\end{tikzpicture}
+\caption{Camino que recorre \textit{n1} hasta la hoja \textit{laser}.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item Un atributo que está en el árbol puede no consultarse en una observación dada: \textit{n2} llega a una hoja sin pasar por \textit{día}.
+  \item ``Irrelevante'' vale \textbf{según esos datos}, no necesariamente en la realidad. Si hay varios atributos de importancia similar, la elección entre ellos es algo arbitraria: con ejemplos un poco distintos, el árbol puede cambiar mucho de estructura aunque calcule una función parecida. AIMA advierte sobre el peligro de sobreinterpretar el árbol.\aima{18.3.3}{702}
+  \item En casos sin ejemplos parecidos, el árbol puede equivocarse. AIMA muestra un caso: el árbol aprendido decide ``no esperar'' en una situación que nunca vio, y con más ejemplos el error se corregiría.\fuentes{AIMA, §18.3.3, pp.~701--702}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{3.d}
+
+\begin{enunciado}{Consigna}
+Investigue por qué los árboles de decisión tienden al sobreajuste (overfitting) cuando crecen sin restricciones.
+\end{enunciado}
+
+La cátedra no lo trata.
+\begin{itemize}
+  \item \textbf{Pueden representar cualquier función} de los atributos, así que nada impide que el árbol memorice el conjunto de entrenamiento.\fuentes{PMG, §11.2, p.~404; AIMA, §18.3.2, pp.~698--699}
+  \item \textbf{Se parte hasta clasificar todo}: sin restricciones, el algoritmo sigue agregando nodos hasta que el árbol es consistente con todos los ejemplos. Así aprovecha \textbf{cualquier patrón} de los datos, incluidas las correlaciones casuales y el ruido, que no se repiten en los datos nuevos.\fuentes{AIMA, §18.3.5, p.~705; PMG, §11.2, p.~408}
+  \item \textbf{Las hojas profundas se apoyan en pocos ejemplos}: cada partición reduce los ejemplos de cada rama, y una hoja que surge de 2 ejemplos no es evidencia de un patrón real.\aima{18.3.5}{705}
+  \begin{itemize}
+    \item Ejemplo de AIMA: predecir si un dado sale 6, con atributos irrelevantes (color, peso, hora, dedos cruzados). Lo correcto es un único nodo ``no''. Pero si dos tiradas de un dado azul de 7\,g con los dedos cruzados salieron 6, el algoritmo arma un camino que predice 6 para ese caso.
+  \end{itemize}
+  \item Por eso el sobreajuste es más probable cuanto más grande es el espacio de hipótesis y cuantos más atributos hay, y menos probable cuantos más ejemplos de entrenamiento hay.\aima{18.3.5}{705}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[level distance=1.05cm,
+    edge from parent/.style={draw=gris, thick}]
+  \node[font=\small\bfseries, text=azul] at (0,1) {Árbol correcto};
+  \node[hoja] at (0,0) {no sale 6};
+  \node[font=\scriptsize, align=center] at (0,-1.1) {generaliza};
+  \begin{scope}[xshift=6.5cm, level 1/.style={sibling distance=2.4cm}]
+    \node[font=\small\bfseries, text=ambar] at (0,1) {Árbol sin restricciones};
+    \node[atr] {color}
+      child {node[hoja] {no} edge from parent node[val, left] {otro}}
+      child {node[atr] {peso}
+        child {node[hoja] {no} edge from parent node[val, left] {otro}}
+        child {node[atr] {dedos cruzados}
+          child {node[hoja] {no} edge from parent node[val, left] {no}}
+          child {node[hoja, draw=ambar, very thick] (s6) {sale 6} edge from parent node[val, right] {sí}}
+          edge from parent node[val, right] {7\,g}}
+        edge from parent node[val, right] {azul}};
+    \node[font=\scriptsize, text=ambar, align=left, anchor=west] at ($(s6.east)+(0.1,0)$) {$\leftarrow$ apoyada en\\solo 2 tiradas};
+  \end{scope}
+\end{tikzpicture}
+\caption{Ejemplo del dado: el árbol sin restricciones memoriza una coincidencia.}
+\end{figure}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X@{}}
+\toprule
+ & \textbf{Árbol chico} & \textbf{Árbol sin restricciones} \\
+\midrule
+Cuándo deja de partir & antes de clasificar todo & cuando clasifica todo el entrenamiento \\
+Ejemplos por hoja & muchos & pocos (a veces 1 o 2) \\
+Qué captura & patrones generales & también coincidencias y ruido \\
+Error en entrenamiento & algo mayor & casi 0 \\
+Error en datos nuevos & menor & mayor (ver la figura del Ejercicio~2) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Remedios}: dos formas de combatirlo:\fuentes{PMG, §11.2, p.~408; AIMA, §18.3.5, pp.~705--706}
+  \begin{itemize}
+    \item \textbf{restringir la partición}: partir solo cuando la partición es útil (\textit{early stopping});
+    \item \textbf{podar} (\textit{pruning}): construir el árbol completo y eliminar los nodos que hacen distinciones no justificadas. AIMA usa una prueba de significancia estadística ($\chi^2$): si la partición no se aparta de lo que daría el azar, el nodo se reemplaza por una hoja.
+  \end{itemize}
+  \item La poda funciona mejor en la práctica. El \textit{early stopping} falla cuando ningún atributo es útil por sí solo pero sí una combinación (p.~ej. XOR de dos atributos): se detendría en la raíz.\fuentes{PMG, §11.2, p.~408; AIMA, §18.3.5, p.~706}
+  \item Los árboles podados toleran ruido en los ejemplos y son más chicos, y por lo tanto más fáciles de entender.\aima{18.3.5}{706}
+  \item \textbf{Random Forest} construye varios árboles de decisión para mejorar la tasa de clasificación.\catedra{Episodio VII, parte 2}{Algoritmos de Aprendizaje con Árboles de Decisión}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 4 --- Redes Neuronales Artificiales (RNA)}
+
+%----------------------------------------------------------------------
+\subsection*{4.a}
+
+\begin{enunciado}{Consigna}
+Describa la estructura de una RNA. Mencione las capas que la componen y las características de cada una.
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{Estructura}: una red de \textbf{neuronas artificiales} (NA). Estructuralmente es un \textbf{grafo dirigido} de nodos interconectados por arcos.\catedra{Episodio VII, parte 3}{Redes Neuronales Artificiales}
+  \begin{itemize}
+    \item Cada \textbf{arco} guarda un \textbf{peso} $w$.
+    \item Cada \textbf{NA} es una función matemática: recibe valores por sus arcos entrantes, calcula un valor con los pesos y lo envía por todos sus arcos salientes.
+  \end{itemize}
+  \item \textbf{Tipos de NA}:\catedra{Episodio VII, parte 3}{Neuronas Artificiales}
+  \begin{itemize}
+    \item \textbf{perceptrón}: devuelve $0$ si $w \cdot x + b \le 0$ y $1$ si $w \cdot x + b > 0$ (el sesgo es $b = -\text{umbral}$);
+    \item \textbf{sigmoide}: devuelve $\sigma(w \cdot x + b)$, con $\sigma(z) = \dfrac{1}{1+e^{-z}}$ (una versión suave del escalón).
+  \end{itemize}
+  \item \textbf{Capas}: en general está organizada en capas:\catedra{Episodio VII, parte 3}{Redes Neuronales Artificiales}
+  \begin{itemize}
+    \item \textbf{de entrada} (\textit{input layer}): recibe el estímulo del exterior de la red. En el reconocimiento de dígitos de $28 \times 28$ píxeles tiene $784$ neuronas, una por píxel;
+    \item \textbf{ocultas} (\textit{hidden layers}): están entre la entrada y la salida y no se conectan con el exterior de la red.\fuentes{Misma idea en AIMA, §18.7.1, p.~729} En el ejemplo, una capa de $15$ neuronas;
+    \item \textbf{de salida} (\textit{output layer}): envía la respuesta al exterior de la red. En el ejemplo, $10$ neuronas, una por dígito.
+  \end{itemize}
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X X l@{}}
+\toprule
+\textbf{Capa} & \textbf{Recibe de} & \textbf{Envía a} & \textbf{Ej. dígitos} \\
+\midrule
+Entrada & el exterior (el estímulo) & la primera capa oculta & 784 (1 por píxel) \\
+Oculta(s) & la capa anterior & la capa siguiente & 15 \\
+Salida & la última capa oculta & el exterior (la respuesta) & 10 (1 por dígito) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=1.6cm, y=0.75cm]
+  \foreach \i in {1,...,4} \node[neu] (i\i) at (0,-\i) {};
+  \foreach \h in {1,...,5} \node[neu, fill=azul!25] (h\h) at (1,{-\h+0.5}) {};
+  \foreach \o in {1,2,3} \node[neu, fill=ambar!25, draw=ambar] (o\o) at (2,{-\o-0.5}) {};
+  \foreach \i in {1,...,4} \foreach \h in {1,...,5} \draw[con] (i\i) -- (h\h);
+  \foreach \h in {1,...,5} \foreach \o in {1,2,3} \draw[con] (h\h) -- (o\o);
+  \node[font=\scriptsize\bfseries, align=center] at (0,0.1) {entrada};
+  \node[font=\scriptsize\bfseries, align=center] at (1,0.1) {oculta};
+  \node[font=\scriptsize\bfseries, align=center] at (2,0.1) {salida};
+  \draw[flecha] (-1.1,-2.5) -- node[val, above=2pt] {estímulo} (-0.3,-2.5);
+  \draw[flecha] (2.3,-2.5) -- node[val, above=2pt] {respuesta} (3.1,-2.5);
+  % Detalle de una neurona
+  \begin{scope}[xshift=8.6cm, yshift=-1.9cm, x=1cm, y=1cm]
+    \node[neu, minimum size=9mm, font=\small] (n) at (0,0) {$\Sigma, f$};
+    \foreach \k/\y in {1/1, 2/0, 3/-1} {
+      \node[font=\small] (x\k) at (-1.3,\y) {$x_\k$};
+      \draw[con, thick] (x\k) -- node[font=\scriptsize, above, sloped, text=azul] {$w_\k$} (n);
+    }
+    \draw[con, thick] (n) -- (1.2,0) node[right, font=\small] {salida};
+    \node[font=\scriptsize, align=center] at (0,-1.7) {salida $= f(w \cdot x + b)$};
+  \end{scope}
+\end{tikzpicture}
+\caption{RNA de tres capas (izquierda) y detalle de una neurona artificial (derecha).}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item Ejemplo de la cátedra: un perceptrón con $w_1 = w_2 = -2$ y $b = 3$ implementa NAND:\catedra{Episodio VII, parte 3}{Ejemplo}
+  \begin{center}\small
+  \begin{tabular}{@{}cc c c@{}}
+  \toprule
+  $x_1$ & $x_2$ & $-2x_1 - 2x_2 + 3$ & salida \\
+  \midrule
+  0 & 0 & 3 & 1 \\
+  0 & 1 & 1 & 1 \\
+  1 & 0 & 1 & 1 \\
+  1 & 1 & $-1$ & 0 \\
+  \bottomrule
+  \end{tabular}
+  \end{center}
+  \item Con conexión completa entre capas, la red de dígitos tiene $784 \times 15 + 15 \times 10 = 11.910$ arcos, y cada uno tiene un peso por ajustar.\catedra{Episodio VII, parte 3}{Redes Neuronales Artificiales}
+  \item Una función de activación no lineal (escalón o sigmoide) permite que la red represente funciones no lineales. Además, la sigmoide es \textbf{derivable}, con $f'(x) = f(x)\,(1 - f(x))$, y eso es lo que necesita el descenso de gradiente (4.b).\fuentes{AIMA, §18.7.1, p.~729; PMG, §11.2, p.~410}
+  \item Las unidades ocultas no tienen un significado fijado de antemano: lo que representan es algo que se aprende, y a veces es difícil de interpretar.\pmg{11.2}{414}
+  \item Se inspiran en las neuronas del cerebro pero no las simulan: tienen muchas menos unidades que las $\approx 10^{11}$ neuronas humanas, y mucho más simples.\pmg{11.2}{408}
+  \item Antes de entrenar hay que elegir la forma de la red. La cátedra muestra varias, incluida la arquitectura \textit{Transformer}.\catedra{Episodio VII, parte 3}{Antes del entrenamiento hay que elegir que RNA usar}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{4.b}
+
+\begin{enunciado}{Consigna}
+¿En qué consiste el método de Backpropagation? ¿Cuál es su relación con el Descenso de Gradiente Estocástico?
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{El problema}: entrenar una RNA es un problema de \textbf{minimización}. Dado un conjunto de ejemplos, hay que encontrar los valores de los parámetros ($w$, $b$) que minimicen el error cuadrático de la salida.\catedra{Episodio VII, parte 3}{Neuronas Artificiales}
+  \item \textbf{Descenso de gradiente estocástico (SGD)}: el método de \textbf{búsqueda} del mínimo, similar a \textit{hill climbing}. Observa la pendiente de su vecindario local y se mueve en la dirección de pendiente más pronunciada.\fuentes{Cátedra, Episodio VII, parte 3, «Neuronas Artificiales» y «Stochastic gradient descent vs. Hill climbing»} Es \textit{estocástico} porque considera un solo ejemplo de entrenamiento por vez y da un paso después de cada uno.\aima{18.6.1}{720}
+  \item \textbf{Backpropagation}: el método para \textbf{calcular el gradiente} de la función de error.\catedra{Episodio VII, parte 3}{Stochastic gradient descent vs. Hill climbing} Esquema:\catedra{Episodio VII, parte 3}{Backpropagation}
+  \begin{enumerate}
+    \item se asignan valores iniciales al azar;
+    \item se repite hasta un umbral definido:
+    \begin{itemize}
+      \item se evalúa un ejemplo de entrenamiento \textbf{hacia adelante} (\textit{forward}), de la entrada a la salida;
+      \item se calculan los errores \textbf{hacia atrás} (\textit{backward}), de la salida a la entrada.
+    \end{itemize}
+  \end{enumerate}
+  \item \textbf{Por qué hacia atrás}: en la capa de salida el error se conoce (salida esperada menos obtenida), pero los datos no dicen qué valor deberían tener las neuronas ocultas. Por eso el error se \textbf{propaga} desde la salida hacia las capas ocultas.\aima{18.7.4}{733}
+  \item \textbf{Relación}: el SGD decide \textbf{cómo moverse} (un paso en contra del gradiente por cada ejemplo), y backpropagation calcula \textbf{el gradiente} que el SGD necesita en cada paso.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X@{}}
+\toprule
+ & \textbf{Descenso de gradiente estocástico} & \textbf{Backpropagation} \\
+\midrule
+Qué es & método de búsqueda / optimización & método de cálculo del gradiente \\
+Responde & ¿hacia dónde y cuánto muevo los pesos? & ¿cuánto influye cada peso en el error? \\
+Cómo & un paso en la dirección de mayor descenso, por cada ejemplo & forward (salida) + backward (errores capa por capa) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm]
+  % Curva de error
+  \draw[-{Stealth}, thick] (-0.2,0) -- (6,0) node[right, font=\scriptsize] {peso $w$};
+  \draw[-{Stealth}, thick] (0,-0.2) -- (0,3.2) node[above, font=\scriptsize] {error};
+  \draw[thick, azul, domain=0.3:5.7, smooth] plot (\x, {0.28*(\x-3.4)^2 + 0.3});
+  \foreach \x/\n in {0.8/1, 1.7/2, 2.4/3, 2.95/4} {
+    \fill[ambar] (\x, {0.28*(\x-3.4)^2 + 0.3}) circle (2.2pt);
+  }
+  \draw[-{Stealth}, ambar, thick] (0.85,2.15) -- (1.6,1.15);
+  \draw[-{Stealth}, ambar, thick] (1.75,1.0) -- (2.3,0.65);
+  \draw[-{Stealth}, ambar, thick] (2.45,0.5) -- (2.9,0.4);
+  \node[font=\scriptsize, align=center] at (3.4,-0.55) {mínimo};
+  \node[font=\scriptsize, text=ambar, align=left, anchor=west] at (1.3,2.6) {pasos del SGD};
+  % Forward / backward
+  \begin{scope}[xshift=8.2cm, yshift=1.2cm]
+    \node[caja] (in) at (0,0) {entrada};
+    \node[cajaazul] (hid) at (2.5,0) {ocultas};
+    \node[caja] (out) at (5,0) {salida};
+    \draw[flecha] (in.north east) to[bend left=30] node[val, above] {forward} (hid.north west);
+    \draw[flecha] (hid.north east) to[bend left=30] node[val, above] {forward} (out.north west);
+    \draw[flecha, draw=ambar] (out.south west) to[bend left=30] node[val, below] {error} (hid.south east);
+    \draw[flecha, draw=ambar] (hid.south west) to[bend left=30] node[val, below] {error} (in.south east);
+    \node[font=\scriptsize, align=center] at (2.5,-1.7) {backpropagation calcula el gradiente};
+  \end{scope}
+\end{tikzpicture}
+\caption{El SGD baja por la curva del error (izquierda) con el gradiente que calcula backpropagation (derecha).}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{SGD vs.\ hill climbing}:\catedra{Episodio VII, parte 3}{Stochastic gradient descent vs. Hill climbing}
+  \begin{center}\small
+  \begin{tabularx}{0.92\linewidth}{@{}>{\bfseries}l X X@{}}
+  \toprule
+   & \textbf{Hill climbing} & \textbf{Descenso de gradiente} \\
+  \midrule
+  Objetivo & maximiza & minimiza \\
+  Cómo elige & evalúa todos los vecinos y va al mejor & mira la pendiente local y sigue la más pronunciada \\
+  Problemas & discretos & funciones continuas con gradiente calculable \\
+  Eficiencia & menor & en general mucho mayor, pero sirve para menos problemas \\
+  \bottomrule
+  \end{tabularx}
+  \end{center}
+  \item \textbf{Historia}: backpropagation se introdujo en la década de 1970, pero se valoró recién con el artículo de Rumelhart, Hinton y Williams (1986), que mostró que era mucho más rápido que los enfoques anteriores.\catedra{Episodio VII, parte 3}{Backpropagation}
+  \item \textbf{Regla de actualización}: $w_{i,j} \leftarrow w_{i,j} + \alpha \cdot a_i \cdot \Delta_j$, donde $\Delta_j$ es el error ``modificado'' de la unidad $j$ y $\alpha$ es la \textbf{tasa de aprendizaje} (\textit{learning rate}). Cada peso cambia en proporción a cuánto reduce el error un pequeño cambio en él.\fuentes{AIMA, §18.7.4, pp.~733--734; PMG, §11.2, p.~412}
+  \item \textbf{Estocástico vs.\ por lotes} (\textit{batch}): el descenso por lotes recorre todos los ejemplos antes de cada paso. El SGD suele ser más rápido, pero con $\alpha$ fijo puede oscilar alrededor del mínimo sin converger. Una tasa de aprendizaje decreciente, como en \textit{simulated annealing}, garantiza la convergencia.\aima{18.6.1}{720}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{4.c}
+
+\begin{enunciado}{Consigna}
+Explique brevemente cómo se desarrolla el proceso de entrenamiento en una RNA. ¿Este proceso modifica las conexiones entre las neuronas? ¿Qué tipo de modificaciones hace?
+\end{enunciado}
+
+\paragraph{Proceso.} Pasos:\fuentes{Cátedra, Episodio VII, parte 3, «Redes Neuronales Artificiales» (¿Cómo se entrena una RNA?) y «Backpropagation»}
+\begin{enumerate}
+  \item \textbf{Antes de entrenar}: se elige la configuración de la red y la función matemática de cada nodo.
+  \item Se asignan \textbf{valores iniciales} (al azar) a los arcos.
+  \item Se usan los ejemplos etiquetados para ir \textbf{adecuando los pesos} $w$ de cada arco: por cada ejemplo, forward, cálculo del error y backpropagation con SGD (Ejercicio~4.b).
+  \item Se repite hasta que la red se comporte con un \textbf{error aceptable} (p.~ej. 97\% de aciertos).
+\end{enumerate}
+Que la red esté \textbf{entrenada} significa que se encontraron valores adecuados para todos los pesos $w_i$ de los arcos y los umbrales de cada nodo, de modo que la red haga ``buenas'' predicciones.\catedra{Episodio VII, parte 3}{Redes Neuronales Artificiales}
+
+\paragraph{¿Modifica las conexiones?} No modifica qué conexiones hay, sino cuánto vale cada una:\catedra{Episodio VII, parte 3}{Redes Neuronales Artificiales}
+\begin{itemize}
+  \item \textbf{No cambia la topología}: qué neurona se conecta con cuál se fija antes de entrenar, al elegir la configuración de la red.
+  \item \textbf{Sí cambia el valor de cada conexión}: ajusta numéricamente los pesos $w$ de los arcos (y los umbrales/sesgos $b$ de los nodos).
+  \item El peso determina la \textbf{intensidad} y el \textbf{signo} de la conexión, así que el entrenamiento cambia cuánto y en qué sentido influye cada neurona sobre la siguiente.\aima{18.7.1}{728}
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}X X@{}}
+\toprule
+\textbf{Se fija antes de entrenar} & \textbf{Cambia durante el entrenamiento} \\
+\midrule
+cantidad de capas y de neuronas & valor de cada peso $w$ (intensidad y signo) \\
+qué neuronas se conectan (arcos) & umbral / sesgo $b$ de cada neurona \\
+función de cada nodo (perceptrón, sigmoide) & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=0.5cm and 0.9cm]
+  \node[caja] (cfg) {elegir red\\y funciones};
+  \node[caja, right=of cfg] (ini) {pesos\\al azar};
+  \node[cajaazul, right=of ini] (fw) {forward\\(un ejemplo)};
+  \node[cajaazul, right=of fw] (err) {error\\de salida};
+  \node[cajaazul, below=1.1cm of err] (bw) {backprop:\\gradiente};
+  \node[cajaazul, below=1.1cm of fw] (upd) {actualizar\\pesos $w$, $b$};
+  \node[caja, below=1.1cm of ini, diamond, aspect=2, inner sep=1pt, font=\scriptsize] (ok) {¿error\\aceptable?};
+  \node[caja, below=1.1cm of cfg, fill=ambar!10, draw=ambar] (fin) {red\\entrenada};
+  \draw[flecha] (cfg) -- (ini);
+  \draw[flecha] (ini) -- (fw);
+  \draw[flecha] (fw) -- (err);
+  \draw[flecha] (err) -- (bw);
+  \draw[flecha] (bw) -- (upd);
+  \draw[flecha] (upd) -- (ok);
+  \draw[flecha] (ok) -- node[val, above] {sí} (fin);
+  \draw[flecha] (ok.north) -- node[val, right] {no} ($(fw.south west)!0.3!(fw.south east)$);
+\end{tikzpicture}
+\caption{Ciclo de entrenamiento de una RNA: la topología no cambia, solo los pesos.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item Una vez conformes con el entrenamiento, para usar la red solo hace falta la red con los pesos de los arcos.\catedra{Episodio VII, parte 3}{Redes Neuronales Artificiales}
+  \item Con varias salidas, el gradiente de la pérdida es la suma de los gradientes de cada salida. Un problema de $m$ salidas se descompone en $m$ problemas, sumando sus contribuciones al actualizar los pesos.\aima{18.7.4}{733}
+  \item PMG estima las derivadas simulando la red con cada parámetro levemente cambiado. Para la sigmoide aplicada a una combinación lineal, la derivada se calcula analíticamente, y así el algoritmo corre más rápido.\pmg{11.2}{412}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{4.d}
+
+\begin{enunciado}{Consigna}
+Describa una Red Neuronal Feed-Forward (hacia adelante) en cuanto a su topología y flujo de señales.
+\end{enunciado}
+
+La cátedra la usa (la red de dígitos y el paso \textit{feedforward} de backpropagation) pero no la define.\catedra{Episodio VII, parte 3}{Backpropagation} Según AIMA:\aima{18.7.1}{729}
+\begin{itemize}
+  \item \textbf{Topología}:
+  \begin{itemize}
+    \item las conexiones van en \textbf{una sola dirección}: es un \textbf{grafo dirigido acíclico}, sin ciclos;
+    \item en general se organiza en \textbf{capas}, y cada unidad recibe entradas solo de la capa inmediatamente anterior.
+  \end{itemize}
+  \item \textbf{Flujo de señales}:
+  \begin{itemize}
+    \item la señal entra por la capa de entrada, atraviesa las ocultas y sale por la de salida: cada nodo recibe de los nodos anteriores (\textit{upstream}) y entrega a los siguientes (\textit{downstream});
+    \item como no hay ciclos, la salida es \textbf{función solo de la entrada actual}: la red no tiene estado interno (memoria) aparte de los pesos.
+  \end{itemize}
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
+\toprule
+Aspecto & \textbf{Red feed-forward} \\
+\midrule
+Grafo & dirigido acíclico (sin ciclos) \\
+Organización & en capas; cada unidad recibe solo de la capa anterior \\
+Flujo & entrada $\to$ ocultas $\to$ salida, siempre hacia adelante \\
+Salida & depende solo de la entrada actual (sin memoria más que los pesos) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[x=1.5cm, y=0.8cm]
+  \foreach \i in {1,2,3} \node[neu] (a\i) at (0,-\i) {};
+  \foreach \h in {1,...,4} \node[neu, fill=azul!25] (b\h) at (1,{-\h+0.5}) {};
+  \foreach \h in {1,...,4} \node[neu, fill=azul!25] (c\h) at (2,{-\h+0.5}) {};
+  \foreach \o in {1,2} \node[neu, fill=ambar!25, draw=ambar] (d\o) at (3,{-\o-0.5}) {};
+  \foreach \i in {1,2,3} \foreach \h in {1,...,4} \draw[con] (a\i) -- (b\h);
+  \foreach \h in {1,...,4} \foreach \k in {1,...,4} \draw[con] (b\h) -- (c\k);
+  \foreach \k in {1,...,4} \foreach \o in {1,2} \draw[con] (c\k) -- (d\o);
+  \node[font=\scriptsize\bfseries] at (0,0.1) {entrada};
+  \node[font=\scriptsize\bfseries] at (1.5,0.1) {ocultas};
+  \node[font=\scriptsize\bfseries] at (3,0.1) {salida};
+  \draw[-{Stealth[length=3mm]}, line width=2pt, azul!60] (0,-4.3) -- node[val, below=2pt, font=\small] {flujo de la señal: siempre hacia adelante, sin ciclos} (3,-4.3);
+\end{tikzpicture}
+\caption{Red feed-forward con dos capas ocultas.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Redes recurrentes}, la alternativa: realimentan sus salidas hacia sus propias entradas. Forman un sistema dinámico que puede estabilizarse, oscilar o tener comportamiento caótico. La respuesta depende del estado anterior, así que tienen memoria de corto plazo: se parecen más al cerebro, pero son más difíciles de entender.\aima{18.7.1}{729}
+  \begin{center}
+  \begin{tikzpicture}[x=1.3cm, y=0.7cm]
+    \node[font=\scriptsize\bfseries, text=azul] at (1,0.7) {Feed-forward};
+    \node[neu] (p1) at (0,0) {}; \node[neu, fill=azul!25] (p2) at (1,0) {}; \node[neu, fill=ambar!25, draw=ambar] (p3) at (2,0) {};
+    \draw[con, thick] (p1) -- (p2); \draw[con, thick] (p2) -- (p3);
+    \node[font=\scriptsize\bfseries, text=ambar] at (6,0.7) {Recurrente};
+    \node[neu] (q1) at (5,0) {}; \node[neu, fill=azul!25] (q2) at (6,0) {}; \node[neu, fill=ambar!25, draw=ambar] (q3) at (7,0) {};
+    \draw[con, thick] (q1) -- (q2); \draw[con, thick] (q2) -- (q3);
+    \draw[con, thick, ambar] (q3) to[bend left=50] (q2);
+    \draw[con, thick, ambar] (q2) to[out=-120, in=-60, looseness=6] (q2);
+  \end{tikzpicture}
+  \end{center}
+  \item \textbf{Una capa vs.\ multicapa}: si todas las entradas se conectan directo a las salidas, es una red de una capa (red de perceptrones); si tiene una o más capas ocultas, es multicapa.\aima{18.7.1}{729}
+  \item PMG compara las redes feed-forward con programas lógicos de encadenamiento hacia adelante, sin ciclos, con parámetros por aprender.\pmg{11.2}{409}
+\end{itemize}
+\end{extras}
+
+\end{document}
