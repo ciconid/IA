@@ -1,0 +1,508 @@
+\documentclass[11pt,a4paper]{article}
+\input{../plantilla/preambulo}
+
+\title{\vspace{-1.5cm}\textbf{Trabajo Práctico 7 --- Resolución}\\[3pt]
+\large Sistemas Basados en Conocimiento}
+\author{\normalsize Inteligencia Artificial --- UNS --- 2026}
+\date{}
+
+% Estilos TikZ comunes a este TP.
+\tikzset{
+  caja/.style={draw=gris, thick, rounded corners=3pt, fill=fondogris, align=center, font=\small, inner sep=4pt},
+  cajaazul/.style={caja, fill=fondoazul, draw=azul},
+  cajaambar/.style={caja, fill=fondoambar, draw=ambar},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=azul},
+  dflecha/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick, draw=azul},
+  val/.style={font=\scriptsize, fill=white, inner sep=1pt},
+  % Argumentos (triángulos) para los árboles de argumentos.
+  arg/.style={isosceles triangle, isosceles triangle apex angle=60, shape border rotate=90,
+              draw, thick, minimum height=8mm, inner sep=0pt, font=\scriptsize\bfseries},
+  afavor/.style={arg, fill=ambar!35, draw=ambar},
+  encontra/.style={arg, fill=azul!25, draw=azul},
+}
+\usetikzlibrary{shapes.geometric}
+
+% Prolog en el texto: negación fuerte y negación por falla.
+\newcommand{\nf}{\textasciitilde}
+\newcommand{\naf}{\textbackslash+}
+% Nota al pie con URLs (sin justificar, para que no se estiren los espacios).
+\newcommand{\fuentesweb}[1]{\footnote{\raggedright #1.}}
+% Bloque de código Prolog.
+\newtcolorbox{codigo}{enhanced, colback=fondogris, colframe=gris, boxrule=0.4pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt, fontupper=\small}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+\notafuentes
+
+%======================================================================
+\section*{Ejercicio 1}
+
+\begin{enunciado}{Consigna}
+¿Qué elementos forman un sistema basado en conocimiento (SBC)? ¿Cómo se relacionan entre ellos?
+\end{enunciado}
+
+\paragraph{Elementos.} La arquitectura básica de un SBC tiene tres módulos:\fuentes{Cátedra, Episodio VIII, «Sistema Basado en Conocimiento (SBC)» y «Ejemplo simplificado de SBC del agente de compañía “Okaeri”». Misma arquitectura en PMG, §6.2, p.~200 (\cita{The main components of the system are the control or inference engine, the knowledge base, and the user interface})}
+\begin{itemize}
+  \item \textbf{Base de conocimiento (KB)}: el conocimiento del dominio, representado como \textbf{reglas} para hacer inferencias y \textbf{hechos} (por ejemplo, los datos percibidos).
+  \item \textbf{Máquina de inferencia}: usa las reglas de la KB para \textbf{sacar conclusiones} a partir de los datos percibidos.
+  \item \textbf{Interface}: se comunica con el \textbf{entorno}. Muestra las sugerencias, procesa las percepciones, busca información en la web, interpreta comandos de voz, etc. Depende mucho del dominio de aplicación y de los sensores y acciones disponibles para el agente.
+\end{itemize}
+
+\paragraph{Relaciones.} Según el diagrama de la arquitectura:\catedra{Episodio VIII}{¿Cómo se implementa un SBC?}
+\begin{itemize}
+  \item \textbf{Interface $\leftrightarrow$ entorno}: por la interface entran las percepciones y consultas y salen las respuestas (conclusiones, recomendaciones).
+  \item \textbf{Interface $\leftrightarrow$ KB y máquina de inferencia}: la interface lleva a la KB los datos percibidos y le pasa las consultas a la máquina de inferencia, que devuelve las conclusiones.
+  \item \textbf{Máquina de inferencia $\leftrightarrow$ KB}: la máquina de inferencia razona sobre las reglas y los hechos de la KB. La representación del conocimiento tiene que estar \textbf{en completa sintonía} con el mecanismo de inferencia.
+  \item \textbf{Diseño modular}: la KB es un módulo independiente del mecanismo de inferencia. Por eso se pueden agregar o quitar reglas y hechos dinámicamente sin cambiar el código del mecanismo de inferencia, y usar la misma máquina de inferencia en otros dominios.\catedra{Episodio VIII}{SBC que usa la máquina de inferencia de Prolog}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  \node[cajaazul, minimum width=3.2cm, minimum height=1.1cm] (mi) at (0,1.4) {\textbf{Máquina de}\\\textbf{inferencia}};
+  \node[cajaazul, minimum width=3.2cm, minimum height=1.1cm] (kb) at (0,-0.4) {\textbf{Base de}\\\textbf{conocimiento (KB)}};
+  \node[cajaazul, minimum width=0.9cm, minimum height=3cm] (int) at (2.6,0.5) {};
+  \node[rotate=-90, font=\small\bfseries, text=azul] at (int.center) {Interface};
+  \node[draw=azul, thick, ellipse, fill=azul!15, font=\small\bfseries, minimum width=2.4cm, minimum height=1cm] (ent) at (5.6,0.5) {Entorno};
+  \draw[dashed, gris, thick, rounded corners=6pt] (-1.9,-1.2) rectangle (3.2,2.2);
+  \node[font=\scriptsize\bfseries, text=gris, anchor=south west] at (-1.9,2.2) {SBC};
+  \draw[dflecha] (mi) -- (kb);
+  \draw[dflecha] (mi.east) -- (int.west |- mi.east);
+  \draw[dflecha] (kb.east) -- (int.west |- kb.east);
+  \draw[dflecha] (int.east) -- (ent.west);
+  \node[font=\scriptsize, align=left, anchor=west] at (4.3,-0.6) {percepciones,\\consultas};
+  \node[font=\scriptsize, align=left, anchor=west] at (4.3,1.6) {respuestas,\\recomendaciones};
+  % Ejemplo Okaeri
+  \node[font=\scriptsize\ttfamily, align=left, anchor=north west, text=gris] at (-7.3,2.1)
+    {chance(lluvia,X), X>50\\\quad$\to$ recomendar(paraguas)\\mínima(T), T<10\\\quad$\to$ recomendar(abrigo)\\verano $\to$ recomendar(sombrero)\\chance(lluvia,80)\\mínima(8)};
+  \draw[gris, -{Stealth}, dashed] (-2.9,0.2) -- (kb.west);
+  \node[font=\scriptsize, text=gris, anchor=north west] at (-7.3,-0.6) {(reglas y hechos de Okaeri)};
+\end{tikzpicture}
+\caption{Arquitectura básica de un SBC, con parte de la KB del agente de compañía Okaeri.}
+\end{figure}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X@{}}
+\toprule
+\textbf{Elemento} & \textbf{Qué hace} & \textbf{En el agente Okaeri} \\
+\midrule
+Base de conocimiento & guarda reglas y hechos del dominio & \texttt{chance(lluvia,X), X>50 $\to$ recomendar(paraguas)}; \texttt{chance(lluvia,80)} \\
+Máquina de inferencia & saca conclusiones con las reglas de la KB & concluye \texttt{recomendar(paraguas)} \\
+Interface & percibe del entorno y muestra los resultados & lee el pronóstico; dice ``No te olvides de llevar un paraguas'' \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Arquitectura de un sistema}: \cita{modelo conceptual que define la estructura del sistema, indicando (generalmente en forma gráfica) los elementos que lo componen y cómo se relacionan}. Para tener razonamiento automático hacen falta herramientas tanto para representar el conocimiento del dominio como para obtener conclusiones.\catedra{Episodio VIII}{Sistema Basado en Conocimiento (SBC)}
+  \item En AIMA, la KB es \cita{a set of sentences}, cada una expresada en un \textit{knowledge representation language}. Las sentencias que se toman como dadas, sin derivarlas de otras, se llaman \textbf{axiomas}. La KB puede arrancar con \textit{background knowledge}.\aima{7.1}{235}
+  \item PMG distingue cuatro \textbf{roles de personas} alrededor de un SBC:\pmg{6.2}{200--201}
+  \begin{itemize}
+    \item \textit{software engineers}: construyen la máquina de inferencia y la interface; no necesitan saber nada del contenido de la KB;
+    \item \textit{knowledge engineers}: diseñan, construyen y depuran la KB consultando a los expertos;
+    \item \textit{domain experts}: tienen el conocimiento que se quiere capturar, pero no suelen saber cómo funciona la inferencia;
+    \item \textit{users}: conocen el caso particular, pero no el dominio. Necesitan una interface simple y natural.
+  \end{itemize}
+  \item \textbf{Cuestiones a resolver en un SBC}:\catedra{Episodio VIII}{Cuestiones que hay que abordar en SBC}
+  \begin{itemize}
+    \item \textit{derivación de nuevo conocimiento}: aprovechar las conexiones entre piezas de conocimiento para deducir, diagnosticar o encontrar explicaciones;
+    \item \textit{explicabilidad} (ver ejercicio 5);
+    \item \textit{información incompleta}: la información del agente en general es parcial;
+    \item \textit{dinámica de la información}: cambia con el tiempo, o el agente la busca cuando la necesita;
+    \item \textit{información contradictoria} (ver ejercicio 6).
+  \end{itemize}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 2}
+
+\begin{enunciado}{Consigna}
+¿Qué tipo de agente utiliza un SBC? Considerando el ciclo de comportamiento de un agente, ¿en qué partes de este ciclo se utiliza el SBC?
+\end{enunciado}
+
+\paragraph{Tipo de agente.} Un \textbf{agente deliberativo}: tiene que sacar una conclusión, dar una recomendación o tomar una decisión, y para eso usa la información que percibe en el momento y lo que puede inferir por su ``propio razonamiento''.\fuentes{Cátedra, Episodio I, parte 2, «¿Por qué un agente deliberativo?». Misma idea en Cátedra, Episodio VIII, «Aplicaciones con razonamiento automático»}
+
+\paragraph{Ciclo y uso del SBC.} El ciclo del agente deliberativo es:\catedra{Episodio I, parte 2}{Agente deliberativo}
+\begin{center}
+\texttt{REPETIR}\quad percibir $\to$ revisar las creencias $\to$ razonar sobre el conocimiento $\to$ seleccionar un curso de acción $\to$ actuar\quad\texttt{HASTA el fin}
+\end{center}
+El SBC interviene en todo el ciclo, cada paso a través de uno de sus módulos:
+\begin{itemize}
+  \item \textbf{Percibir}: la \textbf{interface} procesa las percepciones (p.~ej. lee de la página del clima \texttt{chance(lluvia,80)}, \texttt{mínima(8)}).
+  \item \textbf{Revisar las creencias}: lo percibido se incorpora a la \textbf{base de conocimiento} como hechos.
+  \item \textbf{Razonar sobre el conocimiento}: es el corazón del SBC. La \textbf{máquina de inferencia} usa las reglas y hechos de la KB para sacar conclusiones (\texttt{lloverá}, \texttt{frío}).
+  \item \textbf{Seleccionar un curso de acción}: la acción sale de las conclusiones inferidas (\texttt{recomendar(paraguas)}, \texttt{recomendar(abrigo)}).
+  \item \textbf{Actuar}: la \textbf{interface} ejecuta la acción en el entorno (``No te olvides de llevar un paraguas'').
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  \def\r{2.3}
+  \node[cajaambar, minimum width=2.6cm] (p) at (90:\r) {percibir};
+  \node[cajaazul, minimum width=2.6cm] (rc) at (18:\r+0.9) {revisar las\\creencias};
+  \node[cajaazul, minimum width=2.6cm] (ra) at (-54:\r+0.3) {razonar sobre\\el conocimiento};
+  \node[cajaazul, minimum width=2.6cm] (s) at (-126:\r+0.3) {seleccionar un\\curso de acción};
+  \node[cajaambar, minimum width=2.6cm] (a) at (162:\r+0.9) {actuar};
+  \draw[flecha] (p) to[bend left=15] (rc);
+  \draw[flecha] (rc) to[bend left=15] (ra);
+  \draw[flecha] (ra) to[bend left=15] (s);
+  \draw[flecha] (s) to[bend left=15] (a);
+  \draw[flecha] (a) to[bend left=15] (p);
+  \pic[scale=0.9] at (0,0.1) {robot};
+  \node[font=\scriptsize\bfseries, text=gris] at (0,-0.9) {agente deliberativo};
+  % Módulo del SBC en cada paso
+  \node[font=\scriptsize, text=ambar, anchor=south] at (p.north) {interface};
+  \node[font=\scriptsize, text=azul, anchor=west] at (rc.east) {KB};
+  \node[font=\scriptsize, text=azul, anchor=north] at (ra.south) {máquina de inferencia};
+  \node[font=\scriptsize, text=azul, anchor=north] at (s.south) {conclusiones};
+  \node[font=\scriptsize, text=ambar, anchor=east] at (a.west) {interface};
+\end{tikzpicture}
+\caption{Ciclo del agente deliberativo y módulo del SBC que actúa en cada paso.}
+\end{figure}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Paso del ciclo} & \textbf{Módulo del SBC} & \textbf{Ejemplo (pronóstico del clima)} \\
+\midrule
+percibir & interface & lee \texttt{chance(lluvia,80)}, \texttt{mínima(8)} \\
+revisar las creencias & base de conocimiento & agrega esos hechos a la KB \\
+razonar sobre el conocimiento & máquina de inferencia & infiere \texttt{lloverá}, \texttt{frío} \\
+seleccionar un curso de acción & conclusiones de la inferencia & \texttt{recomendar(paraguas)}, \texttt{recomendar(abrigo)} \\
+actuar & interface & ``No te olvides de llevar un paraguas'' \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Contraste con el agente reactivo}: su ciclo es solo ``percibir $\to$ actuar reactivamente'', con reglas condición--acción (termostato, puerta automática). No mantiene creencias ni razona, así que no usa un SBC.\catedra{Episodio I, parte 2}{Agente reactivo}
+  \item \textbf{El agente Mer-val} instancia el ciclo así:\catedra{Episodio VIII}{Agente de recomendación en el Mercado de Valores (Mer-val)}
+  \begin{itemize}
+    \item esperar una consulta;
+    \item actualizar la información de las empresas con sitios especializados de Internet;
+    \item hacer inferencias con las reglas de los expertos en mercado bursátil;
+    \item dar la respuesta con la recomendación.
+  \end{itemize}
+  \item \textbf{El agente basado en conocimiento de AIMA} hace tres cosas en cada llamada:\aima{7.1}{235--236}
+  \begin{itemize}
+    \item \textsc{Tell}: le dice a la KB lo que percibe;
+    \item \textsc{Ask}: le pregunta a la KB qué acción hacer, lo que puede requerir mucho razonamiento;
+    \item \textsc{Tell}: le dice a la KB qué acción eligió, y la ejecuta.
+  \end{itemize}
+  \item Ese agente se puede describir en el \textbf{nivel de conocimiento}: alcanza con especificar qué sabe y cuáles son sus objetivos, sin importar cómo está implementado. Construirlo diciéndole (\textsc{Tell}) lo que necesita saber es el \textbf{enfoque declarativo}. El enfoque procedural, en cambio, codifica el comportamiento directamente como código.\aima{7.1}{236}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 3}
+
+\begin{enunciado}{Consigna}
+¿Podrías considerar al intérprete de Prolog como un SBC? ¿Cómo instanciarías cada elemento del SBC?
+\end{enunciado}
+
+\textbf{No por sí solo; sí junto con un programa Prolog} que haga de base de conocimiento. Un intérprete de Prolog puede usarse como \textbf{máquina de inferencia} ya existente, y para estar en sintonía con él la base de conocimiento tiene que ser un programa Prolog.\catedra{Episodio VIII}{¿Cómo se implementa un SBC?} El intérprete aporta dos de los tres módulos; la KB hay que escribirla para cada dominio:\catedra{Episodio VIII}{SBC que usa la máquina de inferencia de Prolog}
+\begin{itemize}
+  \item \textbf{Máquina de inferencia} $\to$ el \textbf{intérprete de Prolog} (lo aporta el intérprete).
+  \item \textbf{Interface} $\to$ el \textbf{top-level} del intérprete, como interface rudimentaria: se escriben consultas y se obtienen respuestas (lo aporta el intérprete).
+  \item \textbf{Base de conocimiento} $\to$ un \textbf{programa Prolog} con reglas y hechos (\textbf{no} lo aporta el intérprete). Sin él, el intérprete no tiene conocimiento del dominio y no puede sacar ninguna conclusión. Los hechos (p.~ej. \texttt{chance(lluvia,80)}) pueden obtenerse dinámicamente de Internet y estar actualizados.
+  \item \textbf{Entorno} $\to$ el usuario que consulta y las fuentes (p.~ej. sitios web) de donde salen los hechos.
+\end{itemize}
+
+\begin{codigo}
+\begin{verbatim}
+recomendar(paraguas) :- chance(lluvia, X), X > 50.
+recomendar(abrigo)   :- minima(Temp), Temp < 10.
+recomendar(sombrero) :- verano.
+verano :- hemisferio(sur), mes(M), member(M,[12,1,2]).
+chance(lluvia,80).          % hechos que pueden venir de Internet
+minima(8).
+
+?- recomendar(X).           % consulta en el top-level
+X = paraguas ;
+X = abrigo
+\end{verbatim}
+\end{codigo}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  \node[cajaambar, minimum width=2.8cm, minimum height=1.1cm] (kb) at (-4.4,0) {\textbf{Programa Prolog}\\{\scriptsize (KB: reglas y hechos)}};
+  \node[cajaazul, minimum width=2.8cm, minimum height=1.1cm] (mi) at (0,0) {\textbf{Motor de inferencia}\\{\scriptsize (máquina de inferencia)}};
+  \node[cajaazul, minimum width=0.9cm, minimum height=2.2cm] (int) at (2.7,0) {};
+  \node[rotate=-90, font=\small\bfseries, text=azul] at (int.center) {Top-level};
+  \draw[dashed, azul, thick, rounded corners=6pt] (-1.9,-1.35) rectangle (3.4,1.35);
+  \node[font=\scriptsize\bfseries, text=azul, anchor=south] at (0.75,1.35) {intérprete de Prolog};
+  \node[font=\scriptsize\bfseries, text=ambar, anchor=south] at (kb.north) {lo escribe quien arma el SBC};
+  \draw[dflecha] (kb) -- (mi);
+  \draw[dflecha] (mi) -- (int);
+  \draw[dflecha] (kb.south) to[out=-60, in=-120] (int.south);
+  \pic[scale=0.9] at (6.3,0.1) {compu};
+  \pic[scale=1.4] at (7.4,0.0) {persona};
+  \draw[flecha] (int.east |- 0,0.45) -- node[val, above] {\texttt{?- recomendar(X).}} (5.6,0.45);
+  \draw[flecha] (5.6,-0.45) -- node[val, below] {\texttt{X = paraguas}} (int.east |- 0,-0.45);
+\end{tikzpicture}
+\caption{SBC armado con el intérprete de Prolog: el intérprete aporta la máquina de inferencia y el top-level; el programa Prolog (la KB) se agrega aparte.}
+\end{figure}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X l@{}}
+\toprule
+\textbf{Elemento del SBC} & \textbf{Instancia en Prolog} & \textbf{¿Lo aporta el intérprete?} \\
+\midrule
+Máquina de inferencia & intérprete de Prolog & sí \\
+Interface & top-level (consultas y respuestas) & sí (rudimentaria) \\
+Base de conocimiento & programa Prolog (reglas y hechos) & \textbf{no}: hay que escribirlo \\
+Entorno & usuario que consulta; fuentes de los hechos (Internet) & --- (externo al SBC) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Límites de Prolog estándar como SBC}:
+  \begin{itemize}
+    \item no tiene \textbf{negación fuerte} ni un mecanismo para manejar información contradictoria. En el ejemplo Mer-val responde \texttt{true} tanto a \texttt{comprar\_acciones(acme)} como a \texttt{no\_comprar\_acciones(acme)};\catedra{Episodio VIII}{Consulta: ¿comprar acciones de acme?}
+    \item solo tiene \textbf{negación por falla} (\texttt{\naf p} tiene éxito cuando la derivación de \texttt{p} falla). Sirve para información incompleta, pero solo puede ir en el cuerpo de una regla o en una consulta, nunca en la cabeza ni en un hecho.\catedra{Episodio VIII}{Negación por falla en Prolog}
+  \end{itemize}
+  \item \textbf{Extensiones}: con poco esfuerzo se puede armar un ``top-level extendido'' con una interacción más elaborada, que dé explicaciones o que sea proactivo (sugerencias sin que haya consultas).\catedra{Episodio VIII}{SBC que usa la máquina de inferencia de Prolog}
+  \item \textbf{Prolog en AIMA}:\aima{9.4.2}{339}
+  \begin{itemize}
+    \item la programación lógica se acerca al ideal declarativo: expresar el conocimiento en un lenguaje formal y resolver problemas corriendo inferencia sobre ese conocimiento (\cita{Algorithm = Logic + Control});
+    \item \cita{Many expert systems have been written in Prolog for legal, medical, financial, and other domains};
+    \item el intérprete ejecuta \textbf{encadenamiento hacia atrás en profundidad}, probando las cláusulas en el orden en que están escritas.
+  \end{itemize}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 4}
+
+\begin{enunciado}{Consigna}
+Investigue el uso actual de SBC y comente al menos dos ejemplos de aplicaciones que utilicen estos sistemas.
+\end{enunciado}
+
+La cátedra muestra ejemplos didácticos (Okaeri, Mer-val), no aplicaciones reales en uso, así que los dos ejemplos salen de otras fuentes.
+
+\paragraph{1. Soporte a la decisión clínica (alertas de medicamentos).}\fuentesweb{AHRQ, \textit{Individualized Drug Interaction Alerts}, \url{https://digital.ahrq.gov/ahrq-funded-projects/individualized-drug-interaction-alerts}; CMS, \textit{Clinical Decision Support Rule}, \url{https://www.cms.gov/Regulations-and-Guidance/Legislation/EHRIncentivePrograms/downloads/11ClinicalDecisionSupportRule.pdf}; HL7, \textit{CDS Hooks}, \url{https://cds-hooks.hl7.org/}}
+\begin{itemize}
+  \item Las historias clínicas electrónicas avisan al médico, mientras receta, si hay \textbf{interacciones entre medicamentos} o alergias del paciente.
+  \item La \textbf{KB} tiene reglas sobre combinaciones de medicamentos peligrosas. Los \textbf{hechos} son los datos del paciente: lo que ya toma, sus alergias y lo que se le está recetando.
+  \item La \textbf{máquina de inferencia} cruza las reglas con los hechos. La \textbf{interface} muestra la alerta dentro del flujo de trabajo del médico.
+  \item En EE.~UU., el programa de historias clínicas electrónicas de CMS exigía los controles de interacción medicamento--medicamento y medicamento--alergia.
+  \item El estándar HL7 \textit{CDS Hooks} permite que la historia clínica llame a un servicio de soporte a la decisión externo. Así, la lógica de las reglas vive fuera de la historia clínica y se actualiza por separado (la misma modularidad que separa la KB de la máquina de inferencia).
+\end{itemize}
+
+\paragraph{2. Leyes como código (Catala y el impuesto a la renta en Francia).}\fuentesweb{Merigoux, Chataing \& Protzenko, \textit{Catala: A Programming Language for the Law} (ICFP 2021), \url{https://arxiv.org/abs/2103.03198}; \url{https://github.com/catalalang/catala}; Northwestern Law, \url{https://news.law.northwestern.edu/news/sarah-lawsky-worked-on-a-tax-law-code-that-the-french-government-deemed-officially-awesome/}}
+\begin{itemize}
+  \item \textbf{Catala} es un lenguaje para escribir la legislación como código ejecutable. Su estructura imita la de la ley: \textbf{reglas generales con excepciones}.
+  \item La \textbf{KB} es el texto legal formalizado (las reglas del impuesto o de un beneficio). Los \textbf{hechos} son los datos de un contribuyente. La \textbf{inferencia} calcula cuánto corresponde pagar o cobrar.
+  \item Se usa en un proyecto con la administración tributaria francesa (DGFiP) para reescribir, a partir de los textos legales, el cálculo del impuesto a la renta.
+  \item Al formalizar los beneficios familiares franceses con Catala se encontró un error en la implementación oficial.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X@{}}
+\toprule
+ & \textbf{Alertas clínicas} & \textbf{Catala (impuestos)} \\
+\midrule
+Base de conocimiento & reglas de interacciones y alergias & leyes formalizadas: reglas generales y excepciones \\
+Hechos & medicamentos y alergias del paciente & datos del contribuyente \\
+Máquina de inferencia & motor de reglas de la historia clínica o servicio externo & compilador o intérprete de Catala \\
+Interface & alerta al médico mientras receta & sistema de cálculo de la administración tributaria \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Motores de reglas de negocio} (p.~ej. Drools, base de Red Hat Decision Manager): se usan en seguros y bancos, por ejemplo para decidir qué productos ofrecerle a un solicitante de un seguro. Las reglas las escriben los analistas de negocio, separadas del código, y por eso se pueden cambiar seguido.\fuentesweb{Red Hat, \textit{JBoss BRMS 6.0 Release Notes}, «Use Case: Business Decision Management in the Insurance Industry», \url{https://docs.redhat.com/en/documentation/red_hat_jboss_brms/6.0/html/6.0.0_release_notes/use_cases3}}
+  \item \textbf{Historia: los sistemas expertos}:\aima{1.3.5--1.3.6}{22--24}
+  \begin{itemize}
+    \item \textbf{DENDRAL} (1969) infería estructuras moleculares a partir de un espectrómetro de masas. Fue el primer sistema exitoso basado en mucho conocimiento: su capacidad venía de muchas reglas de propósito específico. Los sistemas posteriores separaron limpiamente el conocimiento (las reglas) del componente de razonamiento.
+    \item \textbf{MYCIN} diagnosticaba infecciones de la sangre con unas 450 reglas. Rendía como algunos expertos y bastante mejor que los médicos residentes. Sus reglas se obtuvieron entrevistando expertos e incorporaban la incertidumbre con \textbf{factores de certeza} (la estrategia MYCIN del ejercicio 7).
+    \item \textbf{R1} (en DEC) fue el primer sistema experto comercial exitoso. Configuraba pedidos de computadoras y en 1986 le ahorraba a la empresa unos \$40 millones por año.
+  \end{itemize}
+  \item La regla general con excepciones de Catala es el mismo tipo de conocimiento que las \textbf{reglas rebatibles} de DeLP: información tentativa que puede ser derrotada.\catedra{Episodio X, parte 2}{Defeasible Logic Programing (DeLP)}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 5}
+
+\begin{enunciado}{Consigna}
+¿Cómo se imagina que un SBC pueda retornar una explicación de su respuesta (o conclusión o recomendación)?
+\end{enunciado}
+
+La explicabilidad es una de las cuestiones de un SBC: las razones que llevan a una conclusión o decisión deberían poder auditarse.\catedra{Episodio VIII}{Cuestiones que hay que abordar en SBC}
+\begin{itemize}
+  \item \textbf{La derivación es la explicación}: el conjunto de reglas que permite inferir una conclusión dice cómo se llegó a ella y es, además, una razón a favor de esa conclusión.\catedra{Episodio VIII}{Consultando por una recomendación}
+  \item \textbf{Cómo obtenerla}: extendiendo la \textbf{interface} para que, además de la respuesta, devuelva la derivación que hizo la máquina de inferencia. En Prolog, con el predicado predefinido \texttt{clause/2}:\catedra{Episodio VIII}{Extendiendo la interface}
+  \begin{itemize}
+    \item \texttt{deriv(Q,D)} junta en la lista \texttt{D} las reglas instanciadas y los hechos usados para derivar \texttt{Q};
+    \item \texttt{explicar(Q)} llama a \texttt{deriv} y muestra la lista en pantalla.
+  \end{itemize}
+  \item \textbf{Con información contradictoria no alcanza con una derivación}: si hay razones a favor y en contra, la explicación detallada es el análisis exhaustivo de todos los argumentos relacionados con la consulta, a favor y en contra.\catedra{Episodio X, parte 1}{Brindando una explicación detallada} En DeLP, ese análisis queda en los \textbf{árboles de dialéctica}, que dan además una explicación de la respuesta.\catedra{Episodio X, parte 2}{Respuesta a una consulta}
+\end{itemize}
+
+\begin{codigo}
+\begin{verbatim}
+deriv(true, []) :- !.
+deriv((Pri,Resto), L) :- !, deriv(Pri,A), deriv(Resto,B), append(A,B,L).
+deriv(Cabeza, [(Cabeza :- Cuerpo) | L1]) :- clause(Cabeza, Cuerpo), deriv(Cuerpo, L1).
+explicar(Q) :- deriv(Q, D), mostrar(D).
+
+?- explicar(comprar_acciones(skynet)).
+comprar_acciones(skynet) :- buen_precio(skynet)
+buen_precio(skynet) :- buen_precio_web(skynet)
+buen_precio_web(skynet) :- true
+\end{verbatim}
+\end{codigo}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  lit/.style={draw=azul, thick, rounded corners=2pt, fill=fondoazul, font=\scriptsize\ttfamily, inner sep=3pt},
+  ]
+  % (a) derivación
+  \node[font=\small\bfseries, text=azul] at (0,2.2) {(a) Una derivación};
+  \node[lit] (c) at (0,1.4) {comprar\_acciones(skynet)};
+  \node[lit] (b) at (0,0.4) {buen\_precio(skynet)};
+  \node[lit] (w) at (0,-0.6) {buen\_precio\_web(skynet)};
+  \node[font=\scriptsize, text=gris] (t) at (0,-1.4) {hecho};
+  \draw[flecha] (b) -- (c);
+  \draw[flecha] (w) -- (b);
+  \draw[gris, thick] (t) -- (w);
+  % (b) árbol de argumentos
+  \node[font=\small\bfseries, text=azul] at (7.6,2.2) {(b) Argumentos a favor y en contra};
+  \node[afavor, label={[font=\scriptsize\ttfamily]left:c}] (B) at (5.4,1.2) {B};
+  \node[encontra, label={[font=\scriptsize\ttfamily]left:\nf c}] (R) at (6.6,0.1) {R};
+  \node[afavor, label={[font=\scriptsize\ttfamily]right:\nf r}] (N) at (7.8,-1.0) {N};
+  \node[encontra, label={[font=\scriptsize\ttfamily]left:r}] (D) at (6.6,-2.1) {D};
+  \draw[flecha, draw=gris] (R.apex) -- (B.right corner);
+  \draw[flecha, draw=gris] (N.apex) -- (R.right corner);
+  \draw[flecha, draw=gris] (D.apex) -- (N.left corner);
+  \node[font=\scriptsize, align=left, anchor=north west, text width=4.3cm] at (9.0,1.6)
+    {B: \texttt{acme} está a buen precio\\R: es riesgosa, está en fusión\\N: no es riesgosa, la fusión es con una fuerte\\D: es riesgosa, hay rumores de deuda};
+  \node[afavor, minimum height=3mm, label={[font=\scriptsize]right:a favor de comprar}] at (9.2,-0.9) {};
+  \node[encontra, minimum height=3mm, label={[font=\scriptsize]right:en contra de comprar}] at (9.2,-1.45) {};
+  \node[font=\scriptsize, text=gris] at (9.9,-2.0) {flecha: ``ataca a''};
+\end{tikzpicture}
+\caption{(a) La derivación de \texttt{comprar\_acciones(skynet)} como explicación. (b) Explicación de ``¿por qué no comprar acciones de \texttt{acme}?'': cada argumento ataca al anterior (c = \texttt{comprar\_acciones(acme)}, r = \texttt{riesgosa(acme)}).}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item La explicación puede presentarse en lenguaje natural con un top-level extendido. Ejemplo:\catedra{Episodio VIII}{SBC que usa la máquina de inferencia de Prolog}
+  \begin{itemize}
+    \item ``Ale: recomendame.'' --- ``Oki: paraguas y abrigo.''
+    \item ``Ale: explicame.'' --- ``Oki: chance de lluvia es 80\%, temperatura mínima de hoy 8 grados.''
+  \end{itemize}
+  \item \textbf{Por qué hace falta explicar}: un sistema no puede dar una respuesta y esperar que el usuario se la crea. Por ejemplo, un médico es legalmente responsable del tratamiento, así que tiene que convencerse de que el diagnóstico es correcto. La misma herramienta sirve para depurar la KB.\pmg{6.5}{217}
+  \item \textbf{Preguntas HOW y WHY} (PMG):\pmg{6.5}{217--221}
+  \begin{itemize}
+    \item \textbf{HOW}: después de una respuesta, el sistema muestra la instancia de la regla con la que la dedujo. Después se puede preguntar HOW por cada átomo del cuerpo, y así se baja por el \textbf{árbol de prueba} (\textit{proof tree}).
+    \item \textbf{WHY}: cuando el sistema le hace una pregunta al usuario, este puede preguntar por qué. El sistema responde con la regla que necesitaba ese dato, y preguntando WHY repetidamente se sube por el árbol hasta la consulta original.
+    \item Saber por qué se hizo una pregunta aumenta la confianza del usuario. Además, una pregunta irrelevante suele ser síntoma de un problema más profundo en la KB.
+  \end{itemize}
+  \item En los \textbf{sistemas de mantenimiento de la verdad} (TMS), una explicación de $P$ es un conjunto de sentencias $E$ que implica $P$. Puede incluir \textbf{suposiciones} no probadas (p.~ej. ``la batería está descargada'' para explicar que el auto no arranca). En general se prefieren las explicaciones \textbf{mínimas}.\aima{12.6.2}{462}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 6}
+
+\begin{enunciado}{Consigna}
+¿Qué ventajas o desventajas puede tener requerir obligatoriamente que la base de conocimiento sea consistente (libre de contradicciones)? ¿Qué consideraciones debemos tener en cuenta si se permite derivar información contradictoria a partir de la base de conocimiento?
+\end{enunciado}
+
+Para no inferir conclusiones contradictorias hay dos grandes opciones:\fuentes{Cátedra, Episodio IX (valores de certeza), «Bases de creencias inconsistentes: dos grandes opciones». Misma diapositiva en Episodio I, parte 2}
+\begin{enumerate}[label=\alph*)]
+  \item mantener la base \textbf{consistente} y usar una inferencia \textbf{monotónica} como Modus Ponens;
+  \item mantener la base \textbf{con potenciales contradicciones} y usar una inferencia (no monotónica) que permita \textbf{decidir} ante una contradicción.
+\end{enumerate}
+Exigir consistencia es elegir la opción (a).
+
+\paragraph{Ventajas de exigir consistencia.}
+\begin{itemize}
+  \item Alcanza con una \textbf{inferencia monotónica estándar} como Modus Ponens.\catedra{Episodio I, parte 2}{Bases de creencias inconsistentes: dos grandes opciones}
+  \item Se evita la \textbf{explosión}: en lógica proposicional, de un conjunto inconsistente se puede derivar todo el lenguaje (``¿aprobé? sí'', ``¿desaprobé? sí'').\catedra{Episodio I, parte 2}{Ejemplo: ¿Dónde está el profesor?}
+  \item Se cumple la propiedad deseable de que el mecanismo de inferencia no concluya a la vez una cosa y exactamente lo contrario.\catedra{Episodio VIII}{¿Cuál conclusión debería prevalecer?}
+\end{itemize}
+
+\paragraph{Desventajas.}
+\begin{itemize}
+  \item \textbf{La información real suele ser contradictoria}: al obtener información puede haber contradicciones en el tiempo o desde distintos puntos de vista.\catedra{Episodio VIII}{Cuestiones que hay que abordar en SBC} Por ejemplo, un agente puede recibir información de varios informantes,\catedra{Episodio IX (informantes)}{Múltiples informantes con diferente credibilidad} o los expertos pueden dar reglas opuestas (en Mer-val, \texttt{riesgosa(X)} si está en fusión y \texttt{\nf riesgosa(X)} si la fusión es con una empresa fuerte).\catedra{Episodio VIII}{Extendiendo el mecanismo de inferencia}
+  \item \textbf{Cada dato nuevo obliga a revisar la base}: si lo que llega contradice lo que ya se cree, hay que \textbf{decidir qué eliminar} para recuperar la consistencia (¿lo nuevo, lo viejo, la regla?).\catedra{Episodio I, parte 2}{Ejemplo: ¿Dónde está el profesor?} Esto requiere operadores de revisión como los de AGM.\catedra{Episodio I, parte 2 (dinámica de creencias)}{Dinámica de creencias}
+  \item \textbf{Se pierde información}: para garantizar la consistencia, la revisión puede eliminar creencias que estaban en la base (revisión priorizada) o rechazar la información nueva (no priorizada).\catedra{Episodio I, parte 2 (dinámica de creencias)}{Revisiones priorizadas y no priorizadas} Lo eliminado ya no puede usarse como razón, ni a favor ni en contra.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}X X@{}}
+\toprule
+\textbf{Ventajas de exigir consistencia} & \textbf{Desventajas} \\
+\midrule
+inferencia monotónica estándar (Modus Ponens) & la información real (tiempo, informantes, expertos) suele ser contradictoria \\
+no hay explosión (no se deriva todo el lenguaje) & cada dato nuevo obliga a decidir qué eliminar (revisión) \\
+nunca se concluye algo y su contrario & se pierden creencias o se rechaza información nueva \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Consideraciones si se permite la contradicción (opción b).}
+\begin{itemize}
+  \item \textbf{Representar la contradicción}: hace falta un operador de \textbf{negación fuerte} (\texttt{\nf}), que Prolog estándar no tiene (ver ejercicio 3), y la noción de complemento (\texttt{\nf c} es el complemento de \texttt{c}, y viceversa).\catedra{Episodio VIII}{Extendiendo el mecanismo de inferencia}
+  \item \textbf{Extender el mecanismo de inferencia} para que no concluya a la vez \texttt{c} y \texttt{\nf c}. Puede hacerlo de dos formas:\catedra{Episodio VIII}{¿Cuál conclusión debería prevalecer?}
+  \begin{enumerate}
+    \item \textbf{cauta}: no concluir ninguna de las dos. Las respuestas pasan a ser \textit{sí}, \textit{no}, \textit{indeciso} (deriva las dos) o \textit{desconozco} (no deriva ninguna);\catedra{Episodio VIII}{Extendiendo el mecanismo de inferencia}
+    \item \textbf{decidir cuál prevalece}, comparando la calidad de la información que sustenta cada derivación.\catedra{Episodio VIII}{Eligiendo la mejor conclusión para recomendar}
+  \end{enumerate}
+  \item \textbf{Cómo comparar}: hay varias formas.
+  \begin{itemize}
+    \item valores de certeza numéricos (enfoque cuantitativo);\catedra{Episodio IX (valores de certeza)}{Conocimiento con valores de certeza (certain factor)}
+    \item un orden de credibilidad entre informantes (enfoque cualitativo);\catedra{Episodio IX (informantes)}{Múltiples informantes con diferente credibilidad}
+    \item argumentación (DeLP).
+  \end{itemize}
+  \item \textbf{Tener en cuenta todas las razones}: para dar una respuesta coherente y consistente hay que considerar todos los argumentos, a favor y en contra.\catedra{Episodio X, parte 1}{Conclusiones aceptadas o rechazadas} Un conflicto también puede aparecer en un \textbf{punto intermedio} de una derivación (\texttt{\nf riesgosa(acme)} ataca la derivación de \texttt{\nf comprar\_acciones(acme)}).\catedra{Episodio X, parte 1}{Conflicto en puntos internos a una derivación}
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  \node[caja, text width=3.2cm] (q) at (0,0) {\texttt{c} y \texttt{\nf c}\\son derivables};
+  \node[cajaazul, text width=4.2cm] (a) at (5,1.1) {\textbf{(a) base consistente}\\revisar y eliminar algo\\+ Modus Ponens};
+  \node[cajaambar, text width=4.2cm] (b) at (5,-1.1) {\textbf{(b) se permite}\\\textbf{el conflicto}\\inferencia no monotónica};
+  \node[caja, text width=2.8cm] (b1) at (10.4,-0.2) {\textbf{cauta}: ninguna\\(indeciso)};
+  \node[caja, text width=2.8cm] (b2) at (10.4,-2.0) {\textbf{decidir}: CF,\\informantes, argumentos};
+  \draw[flecha] (q.east) -- (a.west);
+  \draw[flecha] (q.east) -- (b.west);
+  \draw[flecha, draw=ambar] (b.east) -- (b1.west);
+  \draw[flecha, draw=ambar] (b.east) -- (b2.west);
+\end{tikzpicture}
+\caption{Qué hacer ante conclusiones contradictorias.}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item En la opción (b) la cátedra combina las dos ideas: en DeLP se asume que el conjunto de \textbf{hechos y reglas estrictas} ($\Pi$) no es contradictorio. Solo las \textbf{reglas rebatibles} ($\Delta$) pueden llevar a conclusiones contradictorias.\catedra{Episodio X, parte 2}{Conjunto de reglas contradictorio}
+  \item \textbf{Monotonía}: con Modus Ponens, si una creencia se infiere de un conjunto $S$, también se infiere de cualquier conjunto que contenga a $S$.\catedra{Episodio I, parte 2}{Buscando herramientas para implementar un agente deliberativo} El razonamiento de sentido común, en cambio, es no monotónico: ``saca conclusiones'' que después revisa con información más específica (como que las personas tienen dos piernas, salvo Long John Silver).\aima{12.6}{458--459}
+  \item \textbf{Principio de mínimo cambio}: ante un cambio se busca preservar tanta información como sea posible. Eso descarta soluciones como eliminar todo para sacar una sola creencia.\catedra{Episodio I, parte 2 (dinámica de creencias)}{Dinámica de creencias}
+  \item \textbf{El costo de mantener la consistencia}: al retractar $P$ no alcanza con borrarlo. Hay que revisar todo lo que se infirió de $P$, salvo lo que tenga otra justificación. Los \textbf{TMS} se encargan de eso:\aima{12.6.2}{460--461}
+  \begin{itemize}
+    \item el más simple vuelve al estado anterior a $P$ y rehace todo lo agregado después, lo que es impráctico si se agregan muchos hechos;
+    \item el \textbf{JTMS} anota cada sentencia con sus justificaciones y borra solo las que dependen de $P$ en todas ellas.
+  \end{itemize}
+\end{itemize}
+\end{extras}
+
+\end{document}
