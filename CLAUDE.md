@@ -16,7 +16,8 @@ No es un proyecto de software: es material de estudio de la materia **Inteligenc
 - En caso de citar fuentes en inglés, no traducir al español. Poner el texto original.
 - Si varias fuentes expresan la misma idea o definición, citar solo una de ellas. En todo caso, agregar la otra fuente en la misma nota al pie, sin agregar su contenido.
 - Siempre priorizar mostrar listas con bullet-points en lugar de usar prosa.
-- **Tablas y pictogramas siempre que se pueda** (comparaciones, clasificaciones, ciclos, procesos, arquitecturas): sirven como referencia visual de los conceptos. Van **además** del texto, aunque muestren exactamente lo mismo; esta es la única repetición permitida. No deben agregar información que no esté en el texto. Dibujarlos con TikZ (hay íconos reutilizables en el preámbulo).
+- **Tablas y pictogramas siempre que se pueda** (comparaciones, clasificaciones, ciclos, procesos, arquitecturas): sirven como referencia visual de los conceptos. Van **además** del texto, aunque muestren exactamente lo mismo. No deben agregar información que no esté en el texto. Dibujarlos con TikZ (hay íconos reutilizables en el preámbulo).
+- **Figuras en el lugar donde se usan, aunque se repitan**: en resoluciones de TPs y resúmenes, si un ejercicio o sección necesita una figura, pictograma o gráfico que ya apareció antes, se vuelve a poner ahí completo, en vez de remitir con "ver figura del ejercicio 2". Esto aplica solo a figuras, pictogramas y gráficos; párrafos y texto **no** se repiten (para eso sí vale remitir a donde ya está). Estas dos (figura junto al texto y figura repetida donde se necesita) son las únicas repeticiones permitidas.
 
 ## Estructura
 
