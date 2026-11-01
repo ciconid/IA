@@ -505,4 +505,418 @@ nunca se concluye algo y su contrario & se pierden creencias o se rechaza inform
 \end{itemize}
 \end{extras}
 
+%======================================================================
+\section*{Ejercicio 7}
+
+\begin{enunciado}{Consigna}
+Considere la siguiente base de conocimiento que se muestra en la tabla, donde las reglas y los hechos tienen asociado un valor de certeza (enfoque cuantitativo). Utilizando la estrategia MYCIN para propagar valores numéricos considerando la base de conocimiento anterior, ¿quiénes (turuleca, donald y petete) son capaces de cruzar el lago? Justifique su respuesta comparando los valores de certeza obtenidos para cada una de las derivaciones de los literales que necesita para responder a esta pregunta.
+
+\begin{center}
+\begin{tabular}{@{}>{\color{gris}}l r l @{\hspace{1.2cm}} >{\color{gris}}l r l@{}}
+h1 & 1    & \texttt{gallina(turuleca) ← true} & r1 & 1   & \texttt{ave(X) ← pato(X)} \\
+h2 & -0.3 & \texttt{gallina(petete) ← true}   & r2 & 1   & \texttt{ave(X) ← gallina(X)} \\
+h3 & -1   & \texttt{gallina(donald) ← true}   & r3 & 0.8 & \texttt{anida\_suelo(X) ← gallina(X)} \\
+h4 & 1    & \texttt{pato(donald) ← true}      & r4 & 0.9 & \texttt{anida\_suelo(X) ← pato(X)} \\
+h5 & 0.5  & \texttt{ave(petete) ← true}       & r5 & 0.7 & \texttt{\nf vuela(X) ← anida\_suelo(X), ave(X)} \\
+   &      &                                   & r6 & 0.8 & \texttt{\nf cruza\_lago(X) ← \nf vuela(X), ave(X)} \\
+   &      &                                   & r7 & 0.9 & \texttt{cruza\_lago(X) ← vuela(X)} \\
+   &      &                                   & r8 & 0.7 & \texttt{vuela(X) ← ave(X)} \\
+\end{tabular}
+
+{\footnotesize\color{gris} (Los nombres h1--h5 y r1--r8 no están en el enunciado: se agregan para referirse a cada elemento.)}
+\end{center}
+\end{enunciado}
+
+% Grafo de la KB para un individuo. Antes de usarlo, definir los CF de cada literal
+% (\vG gallina, \vP pato, \vA ave, \vN anida_suelo, \vV vuela, \vNV ~vuela,
+% \vC cruza_lago, \vNC ~cruza_lago; vacíos = sin valores), el estilo "sinpato"
+% y \extraG (dibujos adicionales).
+% Formato del ejemplo resuelto de la cátedra (Ejemplo SBC).
+\definecolor{celeste}{HTML}{CFE2F3}
+\definecolor{celesteborde}{HTML}{6FA8DC}
+\definecolor{rosa}{HTML}{EAD1DC}
+\definecolor{rosaborde}{HTML}{C27BA0}
+\definecolor{violeta}{HTML}{8E7CC3}
+% Encabezado "Veamos las derivaciones posibles para ...".
+\newcommand{\veamos}[1]{\par\smallskip\noindent
+  \tcbox[colback=fondogris, colframe=gris, boxrule=0.4pt, arc=4pt, left=5pt, right=5pt, top=1pt, bottom=1pt]{\small #1}\par}
+% Una derivación: #1 reglas y hechos [vc], #2 vc de la conclusión, #3 cálculo.
+\newcommand{\deriv}[3]{\par\noindent
+  \begin{tcolorbox}[enhanced, nobeforeafter, box align=top, width=0.42\linewidth,
+    colback=white, colframe=black, boxrule=0.6pt, sharp corners,
+    left=3pt, right=3pt, top=2pt, bottom=2pt, fontupper=\footnotesize\ttfamily,
+    overlay={\node[draw, line width=0.6pt, fill=white, font=\small\bfseries, anchor=north east,
+      minimum width=1.1cm, minimum height=0.5cm] at (frame.north east) {#2};}]
+  #1
+  \end{tcolorbox}\hfill
+  \begin{tcolorbox}[enhanced, nobeforeafter, box align=top, width=0.56\linewidth,
+    colback=white, frame hidden, sharp corners,
+    borderline={0.6pt}{0pt}{black, densely dotted}, left=3pt, right=3pt, top=2pt, bottom=2pt,
+    fontupper=\footnotesize\ttfamily]
+  #3
+  \end{tcolorbox}\par\medskip}
+% Nota (recuadro violeta) y conclusión elegida por el SBC.
+\newcommand{\nota}[1]{\par\noindent
+  \begin{tcolorbox}[colback=violeta!6, colframe=violeta, boxrule=0.5pt, sharp corners,
+    left=5pt, right=5pt, top=2pt, bottom=2pt, fontupper=\small]#1\end{tcolorbox}}
+\newcommand{\eleccion}[1]{\par\noindent
+  \begin{tcolorbox}[colback=violeta!6, colframe=violeta, boxrule=1pt, sharp corners,
+    left=5pt, right=5pt, top=3pt, bottom=3pt, fontupper=\small\bfseries\color{violeta!70!black}, halign=center]#1\end{tcolorbox}}
+% Árboles de derivación: celeste = vc de la KB, rosa = vc computado con MYCIN.
+\tikzset{
+  tn/.style={font=\scriptsize\ttfamily, inner sep=2pt},
+  pk/.style={draw=rosaborde, fill=rosa, rounded corners=2pt, font=\scriptsize, inner sep=2pt, minimum width=6mm},
+  bl/.style={draw=celesteborde, fill=celeste, rounded corners=2pt, font=\scriptsize, inner sep=2pt, minimum width=6mm},
+}
+% Derivación de cruza_lago: #1 vc(cruza_lago), #2 vc(vuela), #3 vc(ave),
+% #4 hecho del que sale ave (vacío si ave es un hecho), #5 vc de ese hecho.
+\newcommand{\arbolA}[5]{%
+  \node[tn] (A0) at (0,0) {cruza\_lago};
+  \node[pk, right=3pt of A0] {#1};
+  \node[tn] (A1) at (0,-1.3) {vuela};
+  \node[pk, right=3pt of A1] {#2};
+  \draw[thick] (A0) -- node[bl, left=3pt]{0.9} (A1);
+  \node[tn] (A2) at (0,-2.6) {ave};
+  \draw[thick] (A1) -- node[bl, left=3pt]{0.7} (A2);
+  \ifx&#4&
+    \node[bl, below=3pt of A2] {#3};
+  \else
+    \node[pk, right=3pt of A2] {#3};
+    \node[tn] (A3) at (0,-3.9) {#4};
+    \draw[thick] (A2) -- node[bl, left=3pt]{1} (A3);
+    \node[bl, below=3pt of A3] {#5};
+  \fi}
+% Derivación de ~cruza_lago: #1 vc(~cruza_lago), #2 vc del cuerpo "~vuela, ave",
+% #3 vc del cuerpo "anida_suelo, ave", #4 vc de la regla de anida_suelo, #5 su hecho,
+% #6 vc de ese hecho, #7 vc(ave), #8 hecho del que sale ave (vacío si ave es un hecho),
+% #9 vc de ese hecho.
+\newcommand{\arbolB}[9]{%
+  \node[tn] (B0) at (0,0) {\nf cruza\_lago};
+  \node[pk, right=3pt of B0] {#1};
+  \node[tn] (B1) at (0,-1.3) {\nf vuela, ave};
+  \node[pk, right=3pt of B1] {#2};
+  \draw[thick] (B0) -- node[bl, left=3pt]{0.8} (B1);
+  \coordinate (B1l) at ($(B1.south west)+(0.4,0.08)$);
+  \coordinate (B1r) at ($(B1.south east)+(-0.25,0.08)$);
+  \node[tn] (B2) at (-1.3,-2.6) {anida\_suelo, ave};
+  \node[pk, left=3pt of B2] {#3};
+  \draw[thick] (B1l) -- node[bl, left=3pt]{0.7} (B2.north);
+  \coordinate (B2l) at ($(B2.south west)+(0.5,0.08)$);
+  \coordinate (B2r) at ($(B2.south east)+(-0.25,0.08)$);
+  \node[tn] (B3) at (-2.2,-3.9) {#5};
+  \draw[thick] (B2l) -- node[bl, left=3pt]{#4} (B3.north);
+  \node[bl, below=3pt of B3] {#6};
+  \ifx&#8&
+    \node[bl, below=4pt] at (B2r) {#7};
+    \node[bl, below=4pt] at (B1r) {#7};
+  \else
+    \node[tn] (B4) at (-0.2,-3.9) {#8};
+    \draw[thick] (B2r) -- node[bl, right=3pt]{1} (B4.north);
+    \node[bl, below=3pt of B4] {#9};
+    \node[tn] (B5) at (1.3,-2.6) {#8};
+    \draw[thick] (B1r) -- node[bl, right=3pt]{1} (B5.north);
+    \node[bl, below=3pt of B5] {#9};
+  \fi}
+
+\newcommand{\cfv}[1]{\ifx#1\empty\else\\{\color{ambar}\bfseries #1}\fi}
+\newcommand{\grafocf}{%
+\begin{tikzpicture}[
+  lit/.style={draw=azul, thick, rounded corners=2pt, fill=fondoazul, font=\scriptsize\ttfamily,
+              inner sep=3pt, minimum width=2.2cm, align=center},
+  hecho/.style={lit, draw=gris, fill=fondogris},
+  r/.style={font=\tiny, fill=white, inner sep=1pt, text=gris},
+  ]
+  \node[hecho] (g) at (1.5,0) {gallina\cfv{\vG}};
+  \node[hecho, sinpato] (p) at (6,0) {pato\cfv{\vP}};
+  \node[lit] (a) at (1.5,1.8) {ave\cfv{\vA}};
+  \node[lit] (n) at (6,1.8) {anida\_suelo\cfv{\vN}};
+  \node[lit] (v) at (0,3.8) {vuela\cfv{\vV}};
+  \node[lit] (nv) at (5.6,3.8) {\nf vuela\cfv{\vNV}};
+  \node[lit] (c) at (0,5.8) {cruza\_lago\cfv{\vC}};
+  \node[lit] (nc) at (5.6,5.8) {\nf cruza\_lago\cfv{\vNC}};
+  \coordinate (j5) at (5.6,2.95);
+  \coordinate (j6) at (5.6,4.95);
+  % reglas de un solo antecedente
+  \draw[flecha] (g) -- node[r, anchor=east, xshift=-1pt]{r2 · 1} (a);
+  \draw[flecha, sinpato] (p) -- node[r, pos=0.2]{r1 · 1} (a);
+  \draw[flecha] (g) -- node[r, pos=0.2]{r3 · 0.8} (n);
+  \draw[flecha, sinpato] (p) -- node[r, anchor=west, xshift=1pt]{r4 · 0.9} (n);
+  \draw[flecha] (a) -- node[r]{r8 · 0.7} (v);
+  \draw[flecha] (v) -- node[r]{r7 · 0.9} (c);
+  % reglas con conjunción: se juntan en un punto (mínimo)
+  \draw[thick, azul] (a) -- (j5) (n) -- (j5);
+  \draw[flecha] (j5) -- (nv);
+  \fill[azul] (j5) circle (1.5pt);
+  \node[r, anchor=west] at ($(j5)+(0.12,0.05)$) {r5 · 0.7 (mín)};
+  \draw[thick, azul] (a) -- (j6) (nv) -- (j6);
+  \draw[flecha] (j6) -- (nc);
+  \fill[azul] (j6) circle (1.5pt);
+  \node[r, anchor=west] at ($(j6)+(0.12,0.05)$) {r6 · 0.8 (mín)};
+  \extraG
+\end{tikzpicture}}
+
+\textbf{Respuesta}: con la estrategia MYCIN, \textbf{los tres} (turuleca, petete y donald) cruzan el lago: para cada uno, el valor de certeza ($vc$) de \texttt{cruza\_lago} es mayor que el de \texttt{\nf cruza\_lago}. El paso a paso:
+
+\paragraph{Paso 1: cómo se propagan los valores de certeza (estrategia MYCIN).}
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+\textbf{Qué se calcula} & \textbf{Cómo} \\
+\midrule
+hecho & su $vc$ en la KB \\
+conjunción $P_1,\dots,P_N$ & $\min(vc(P_1),\dots,vc(P_N))$\catedra{Episodio IX (valores de certeza)}{Computando el valor de certeza de las conclusiones} \\
+conclusión $Q$ de la regla $Q \leftarrow P$ & $vc(P) \cdot vc(Q \leftarrow P)$ si $vc(P)$ es positivo; $0$ si $vc(P)$ es negativo o cero \\
+literal con varias derivaciones & el \textbf{máximo} de los $vc$ de sus derivaciones\catedra{Episodio IX (valores de certeza)}{Resolución del conflicto con información numérica} \\
+respuesta a la consulta $Q$ & \textbf{sí} si hay derivación para $Q$ y no para su complemento, o hay para ambos y $vc(Q) > vc(\overline{Q})$; \textbf{no} en el caso simétrico; \textbf{indeciso} si $vc(Q) = vc(\overline{Q})$; \textbf{desconocido} si no hay derivación para ninguno\catedra{Episodio IX (valores de certeza)}{¿Qué respuesta dar?} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Paso 2: qué literales hacen falta.}
+\begin{itemize}
+  \item Para responder ``¿\texttt{cruza\_lago(X)}?'' hay que comparar $vc(\texttt{cruza\_lago(X)})$ con $vc(\texttt{\nf cruza\_lago(X)})$.
+  \item \texttt{cruza\_lago(X)} sale de r7, que necesita \texttt{vuela(X)}; este sale de r8, que necesita \texttt{ave(X)}.
+  \item \texttt{\nf cruza\_lago(X)} sale de r6, que necesita \texttt{\nf vuela(X)} y \texttt{ave(X)}; \texttt{\nf vuela(X)} sale de r5, que necesita \texttt{anida\_suelo(X)} y \texttt{ave(X)}.
+  \item \texttt{ave(X)} y \texttt{anida\_suelo(X)} salen de los hechos \texttt{gallina(X)} y \texttt{pato(X)} (r1--r4), y en el caso de petete también del hecho h5.
+  \item Hay una derivación distinta por cada forma de elegir con qué regla o hecho se obtiene cada literal: si \texttt{ave} tiene 2 derivaciones y \texttt{anida\_suelo} tiene 2, \texttt{\nf cruza\_lago} tiene $2 \times 2 = 4$.
+\end{itemize}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\def\vG{}\def\vP{}\def\vA{}\def\vN{}\def\vV{}\def\vNV{}\def\vC{}\def\vNC{}
+\tikzset{sinpato/.style={}}\def\extraG{}
+\grafocf
+\captionof{figure}{Dependencias entre los literales de la KB (para un \texttt{X} cualquiera). Cada flecha es una regla, con su valor de certeza; en r5 y r6 los dos antecedentes se juntan en un punto porque se combinan con el mínimo.}
+\end{minipage}\par\medskip
+
+A continuación, para cada individuo, se siguen los pasos del ejemplo resuelto de la cátedra:\catedra{Ejemplo SBC}{Enfoque cuantitativo: Factores de certeza numéricos}
+\begin{enumerate}
+  \item cada derivación posible de \texttt{cruza\_lago} y de \texttt{\nf cruza\_lago}: a la izquierda, sus reglas y hechos con su valor de certeza y, en el recuadro, el $vc$ de la conclusión en esa derivación; a la derecha, el cálculo;
+  \item para cada literal, el $vc$ más alto entre sus derivaciones;
+  \item cada derivación como un árbol: en \colorbox{celeste}{celeste}, los valores de certeza según aparecen en la KB; en \colorbox{rosa}{rosa}, los computados con MYCIN;
+  \item la conclusión que elige el SBC.
+\end{enumerate}
+Dentro de cada derivación se omite el argumento (es siempre el mismo individuo): \texttt{ave} es \texttt{ave(turuleca)}, etc.
+
+%----------------------------------------------------------------------
+\paragraph{Paso 3: turuleca.}
+
+\veamos{Veamos las derivaciones posibles para \texttt{cruza\_lago(turuleca)}\dots}
+
+\deriv{cruza\_lago ← vuela [0.9]\\ vuela ← ave [0.7]\\ ave ← gallina [1]\\ gallina [1]}{0.63}
+{vc(cruza\_lago) = (0.9) * vc(vuela)\\ vc(cruza\_lago) = (0.9) * (0.7) = \textbf{0.63}\\[3pt]
+ vc(vuela) = (0.7) * vc(ave)\\ vc(vuela) = (0.7) * (1) = 0.7\\
+ vc(ave) = (1) * vc(gallina)\\ vc(ave) = (1) * (1) = 1\\
+ vc(gallina) = 1}
+
+\veamos{Veamos ahora las derivaciones posibles para \texttt{\nf cruza\_lago(turuleca)}\dots}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← gallina [0.8]\\ ave ← gallina [1]\\ gallina [1]}{0.448}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0.56, 1)\\ vc(\nf cruza\_lago) = (0.8) * (0.56) = \textbf{0.448}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0.8, 1)\\ vc(\nf vuela) = (0.7) * (0.8) = 0.56\\[3pt]
+ vc(anida\_suelo) = (0.8) * vc(gallina)\\ vc(anida\_suelo) = (0.8) * (1) = 0.8\\
+ vc(ave) = (1) * vc(gallina)\\ vc(ave) = (1) * (1) = 1\\
+ vc(gallina) = 1}
+
+\nota{Cada literal tiene una sola derivación: $vc(\texttt{cruza\_lago}) = \mathbf{0.63}$ y $vc(\texttt{\nf cruza\_lago}) = \mathbf{0.448}$.}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \begin{scope}[xshift=0cm]
+    \arbolA{0.63}{0.7}{1}{gallina}{1}
+  \end{scope}
+  \begin{scope}[xshift=6.2cm]
+    \arbolB{0.448}{0.56}{0.8}{0.8}{gallina}{1}{1}{gallina}{1}
+  \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Las dos derivaciones de turuleca como árboles. Celeste: valores de la KB; rosa: valores computados con MYCIN.}
+\end{minipage}\par\medskip
+
+\eleccion{En base a los valores de certeza, el SBC elige la conclusión \texttt{cruza\_lago(turuleca)}: \textbf{turuleca cruza el lago}.}
+
+%----------------------------------------------------------------------
+\paragraph{Paso 4: petete.}
+
+Hechos: $vc(\texttt{gallina}) = -0.3$ (h2: hay algo más de certeza de que \textbf{no} es gallina) y $vc(\texttt{ave}) = 0.5$ (h5). No hay \texttt{pato(petete)}, así que r1 y r4 no se pueden usar. Como \texttt{ave} se obtiene de dos formas (h5 o r2), cada literal tiene 2 derivaciones.
+
+\veamos{Veamos las derivaciones posibles para \texttt{cruza\_lago(petete)}\dots}
+
+\deriv{cruza\_lago ← vuela [0.9]\\ vuela ← ave [0.7]\\ ave [0.5]}{0.315}
+{vc(cruza\_lago) = (0.9) * vc(vuela)\\ vc(cruza\_lago) = (0.9) * (0.35) = \textbf{0.315}\\[3pt]
+ vc(vuela) = (0.7) * vc(ave)\\ vc(vuela) = (0.7) * (0.5) = 0.35\\
+ vc(ave) = 0.5}
+
+\deriv{cruza\_lago ← vuela [0.9]\\ vuela ← ave [0.7]\\ ave ← gallina [1]\\ gallina [-0.3]}{0}
+{vc(cruza\_lago) = (0.9) * vc(vuela)\\ vc(cruza\_lago) = (0.9) * 0 = \textbf{0}\\[3pt]
+ vc(vuela) = (0.7) * vc(ave)\\ vc(vuela) = (0.7) * 0 = 0\\
+ vc(ave) = 0, porque vc(gallina) $\le$ 0\\
+ vc(gallina) = -0.3}
+
+\nota{Si tenemos más de una derivación posible para un literal, nos quedamos con el valor de certeza más alto. En este caso, $vc(\texttt{cruza\_lago}) = \mathbf{0.315}$.}
+
+\veamos{Veamos ahora las derivaciones posibles para \texttt{\nf cruza\_lago(petete)}\dots}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← gallina [0.8]\\ gallina [-0.3]\\ ave [0.5]}{0}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0, 0.5)\\ vc(\nf cruza\_lago) = (0.8) * 0 = \textbf{0}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0, 0.5)\\ vc(\nf vuela) = (0.7) * 0 = 0\\[3pt]
+ vc(anida\_suelo) = 0, porque vc(gallina) $\le$ 0\\
+ vc(gallina) = -0.3\\
+ vc(ave) = 0.5}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← gallina [0.8]\\ ave ← gallina [1]\\ gallina [-0.3]}{0}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0, 0)\\ vc(\nf cruza\_lago) = (0.8) * 0 = \textbf{0}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0, 0)\\ vc(\nf vuela) = (0.7) * 0 = 0\\[3pt]
+ vc(anida\_suelo) = 0, porque vc(gallina) $\le$ 0\\
+ vc(ave) = 0, porque vc(gallina) $\le$ 0\\
+ vc(gallina) = -0.3}
+
+\nota{En este caso, $vc(\texttt{\nf cruza\_lago}) = \mathbf{0}$: ninguna derivación da más que 0, porque \texttt{anida\_suelo} solo se obtiene de \texttt{gallina}, que es negativo.}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \begin{scope}[xshift=0cm]
+    \arbolA{0.315}{0.35}{0.5}{}{}
+  \end{scope}
+  \begin{scope}[xshift=4.2cm]
+    \arbolA{0}{0}{0}{gallina}{-0.3}
+  \end{scope}
+  \begin{scope}[xshift=0.6cm, yshift=-5.6cm]
+    \arbolB{0}{0}{0}{0.8}{gallina}{-0.3}{0.5}{}{}
+  \end{scope}
+  \begin{scope}[xshift=7.6cm, yshift=-5.6cm]
+    \arbolB{0}{0}{0}{0.8}{gallina}{-0.3}{0}{gallina}{-0.3}
+  \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Las derivaciones de petete como árboles: arriba, las de \texttt{cruza\_lago}; abajo, las de \texttt{\nf cruza\_lago}. Celeste: valores de la KB; rosa: valores computados con MYCIN.}
+\end{minipage}\par\medskip
+
+\eleccion{En base a los valores de certeza, el SBC elige la conclusión \texttt{cruza\_lago(petete)}: \textbf{petete cruza el lago}.}
+
+%----------------------------------------------------------------------
+\paragraph{Paso 5: donald.}
+
+Hechos: $vc(\texttt{gallina}) = -1$ (h3: certeza total de que \textbf{no} es gallina) y $vc(\texttt{pato}) = 1$ (h4). \texttt{ave} se obtiene de dos formas (r1 o r2) y \texttt{anida\_suelo} también (r4 o r3): \texttt{cruza\_lago} tiene 2 derivaciones y \texttt{\nf cruza\_lago}, $2 \times 2 = 4$.
+
+\veamos{Veamos las derivaciones posibles para \texttt{cruza\_lago(donald)}\dots}
+
+\deriv{cruza\_lago ← vuela [0.9]\\ vuela ← ave [0.7]\\ ave ← pato [1]\\ pato [1]}{0.63}
+{vc(cruza\_lago) = (0.9) * vc(vuela)\\ vc(cruza\_lago) = (0.9) * (0.7) = \textbf{0.63}\\[3pt]
+ vc(vuela) = (0.7) * vc(ave)\\ vc(vuela) = (0.7) * (1) = 0.7\\
+ vc(ave) = (1) * vc(pato)\\ vc(ave) = (1) * (1) = 1\\
+ vc(pato) = 1}
+
+\deriv{cruza\_lago ← vuela [0.9]\\ vuela ← ave [0.7]\\ ave ← gallina [1]\\ gallina [-1]}{0}
+{vc(cruza\_lago) = (0.9) * vc(vuela)\\ vc(cruza\_lago) = (0.9) * 0 = \textbf{0}\\[3pt]
+ vc(vuela) = (0.7) * vc(ave)\\ vc(vuela) = (0.7) * 0 = 0\\
+ vc(ave) = 0, porque vc(gallina) $\le$ 0\\
+ vc(gallina) = -1}
+
+\nota{Si tenemos más de una derivación posible para un literal, nos quedamos con el valor de certeza más alto. En este caso, $vc(\texttt{cruza\_lago}) = \mathbf{0.63}$.}
+
+\veamos{Veamos ahora las derivaciones posibles para \texttt{\nf cruza\_lago(donald)}\dots}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← pato [0.9]\\ ave ← pato [1]\\ pato [1]}{0.504}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0.63, 1)\\ vc(\nf cruza\_lago) = (0.8) * (0.63) = \textbf{0.504}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0.9, 1)\\ vc(\nf vuela) = (0.7) * (0.9) = 0.63\\[3pt]
+ vc(anida\_suelo) = (0.9) * vc(pato)\\ vc(anida\_suelo) = (0.9) * (1) = 0.9\\
+ vc(ave) = (1) * vc(pato)\\ vc(ave) = (1) * (1) = 1\\
+ vc(pato) = 1}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← pato [0.9]\\ ave ← gallina [1]\\ pato [1]\\ gallina [-1]}{0}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0, 0)\\ vc(\nf cruza\_lago) = (0.8) * 0 = \textbf{0}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0.9, 0)\\ vc(\nf vuela) = (0.7) * 0 = 0\\[3pt]
+ vc(anida\_suelo) = (0.9) * vc(pato)\\ vc(anida\_suelo) = (0.9) * (1) = 0.9\\
+ vc(ave) = 0, porque vc(gallina) $\le$ 0\\
+ vc(pato) = 1;\quad vc(gallina) = -1}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← gallina [0.8]\\ ave ← pato [1]\\ gallina [-1]\\ pato [1]}{0}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0, 1)\\ vc(\nf cruza\_lago) = (0.8) * 0 = \textbf{0}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0, 1)\\ vc(\nf vuela) = (0.7) * 0 = 0\\[3pt]
+ vc(anida\_suelo) = 0, porque vc(gallina) $\le$ 0\\
+ vc(ave) = (1) * vc(pato)\\ vc(ave) = (1) * (1) = 1\\
+ vc(gallina) = -1;\quad vc(pato) = 1}
+
+\deriv{\nf cruza\_lago ← \nf vuela, ave [0.8]\\ \nf vuela ← anida\_suelo, ave [0.7]\\ anida\_suelo ← gallina [0.8]\\ ave ← gallina [1]\\ gallina [-1]}{0}
+{vc(\nf cruza\_lago) = (0.8) * min(vc(\nf vuela), vc(ave))\\ vc(\nf cruza\_lago) = (0.8) * min(0, 0)\\ vc(\nf cruza\_lago) = (0.8) * 0 = \textbf{0}\\[3pt]
+ vc(\nf vuela) = (0.7) * min(vc(anida\_suelo), vc(ave))\\ vc(\nf vuela) = (0.7) * min(0, 0)\\ vc(\nf vuela) = (0.7) * 0 = 0\\[3pt]
+ vc(anida\_suelo) = 0, porque vc(gallina) $\le$ 0\\
+ vc(ave) = 0, porque vc(gallina) $\le$ 0\\
+ vc(gallina) = -1}
+
+\nota{En este caso, $vc(\texttt{\nf cruza\_lago}) = \mathbf{0.504}$: es la única derivación que no pasa por \texttt{gallina}.}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \begin{scope}[xshift=0cm]
+    \arbolA{0.63}{0.7}{1}{pato}{1}
+  \end{scope}
+  \begin{scope}[xshift=4.2cm]
+    \arbolA{0}{0}{0}{gallina}{-1}
+  \end{scope}
+  \begin{scope}[xshift=0.6cm, yshift=-5.9cm]
+    \arbolB{0.504}{0.63}{0.9}{0.9}{pato}{1}{1}{pato}{1}
+  \end{scope}
+  \begin{scope}[xshift=7.6cm, yshift=-5.9cm]
+    \arbolB{0}{0}{0}{0.9}{pato}{1}{0}{gallina}{-1}
+  \end{scope}
+  \begin{scope}[xshift=0.6cm, yshift=-11.3cm]
+    \arbolB{0}{0}{0}{0.8}{gallina}{-1}{1}{pato}{1}
+  \end{scope}
+  \begin{scope}[xshift=7.6cm, yshift=-11.3cm]
+    \arbolB{0}{0}{0}{0.8}{gallina}{-1}{0}{gallina}{-1}
+  \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Las derivaciones de donald como árboles: arriba, las de \texttt{cruza\_lago}; abajo, las cuatro de \texttt{\nf cruza\_lago}. Celeste: valores de la KB; rosa: valores computados con MYCIN.}
+\end{minipage}\par\medskip
+
+\eleccion{En base a los valores de certeza, el SBC elige la conclusión \texttt{cruza\_lago(donald)}: \textbf{donald cruza el lago}.}
+
+\paragraph{Paso 6: comparación final.}
+\begin{center}
+\small
+\begin{tabular}{@{}l c c c c c@{}}
+\toprule
+ & \texttt{vuela} & \texttt{\nf vuela} & \texttt{cruza\_lago} & \texttt{\nf cruza\_lago} & \textbf{¿cruza el lago?} \\
+\midrule
+turuleca & 0.7  & 0.56 & \textbf{0.63}  & 0.448 & sí \\
+petete   & 0.35 & 0    & \textbf{0.315} & 0     & sí \\
+donald   & 0.7  & 0.63 & \textbf{0.63}  & 0.504 & sí \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+  \item En los tres casos, $vc(\texttt{cruza\_lago}) > vc(\texttt{\nf cruza\_lago})$: la respuesta a ``¿\texttt{cruza\_lago(X)}?'' es \textbf{sí}.
+  \item También el conflicto intermedio \texttt{vuela} / \texttt{\nf vuela} se resuelve a favor de \texttt{vuela} en los tres, así que es coherente con la respuesta.
+\end{itemize}
+
+\begin{aviso}{Supuestos}
+\begin{itemize}
+  \item \textbf{Derivaciones con $vc$ 0}: se cuentan como derivaciones, como hace la cátedra en sus ejemplos (\texttt{\nf a ← e} con $vc = 0$ en el Ejemplo SBC). Si no se contaran, petete no tendría ninguna derivación para \texttt{\nf cruza\_lago} y la respuesta sería igual: sí.
+  \item \textbf{Hechos negativos}: en el Ejemplo SBC la cátedra escribe directamente \texttt{vc(f) = 0} para el hecho \texttt{f [-0.3]}. Acá se deja el valor del hecho y se aplica la regla ``si el cuerpo es negativo o cero, la conclusión vale 0''. El resultado es el mismo.\footnotemark{}
+  \item \textbf{Un literal repetido se deriva igual}: \texttt{ave} aparece dos veces en las derivaciones de \texttt{\nf cruza\_lago} (en r5 y en r6); se toma la misma derivación de \texttt{ave} en los dos lugares (cada derivación es un conjunto de reglas y hechos, como en el ejemplo de la cátedra). Si se mezclaran (r1 en un lugar y r2 en el otro), aparecerían derivaciones extra para donald, todas con $vc$ 0: no cambian el máximo.
+  \item \textbf{Conflictos intermedios}: el $vc$ de cada derivación se calcula sin mirar si un literal intermedio tiene complemento derivable (así lo hace la cátedra en sus ejemplos). Acá no cambia nada, porque \texttt{vuela} gana sobre \texttt{\nf vuela} para los tres.
+\end{itemize}
+\end{aviso}
+\footnotetext{Cátedra, Ejemplo SBC, «Enfoque cuantitativo: Factores de certeza numéricos»; regla en Episodio IX (valores de certeza), «Computando el valor de certeza de las conclusiones».}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{La propagación es una elección}: hay muchas maneras de computar el CF de una conclusión; la de la cátedra es una forma muy simple basada en MYCIN. Al implementar un sistema se puede usar otra que se adapte mejor al dominio.\catedra{Episodio IX (valores de certeza)}{Computando el valor de certeza de las conclusiones}
+  \item \textbf{Ventaja y desventaja de los CF}: las computadoras hacen cómputos numéricos con facilidad y hay mucho sustento matemático. La desventaja es decidir qué valor asociar a cada sentencia: ¿de dónde surge?, ¿quién lo decide?, ¿0.7 o 0.71?\catedra{Episodio IX (valores de certeza)}{Uso de valores de certeza en un SBC}
+  \begin{itemize}
+    \item Ejemplo con esta KB: si r7 tuviera $vc = 0.7$ en vez de $0.9$, $vc(\texttt{cruza\_lago(donald)}) = 0.7 \cdot 0.7 = 0.49 < 0.504$ y donald \textbf{no} cruzaría; turuleca sí ($0.49 > 0.448$).
+  \end{itemize}
+  \item \textbf{MYCIN} diagnosticaba infecciones de la sangre con unas 450 reglas, obtenidas entrevistando expertos. Los CF fueron su forma de reflejar la incertidumbre del conocimiento médico.\aima{1.3.5}{23}
+  \item \textbf{Los CF son \textit{truth-functional}}: el valor de una sentencia compuesta se calcula solo a partir del de sus componentes (como acá, con el mínimo y el producto), y la propagación es local.\aima{14.7.1}{547--548} Según AIMA, eso funciona solo con reglas puramente diagnósticas o causales y poco interconectadas:\aima{14.7.1}{549}
+  \begin{itemize}
+    \item \cita{In other circumstances, certainty factors could yield disastrously incorrect degrees of belief through overcounting of evidence.}
+    \item al crecer la KB había que retocar (\textit{tweak}) los CF de otras reglas al agregar una nueva; por eso las redes bayesianas los reemplazaron.
+  \end{itemize}
+\end{itemize}
+\end{extras}
+
 \end{document}
