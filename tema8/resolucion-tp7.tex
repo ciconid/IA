@@ -919,4 +919,200 @@ donald   & 0.7  & 0.63 & \textbf{0.63}  & 0.504 & sí \\
 \end{itemize}
 \end{extras}
 
+%======================================================================
+\section*{Ejercicio 8}
+
+\begin{enunciado}{Consigna}
+Considere la siguiente base de conocimiento, donde las reglas y los hechos tienen asociado un informante (enfoque cualitativo).
+
+\begin{center}
+\begin{tabular}{@{}>{\color{gris}}l l l @{\hspace{1.2cm}} >{\color{gris}}l l l@{}}
+h1 & Ar & \texttt{camino\_abierto}  & r1 & At & \texttt{\nf camino\_abierto ← nieve} \\
+h2 & Ap & \texttt{camino\_abierto}  & r2 & Av & \texttt{\nf viaje ← \nf camino\_abierto} \\
+h3 & Ai & \texttt{\nf nieve}        & r3 & Av & \texttt{viaje ← camino\_abierto} \\
+h4 & Ap & \texttt{\nf nieve}        & r4 & Ai & \texttt{camino\_abierto ← \nf nieve} \\
+h5 & Ai & \texttt{nieve}            &    &    & \\
+\end{tabular}
+
+{\footnotesize\color{gris} (El enunciado da los elementos en otro orden y sin nombres; h1--h5 y r1--r4 se agregan para referirse a cada uno.)}
+\end{center}
+
+\begin{enumerate}[label=\alph*.]
+  \item Considerando el siguiente orden entre los informantes: Av < Ar < Ap < At < Ai < Ac, y asumiendo el criterio de comparación entre derivaciones ``enlace más débil'', indique cuál sería la decisión tomada por un agente con respecto a viajar. Justifique su respuesta comparando el informante asociado a cada una de las derivaciones de los literales que necesita para responder a esta pregunta.
+  \item Indique un orden de informantes para que la decisión del inciso anterior cambie.
+\end{enumerate}
+\end{enunciado}
+
+% Árboles de derivación con informantes (celeste = informante de la KB,
+% rosa = informante obtenido con el eslabón más débil).
+% Dos niveles: #1 raíz, #2 su informante calculado, #3 informante de la regla,
+% #4 hecho, #5 informante del hecho.
+\newcommand{\arbolI}[5]{%
+  \node[tn] (I0) at (0,0) {#1};
+  \node[pk, right=3pt of I0] {#2};
+  \node[tn] (I1) at (0,-1.3) {#4};
+  \draw[thick] (I0) -- node[bl, left=3pt]{#3} (I1);
+  \node[bl, below=3pt of I1] {#5};}
+% Tres niveles: #1 raíz, #2 su informante calculado, #3 informante de la regla de arriba,
+% #4 literal intermedio, #5 su informante calculado, #6 informante de la regla de abajo,
+% #7 hecho, #8 informante del hecho.
+\newcommand{\arbolII}[8]{%
+  \node[tn] (I0) at (0,0) {#1};
+  \node[pk, right=3pt of I0] {#2};
+  \node[tn] (I1) at (0,-1.3) {#4};
+  \node[pk, right=3pt of I1] {#5};
+  \draw[thick] (I0) -- node[bl, left=3pt]{#3} (I1);
+  \node[tn] (I2) at (0,-2.6) {#7};
+  \draw[thick] (I1) -- node[bl, left=3pt]{#6} (I2);
+  \node[bl, below=3pt of I2] {#8};}
+% Recuadro punteado con el orden entre informantes.
+\newcommand{\ordeninf}[1]{\par\smallskip\begin{center}
+  \tcbox[enhanced, colback=white, frame hidden, borderline={0.6pt}{0pt}{black, densely dotted},
+    sharp corners, left=8pt, right=8pt, top=2pt, bottom=2pt]{\small #1}\end{center}}
+% Árboles de las cinco derivaciones. #1--#4: informante de viaje en D1--D4;
+% #5, #6: informante de camino_abierto en D3, D4; #7 de ~viaje; #8 de ~camino_abierto.
+\newcommand{\arbolesviaje}[8]{%
+\begin{tikzpicture}
+  \begin{scope}[xshift=0cm]    \arbolI{viaje}{#1}{Av}{camino\_abierto}{Ar} \end{scope}
+  \begin{scope}[xshift=3.6cm]  \arbolI{viaje}{#2}{Av}{camino\_abierto}{Ap} \end{scope}
+  \begin{scope}[xshift=7.4cm]  \arbolII{viaje}{#3}{Av}{camino\_abierto}{#5}{Ai}{\nf nieve}{Ai} \end{scope}
+  \begin{scope}[xshift=11.2cm] \arbolII{viaje}{#4}{Av}{camino\_abierto}{#6}{Ai}{\nf nieve}{Ap} \end{scope}
+  \begin{scope}[xshift=5.6cm, yshift=-4.6cm] \arbolII{\nf viaje}{#7}{Av}{\nf camino\_abierto}{#8}{At}{nieve}{Ai} \end{scope}
+\end{tikzpicture}}
+
+\paragraph{Inciso a.}
+
+\textbf{Respuesta}: el agente queda \textbf{indeciso} (no decide ni viajar ni no viajar): la mejor derivación de \texttt{viaje} y la de \texttt{\nf viaje} tienen el mismo informante, \textbf{Av}. Todas pasan por una regla de Av (r3 o r2), y Av es el informante menos creíble. El paso a paso:
+
+\paragraph{Paso 1: cómo se compara con informantes.}
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+\textbf{Qué se calcula} & \textbf{Cómo} \\
+\midrule
+confianza de una derivación & el informante \textbf{menos creíble} (mínimo) de sus elementos: ``eslabón más débil''\catedra{Episodio IX (informantes)}{Resolución del conflicto con información simbólica} \\
+literal con varias derivaciones & el \textbf{máximo} de las confianzas de sus derivaciones\catedra{Episodio IX (informantes)}{Resolución del conflicto basado en informantes} \\
+respuesta a la consulta $Q$ & \textbf{sí} si hay derivación para $Q$ y no para su complemento, o hay para ambos y confianza($Q$) $>$ confianza($\overline{Q}$); \textbf{no} en el caso simétrico; \textbf{indeciso} si las confianzas son iguales; \textbf{desconocido} si no hay derivación para ninguno\catedra{Episodio IX (informantes)}{¿Qué respuesta dar?} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Paso 2: qué literales hacen falta.}
+\begin{itemize}
+  \item Para decidir si viajar hay que comparar la confianza de \texttt{viaje} con la de \texttt{\nf viaje}.
+  \item \texttt{viaje} sale de r3, que necesita \texttt{camino\_abierto}; este sale de h1, de h2 o de r4 (que necesita \texttt{\nf nieve}, hecho h3 o h4). Son \textbf{4 derivaciones}.
+  \item \texttt{\nf viaje} sale de r2, que necesita \texttt{\nf camino\_abierto}; este sale de r1, que necesita \texttt{nieve} (h5). Es \textbf{1 derivación}.
+\end{itemize}
+
+Se siguen los pasos del ejemplo resuelto de la cátedra:\catedra{Ejemplo SBC}{Enfoque cualitativo: Orden de credibilidad entre informantes}
+\begin{enumerate}
+  \item cada derivación posible de \texttt{viaje} y de \texttt{\nf viaje}: a la izquierda, sus reglas y hechos con su informante y, en el recuadro, el informante de la conclusión en esa derivación; a la derecha, el cálculo;
+  \item para cada literal, el mejor informante entre sus derivaciones;
+  \item cada derivación como un árbol: en \colorbox{celeste}{celeste}, los informantes según aparecen en la KB; en \colorbox{rosa}{rosa}, los obtenidos con el eslabón más débil;
+  \item la conclusión que elige el SBC.
+\end{enumerate}
+
+\ordeninf{Av < Ar < Ap < At < Ai < Ac}
+
+\veamos{Veamos las derivaciones posibles para \texttt{viaje}\dots}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto [Ar]}{Av}
+{conf(viaje) = mín(\{Av, Ar\}) = \textbf{Av}}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto [Ap]}{Av}
+{conf(viaje) = mín(\{Av, Ap\}) = \textbf{Av}}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto ← \nf nieve [Ai]\\ \nf nieve [Ai]}{Av}
+{conf(viaje) = mín(\{Av, Ai, Ai\}) = \textbf{Av}\\[3pt]
+ conf(camino\_abierto) = mín(\{Ai, Ai\}) = Ai}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto ← \nf nieve [Ai]\\ \nf nieve [Ap]}{Av}
+{conf(viaje) = mín(\{Av, Ai, Ap\}) = \textbf{Av}\\[3pt]
+ conf(camino\_abierto) = mín(\{Ai, Ap\}) = Ap}
+
+\nota{Si tenemos más de una derivación posible para un literal, nos quedamos con el mejor informante posible asociado. En este caso, las cuatro dan Av: confianza(\texttt{viaje}) = \textbf{Av}.}
+
+\veamos{Y las derivaciones posibles para \texttt{\nf viaje}\dots}
+
+\deriv{\nf viaje ← \nf camino\_abierto [Av]\\ \nf camino\_abierto ← nieve [At]\\ nieve [Ai]}{Av}
+{conf(\nf viaje) = mín(\{Av, At, Ai\}) = \textbf{Av}\\[3pt]
+ conf(\nf camino\_abierto) = mín(\{At, Ai\}) = At}
+
+\nota{Hay una sola derivación: confianza(\texttt{\nf viaje}) = \textbf{Av}.}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\arbolesviaje{Av}{Av}{Av}{Av}{Ai}{Ap}{Av}{At}
+\ordeninf{Av < Ar < Ap < At < Ai < Ac}
+\captionof{figure}{Las derivaciones del inciso a como árboles: arriba, las cuatro de \texttt{viaje}; abajo, la de \texttt{\nf viaje}. Celeste: informantes de la KB; rosa: informantes obtenidos con el eslabón más débil.}
+\end{minipage}\par\medskip
+
+\eleccion{confianza(\texttt{viaje}) = confianza(\texttt{\nf viaje}) = Av: el SBC no puede preferir ninguna de las dos conclusiones.\\ Respuesta: \textbf{indeciso}. El agente no tiene una decisión sobre viajar.}
+
+\paragraph{Inciso b.}
+
+\textbf{Respuesta}: con el orden \textbf{At < Av < Ar < Ap < Ai < Ac} (At pasa de la mitad al último lugar; el resto queda igual), el agente \textbf{viaja}.
+\begin{itemize}
+  \item Las derivaciones de \texttt{viaje} no usan At: siguen dando Av.
+  \item La de \texttt{\nf viaje} sí usa At (r1), que ahora es el eslabón más débil: da At.
+  \item Como Av > At, se prefiere \texttt{viaje}.
+\end{itemize}
+
+\ordeninf{At < Av < Ar < Ap < Ai < Ac}
+
+\veamos{Veamos las derivaciones posibles para \texttt{viaje}\dots}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto [Ar]}{Av}
+{conf(viaje) = mín(\{Av, Ar\}) = \textbf{Av}}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto [Ap]}{Av}
+{conf(viaje) = mín(\{Av, Ap\}) = \textbf{Av}}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto ← \nf nieve [Ai]\\ \nf nieve [Ai]}{Av}
+{conf(viaje) = mín(\{Av, Ai, Ai\}) = \textbf{Av}\\[3pt]
+ conf(camino\_abierto) = mín(\{Ai, Ai\}) = Ai}
+
+\deriv{viaje ← camino\_abierto [Av]\\ camino\_abierto ← \nf nieve [Ai]\\ \nf nieve [Ap]}{Av}
+{conf(viaje) = mín(\{Av, Ai, Ap\}) = \textbf{Av}\\[3pt]
+ conf(camino\_abierto) = mín(\{Ai, Ap\}) = Ap}
+
+\nota{confianza(\texttt{viaje}) = \textbf{Av}.}
+
+\veamos{Y las derivaciones posibles para \texttt{\nf viaje}\dots}
+
+\deriv{\nf viaje ← \nf camino\_abierto [Av]\\ \nf camino\_abierto ← nieve [At]\\ nieve [Ai]}{At}
+{conf(\nf viaje) = mín(\{Av, At, Ai\}) = \textbf{At}\\[3pt]
+ conf(\nf camino\_abierto) = mín(\{At, Ai\}) = At}
+
+\nota{confianza(\texttt{\nf viaje}) = \textbf{At}.}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\arbolesviaje{Av}{Av}{Av}{Av}{Ai}{Ap}{At}{At}
+\ordeninf{At < Av < Ar < Ap < Ai < Ac}
+\captionof{figure}{Las derivaciones del inciso b como árboles: arriba, las cuatro de \texttt{viaje}; abajo, la de \texttt{\nf viaje}. Celeste: informantes de la KB; rosa: informantes obtenidos con el eslabón más débil.}
+\end{minipage}\par\medskip
+
+\eleccion{En base a los informantes, el SBC elige la conclusión \texttt{viaje} (Av > At): \textbf{el agente viaja}.}
+
+\begin{aviso}{Supuestos}
+\begin{itemize}
+  \item \textbf{Ac} aparece en el orden pero no etiqueta ningún elemento de la KB; no interviene en ninguna derivación.
+  \item \textbf{Conflicto intermedio}: \texttt{camino\_abierto} y \texttt{\nf camino\_abierto} también se derivan los dos. Como en el ejercicio 7, la confianza de cada derivación se calcula sin mirar ese conflicto (así lo hace la cátedra en sus ejemplos). Igual se resuelve a favor de \texttt{camino\_abierto} en los dos incisos: Ai contra At.
+\end{itemize}
+\end{aviso}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Cambiar el orden sin tocar la KB}: si el agente descubre un cambio en la credibilidad de sus fuentes, puede cambiar el orden sin reasignar las etiquetas de la KB, y con eso puede preferirse otra conclusión.\catedra{Episodio IX (informantes)}{El orden de credibilidad puede cambiar dinámicamente} Es lo que pasa en el inciso b.
+  \item \textbf{Con esta KB, ningún orden total hace que el agente decida no viajar}:
+  \begin{itemize}
+    \item la derivación de \texttt{\nf viaje} usa Av, At y Ai; la tercera de \texttt{viaje} (r3, r4, h3) usa solo Av y Ai;
+    \item el mínimo de un subconjunto nunca es menor que el del conjunto, así que confianza(\texttt{viaje}) $\geq$ confianza(\texttt{\nf viaje}) con cualquier orden: la respuesta es \textbf{sí} o \textbf{indeciso}, nunca \textbf{no}.
+  \end{itemize}
+  Para que gane \texttt{\nf viaje} habría que cambiar los informantes de la KB (por ejemplo, r3 de Av a Ar, con Ar como el menos creíble: \texttt{viaje} daría Ar y \texttt{\nf viaje}, Av) o agregar reglas.
+\end{itemize}
+\end{extras}
+
 \end{document}
