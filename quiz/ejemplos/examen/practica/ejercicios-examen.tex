@@ -1,0 +1,730 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{2em}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\usepackage[hidelinks]{hyperref}
+
+\usetikzlibrary{babel,arrows.meta,positioning,calc,shapes.geometric}
+\tcbuselibrary{skins,breakable}
+
+\definecolor{azulnuevo}{HTML}{1F4E79}
+\definecolor{grisrep}{HTML}{6B7280}
+\definecolor{ambar}{HTML}{B45309}
+\definecolor{verde}{HTML}{15803D}
+\definecolor{fondonuevo}{HTML}{F3F7FB}
+\definecolor{fondorep}{HTML}{F4F4F5}
+\definecolor{fondoaviso}{HTML}{FFF7ED}
+\definecolor{fondoej}{HTML}{F0FDF4}
+\definecolor{critrojo}{HTML}{DC2626}
+\definecolor{azultemp}{HTML}{1D4ED8}
+\definecolor{rojotard}{HTML}{B91C1C}
+
+\titleformat{\section}{\Large\bfseries\color{azulnuevo}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{9pt}{4pt}
+
+\newtcolorbox{defbox}[1]{
+  breakable, enhanced, colback=fondonuevo, colframe=azulnuevo,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=azulnuevo, fonttitle=\small}
+\newtcolorbox{yavisto}{
+  breakable, enhanced, colback=fondorep, colframe=grisrep,
+  boxrule=0.4pt, left=6pt, right=6pt, top=4pt, bottom=4pt, fontupper=\small}
+\newtcolorbox{aviso}[1]{
+  breakable, enhanced, colback=fondoaviso, colframe=ambar,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=ambar, fonttitle=\small}
+\newtcolorbox{ejemplo}[1]{
+  breakable, enhanced, colback=fondoej, colframe=verde,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=verde, fonttitle=\small}
+\newtcolorbox{enresumen}{
+  breakable, enhanced, colback=white, colframe=azulnuevo,
+  boxrule=0.4pt, leftrule=3pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries En resumen}, coltitle=azulnuevo, colbacktitle=white,
+  fonttitle=\small, attach title to upper={\ }, fontupper=\small}
+
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{itemsep=1pt, topsep=2pt, parsep=0pt}
+\captionsetup{font=small, labelfont=bf}
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+
+\tikzset{
+  caja/.style={draw=azulnuevo, fill=fondonuevo, rounded corners=2pt, align=center, font=\small, inner sep=4pt},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=azulnuevo},
+  tarea/.style={draw=black!80, thick, minimum width=17mm, minimum height=8mm, fill=white, font=\small},
+  crit/.style={tarea, draw=critrojo, fill=critrojo!15, very thick},
+  temp/.style={text=azultemp, font=\scriptsize\bfseries},
+  tard/.style={text=rojotard, font=\scriptsize\bfseries},
+  dep/.style={-{Stealth[length=2.2mm]}, thick, draw=azulnuevo!75},
+  depc/.style={-{Stealth[length=2.2mm]}, very thick, draw=critrojo}
+}
+\newcommand{\tnode}[9][tarea]{\node[#1,
+  label={[temp,anchor=south west,inner sep=1pt]north west:#6},
+  label={[temp,anchor=south east,inner sep=1pt]north east:#7},
+  label={[tard,anchor=north west,inner sep=1pt]south west:#8},
+  label={[tard,anchor=north east,inner sep=1pt]south east:#9}] (#2) at (#3) {\textbf{#4}\hspace{5mm}#5};}
+
+\definecolor{fondoenun}{HTML}{F8FAFC}
+\newtcolorbox{enunciado}[1]{
+  breakable, enhanced, colback=fondoenun, colframe=black!55,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=black!65, fonttitle=\small}
+\newtcolorbox{plantilla}[1]{
+  breakable, enhanced, colback=fondorep, colframe=grisrep,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries Dado en el enunciado: #1}, coltitle=white, colbacktitle=grisrep, fonttitle=\small, fontupper=\small}
+\newtcolorbox{resultado}[1]{
+  breakable, enhanced, colback=fondoej, colframe=verde,
+  boxrule=0.8pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=verde, fonttitle=\small}
+\newcommand{\hueco}[1][1.6cm]{\rule{0pt}{#1}}
+\title{\vspace{-1.6cm}\textbf{Guía de ejercicios para el examen}\\[4pt]
+\large Ejercicios del estilo de los TPs, con las fórmulas y plantillas que da el enunciado}
+\author{\normalsize Administración de Proyectos de Software (7502) --- UNS}
+\date{\normalsize Las respuestas están en \texttt{respuestas-ejercicios.pdf}}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{yavisto}
+\textbf{Cómo usar esta guía.} Los ejercicios imitan a los de los TPs (el docente dijo que los del examen van a
+ser ``muy similares''). Se priorizaron los tipos que la cátedra resolvió en clase: la red con los cuatro tipos
+de dependencias (TP3, ejercicio 3), los Puntos de Función (TP4, sistema S1), la matriz persona/perfil (TP5,
+ejercicio 2) y la tabla de riesgos con RSGR (TP1, caso de salud). Como en el parcial, cada enunciado trae en una
+caja gris la \textbf{fórmula o plantilla} que hace falta: no hay que memorizarlas, hay que saber usarlas. No se
+pide redactar un POS ni un COS, pero sí sacar requerimientos y riesgos de un enunciado largo (bloque B).
+Resolvé primero y después compará con \texttt{respuestas-ejercicios.pdf}. La teoría de cada bloque está en el
+resumen final (\texttt{examen/resumen/resumen-final.pdf}).
+\end{yavisto}
+
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section{Bloque A --- Scrum: historias, velocity y criterios de aceptación}
+% =====================================================================
+\begin{enunciado}{Ejercicio A1 (estilo TP0)}
+Un club deportivo mantiene el siguiente Product Backlog para su sistema de reservas. ``Valor'' es el
+\emph{business value} definido por el Product Owner y ``Esfuerzo'' son los \emph{story points} estimados por el
+equipo.
+\begin{center}\small
+\begin{tabular}{@{}clcc@{}}
+\toprule
+\# & Ítem & Valor & Esfuerzo\\
+\midrule
+1 & Como socio, quiero reservar una cancha de pádel para asegurarme un horario & 8 & 5\\
+2 & Como socio, quiero cancelar mi reserva para liberar el turno si no puedo ir & 5 & 2\\
+3 & Migrar la base de datos a PostgreSQL 15 & 3 & 8\\
+4 & Como administrativo, quiero ver la ocupación semanal de las canchas & 6 & 8\\
+5 & Corregir el error de horarios duplicados en el calendario & 4 & 3\\
+6 & Como socio, quiero recibir un recordatorio el día anterior a mi reserva & 3 & 3\\
+7 & Configurar copias de seguridad automáticas & 2 & 5\\
+8 & Como socio, quiero pagar la reserva con tarjeta & 7 & 13\\
+9 & Como profesor, quiero publicar los horarios de mis clases & 2 & 5\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{enumerate}[label=\alph*)]
+  \item Describa brevemente el sistema que se está desarrollando.
+  \item Indique qué ítems son historias de usuario y cuáles son ítems propios del equipo de desarrollo.
+  Justifique.
+  \item La velocity del equipo es 21. Indique qué ítems entran en el próximo sprint y en qué orden se eligen.
+  \item Escriba los criterios de aceptación de las historias \#2 y \#6.
+  \item El PO quiere agregar el ítem \#8 a mitad del sprint porque un sponsor lo pidió. ¿Qué le responde?
+\end{enumerate}
+\end{enunciado}
+\begin{plantilla}{criterio de selección y formato de historia}
+Ratio $=$ valor/esfuerzo; se toman los ítems de mayor a menor ratio mientras la suma de esfuerzos no supere la
+velocity. Historia de usuario: ``Como [rol], quiero [objetivo], para [beneficio]''. Criterios de aceptación:
+qué puede hacer el usuario; reglas ``si\ldots entonces\ldots''; confirmación visible al final.
+\end{plantilla}
+
+% =====================================================================
+\section{Bloque B --- Requerimientos y riesgos a partir de un enunciado largo}
+% =====================================================================
+\begin{enunciado}{Ejercicio B1 (estilo TP1 + TP2): turnos en centros de salud municipales}
+\small
+La Secretaría de Salud de un municipio de 180.000 habitantes administra \textbf{12 centros de atención
+primaria}, tres de ellos en zonas rurales con conectividad a Internet irregular. Hoy los turnos se piden por
+teléfono o en persona: en las horas pico la espera telefónica supera los \textbf{40 minutos} y el
+\textbf{25\% de los turnos otorgados no se usa} porque los pacientes se olvidan o no avisan que no van a ir. Los
+centros atienden unas \textbf{85.000 consultas por año}.
+
+El Secretario de Salud pidió ``un sistema de turnos como el que usa la ciudad vecina, porque ese anda bien''.
+Después de dos entrevistas con el equipo de la Secretaría se sabe que:
+\begin{itemize}
+  \item Los pacientes deben poder pedir, consultar y cancelar turnos por una página web y por una app móvil,
+  y los administrativos de cada centro deben poder darlos también en mostrador para quienes no usan Internet.
+  \item Cada profesional tiene una agenda semanal que define el director de cada centro; los feriados y
+  licencias bloquean la agenda.
+  \item El sistema debe enviar un recordatorio por SMS 48 horas antes del turno, y si el paciente cancela, el
+  turno se ofrece automáticamente al primero de una lista de espera.
+  \item Solo pueden sacar turno los pacientes empadronados en el \textbf{padrón provincial de beneficiarios},
+  que mantiene el Ministerio de Salud provincial; el sistema solo lo consulta.
+  \item La Secretaría quiere un reporte mensual con la cantidad de turnos dados, usados y perdidos por centro y
+  por especialidad, y el porcentaje de ausentismo.
+  \item ``El sistema tiene que ser rápido y fácil de usar'', porque muchos pacientes son adultos mayores.
+  \item Los datos de los pacientes son datos de salud y deben protegerse según la ley de protección de datos
+  personales.
+  \item El sistema debe estar funcionando antes del invierno (en \textbf{8 meses}), cuando empieza la campaña de
+  vacunación. Se financia con un programa provincial cuyo presupuesto es fijo y vence al terminar el año.
+  \item El área de informática municipal tiene \textbf{3 personas}; ninguna desarrolló antes una app móvil, y una
+  de ellas tiene una licencia por maternidad prevista para dentro de 4 meses.
+  \item Los administrativos de los centros temen que el sistema les agregue trabajo. Dentro de 10 meses hay
+  elecciones municipales.
+\end{itemize}
+\normalsize
+\begin{enumerate}[label=\alph*)]
+  \item Liste los requerimientos funcionales del sistema (al menos 8). Para dos de ellos complete la ficha de
+  requerimiento funcional.
+  \item Identifique los requerimientos no funcionales. Elija uno que sea un atributo crítico y especifíquelo con
+  la plantilla de atributos (proponga valores razonables y justifíquelos).
+  \item En el enunciado hay al menos una \emph{solución disfrazada de requerimiento} y un \emph{requerimiento
+  ambiguo}. Identifíquelos y explique cómo los trataría.
+  \item Construya una lista de comprobación de elementos de riesgo (entre 10 y 15), indicando para cada uno la
+  categoría de Pressman y, si corresponde, el conductor de riesgo de Wysocki.
+  \item Elabore la tabla de riesgos justificando probabilidad e impacto, ordénela, defina una línea de corte y
+  diga qué riesgos requieren mayor atención.
+  \item Desarrolle el plan RSGR para los tres riesgos más prioritarios.
+\end{enumerate}
+\end{enunciado}
+
+\begin{plantilla}{ficha de requerimiento funcional}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+req.\ id & identificador único (F1, F2\ldots)\\
+categoría & funcional, de interfaz, de datos, de seguridad\ldots\\
+descripción & qué debe hacer el sistema, quién lo hace\\
+términos & glosario de los términos del dominio usados\\
+justificación & por qué existe\\
+prioridad & alta / media / baja\\
+dependencias & otros requerimientos de los que depende\\
+documentos & documentos de soporte\\
+factibilidad & análisis preliminar de si es realizable\\
+verificación & cómo se comprueba que se cumplió\\
+\end{tabularx}
+\end{plantilla}
+\begin{plantilla}{especificación de un atributo (requerimiento no funcional)}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+Nombre & el atributo\\
+Escala & unidad de medida: qué se mide\\
+Test & procedimiento concreto: cómo se mide\\
+Peor caso & peor nivel aceptable; por debajo, el proyecto fracasa en ese atributo\\
+Nivel planificado & nivel que el proyecto se compromete a alcanzar\\
+Mejor caso & mejor nivel alcanzable (solo informativo)\\
+Nivel actual & nivel en el sistema o proceso existente\\
+\end{tabularx}
+\end{plantilla}
+\begin{plantilla}{riesgos}
+\textbf{Categorías de la lista de comprobación (Pressman)}: tamaño del producto; impacto en el negocio;
+características del cliente; definición del proceso; entorno de desarrollo; tecnología a construir; tamaño y
+experiencia de la plantilla.
+
+\textbf{Conductores de riesgo (Wysocki)}: planificación demasiado ambiciosa; subestimación del presupuesto;
+obligaciones de contrato mal interpretadas; estimación de tamaño inadecuada; hardware nuevo o poco familiar;
+personal calificado no adecuado; plan de desarrollo inadecuado; métodos pobres de ingeniería; falta de soporte
+político o de necesidad; análisis de riesgos inadecuado; expectativas poco realistas; procesos o tecnologías
+poco familiares; modelo de desarrollo inadecuado; requerimientos definidos pobremente; estructura organizacional
+inadecuada.
+
+\textbf{Tabla de riesgos}:\quad \begin{tabular}{|l|l|l|l|}\hline Elemento de riesgo & Categoría & Probabilidad & Impacto\\\hline\end{tabular}
+
+Impacto: 1 catastrófico, 2 crítico, 3 marginal, 4 despreciable. Ordenar por probabilidad y luego por impacto.
+
+\textbf{Plan RSGR} (por riesgo): \emph{Reducción} (evitar y mitigar, antes) / \emph{Supervisión} (controlar que
+se ejecuta la reducción y detectar señales, durante) / \emph{Gestión} (qué hacer si ocurrió).
+\end{plantilla}
+
+\begin{enunciado}{Ejercicio B2: plataforma para una cooperativa frutihortícola}
+\small
+Una cooperativa que agrupa a \textbf{60 productores} frutihortícolas quiere vender directamente a comercios y a
+particulares de la región. Hoy los pedidos llegan por WhatsApp y teléfono, los anota una administrativa en un
+cuaderno, y cada fin de mes se calcula a mano cuánto le corresponde a cada productor: el cálculo tarda una
+semana y genera reclamos frecuentes.
+
+La cooperativa pide ``una planilla compartida en Google para que los productores carguen su stock''. En las
+reuniones se aclaró que necesitan:
+\begin{itemize}
+  \item que cada productor publique semanalmente la mercadería disponible (producto, cantidad, precio, fecha de
+  cosecha), y que los productos se den de baja solos cuando superan los días de frescura de su tipo;
+  \item que comercios y particulares hagan pedidos desde una web, eligiendo día y franja de entrega;
+  \item cobrar con tarjeta por medio de una pasarela de pagos externa y emitir la factura electrónica a través
+  del servicio de facturación del organismo recaudador;
+  \item una app para los 4 repartidores, con la hoja de ruta del día y la confirmación de cada entrega;
+  \item la liquidación mensual a cada productor (ventas menos la comisión de la cooperativa) y un reporte de
+  ventas por producto y por productor;
+  \item soportar la temporada alta de diciembre, en la que los pedidos se triplican.
+\end{itemize}
+El proyecto se financia con un subsidio que exige rendir gastos por hitos. Lo desarrollará una consultora
+externa de 5 personas que nunca trabajó con cooperativas. Varios productores mayores nunca usaron una
+aplicación y la presidenta de la cooperativa, impulsora del proyecto, termina su mandato en 6 meses.
+\normalsize
+\begin{enumerate}[label=\alph*)]
+  \item Liste los requerimientos funcionales y no funcionales.
+  \item ¿Qué hay detrás del pedido de la planilla de Google? ¿Cuál es el requerimiento real?
+  \item Identifique entre 10 y 15 riesgos con su categoría, arme la tabla, ordénela, trace la línea de corte y
+  desarrolle el RSGR de los dos primeros.
+\end{enumerate}
+\end{enunciado}
+
+\begin{enunciado}{Ejercicio B3: funcional, no funcional o solución}
+Clasifique cada enunciado como requerimiento \textbf{funcional} (F), \textbf{no funcional} (NF),
+\textbf{solución} (S) o una \textbf{mezcla} que hay que separar. Cuando sea una solución, indique qué
+pregunta haría y cuál podría ser el requerimiento real.
+\begin{enumerate}
+  \item El sistema permite al vendedor registrar una venta.
+  \item El 95\% de las consultas se responde en menos de 2 segundos con 300 usuarios concurrentes.
+  \item Hay que usar una base de datos Oracle.
+  \item El sistema emite un reporte mensual de ventas por sucursal con totales.
+  \item Queremos un chatbot para reducir las llamadas al centro de atención.
+  \item El sistema debe estar disponible el 99,5\% del tiempo en horario comercial.
+  \item Generar un manual de usuario fácil de entender.
+  \item El sistema debe correr en los servidores Linux que ya tiene la empresa.
+  \item El usuario puede recuperar su contraseña por correo electrónico.
+  \item Un cajero nuevo debe poder cobrar sin ayuda después de 2 horas de capacitación.
+\end{enumerate}
+\end{enunciado}
+
+% =====================================================================
+\section{Bloque C --- Comparación de soluciones (estilo TP2, ejercicio 5)}
+% =====================================================================
+\begin{enunciado}{Ejercicio C1}
+Para un problema se definieron cuatro atributos de calidad (A, B, C y D). Tres equipos propusieron soluciones,
+y el análisis de impacto (en \% del nivel planificado de cada atributo que aporta cada solución) es:
+\begin{center}
+\begin{tabular}{c|ccc}
+\toprule
+ & S1 & S2 & S3\\
+\midrule
+A & 60 & 20 & 30\\
+B & 15 & 50 & 30\\
+C & 10 & 40 & 35\\
+D & 35 & 20 & 25\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{enumerate}[label=\alph*)]
+  \item ¿Qué solución elegiría según su impacto en los atributos? ¿Por qué?
+  \item ¿Hay algún atributo determinante para esa elección? Justifique.
+  \item Los costos son: S1 el 30\% del presupuesto máximo, S2 el 50\% y S3 el 40\%. ¿Cuál es ahora la preferida?
+  \item Se establece que el peor caso del atributo C exige que la solución aporte al menos el 15\% de su nivel
+  planificado. ¿Cambia la decisión?
+  \item Usted lidera el equipo de S2. ¿Qué podría hacer, legítimamente, para que su solución sea la preferida?
+\end{enumerate}
+\end{enunciado}
+\begin{plantilla}{criterios de comparación}
+Se suman algebraicamente los impactos: en atributos de calidad, más es mejor; en recursos, menos es mejor.
+Razón de impactos $= \sum$ impactos de calidad $/\ \sum$ impactos de recursos (mayor es mejor). Paso 3 del
+proceso de búsqueda de soluciones: eliminar las soluciones que producen el peor caso en algún atributo.
+\end{plantilla}
+
+% =====================================================================
+\section{Bloque D --- Estimación}
+% =====================================================================
+\begin{plantilla}{fórmulas de estimación}
+duración $=$ esfuerzo / porcentaje de dedicación; \quad 3 puntos: $E = (O + 4M + P)/6$.
+Delphi: estiman en forma individual; justifican los que caen en los cuartiles exteriores; la estimación es el
+promedio de la tercera pasada. Delphi de banda ancha: cada uno da $O$, $M$ y $P$; se eliminan los extremos de cada
+columna, se promedia y se aplica la fórmula de 3 puntos.
+\end{plantilla}
+\begin{enunciado}{Ejercicio D1: Delphi}
+Ocho estimadores dan, en la primera pasada, las siguientes duraciones (días) para una tarea: 12, 15, 9, 14, 22,
+13, 16, 30. (a) ¿Quiénes deben justificar su estimación y por qué la técnica lo pide? (b) En la tercera pasada
+las estimaciones son 14, 15, 15, 16, 17, 15, 16, 18. ¿Cuál es la estimación del grupo? (c) ¿Qué ventaja tiene
+Delphi frente a que el LP estime solo, y en qué se parece y diferencia de Planning Poker?
+\end{enunciado}
+\begin{enunciado}{Ejercicio D2: 3 puntos}
+Para cuatro tareas se obtuvieron estas estimaciones (días):
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+Tarea & Optimista & Más probable & Pesimista\\
+\midrule
+T1 & 2 & 4 & 12\\
+T2 & 5 & 8 & 17\\
+T3 & 1 & 3 & 5\\
+T4 & 10 & 12 & 26\\
+\bottomrule
+\end{tabular}
+\end{center}
+(a) Calcule la estimación de 3 puntos de cada tarea. (b) ¿Por qué en T1 la estimación es mayor que el valor más
+probable? (c) ¿Cuál es la tarea más incierta?
+\end{enunciado}
+\begin{enunciado}{Ejercicio D3: Delphi de banda ancha}
+Cinco estimadores dan (días):
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+Estimador & $O$ & $M$ & $P$\\
+\midrule
+1 & 4 & 6 & 10\\
+2 & 3 & 7 & 12\\
+3 & 5 & 6 & 9\\
+4 & 2 & 5 & 20\\
+5 & 4 & 9 & 11\\
+\bottomrule
+\end{tabular}
+\end{center}
+Calcule la estimación descartando en cada columna el valor mínimo y el máximo.
+\end{enunciado}
+\begin{enunciado}{Ejercicio D4: duración, esfuerzo y crash point}
+Una tarea requiere 96 horas-persona; la jornada es de 8 horas. (a) ¿Cuánto dura con una persona al 100\%? (b) ¿Y
+con dos personas al 60\% cada una? (c) Si debe terminar en 6 días, ¿cuántas personas a tiempo completo hacen
+falta? (d) ¿Por qué no se puede hacer en 1 día con 12 personas? (e) ¿De qué depende el costo de la tarea y de
+qué su fecha de fin?
+\end{enunciado}
+
+% =====================================================================
+\section{Bloque E --- Planificación: redes, planificaciones, márgenes y camino crítico}
+% =====================================================================
+\begin{plantilla}{convención y fórmulas de la cátedra}
+Días numerados desde 1. CTe $= \max_{\text{pred}}$(FTe) $+ 1$ (1 si no tiene predecesoras); FTe $=$ CTe $+ d - 1$;
+FTa $= \min_{\text{suc}}$(CTa) $- 1$ (fin del proyecto si no tiene sucesoras); CTa $=$ FTa $- d + 1$; Ventana
+$V =$ FTa $-$ CTe $+ 1$; Margen total MT $= V - d$; Margen libre ML $= \min_{\text{suc}}$(CTe) $-$ FTe $- 1$
+(fin del proyecto $+ 1$ si no tiene sucesoras).
+
+Otras dependencias (predecesora $q$, sucesora $p$): \textbf{CC}: CTe($p$) $\ge$ CTe($q$), holgura CTe($p$) $-$
+CTe($q$); \textbf{FF}: FTe($p$) $\ge$ FTe($q$), holgura FTe($p$) $-$ FTe($q$); \textbf{CF}: FTe($p$) $\ge$
+CTe($q$), holgura FTe($p$) $-$ CTe($q$). Si una tarea solo tiene predecesoras FF o CF: CTe $= 1$ y FTe $=$
+máx(CTe $+ d - 1$, lo que impone la dependencia).
+
+Nodo: \quad\begin{tikzpicture}[baseline=-1mm]\tnode{X}{0,0}{X}{d}{CTe}{FTe}{CTa}{FTa}\end{tikzpicture}
+\end{plantilla}
+
+\begin{enunciado}{Ejercicio E1 (estilo TP3, ejercicio 1)}
+Construya la red PDM, calcule las planificaciones temprana y tardía, la ventana y los márgenes de cada tarea, y
+determine el camino crítico.
+\begin{center}\small
+\begin{tabular}{ccl@{\qquad}ccl}
+\toprule
+Tarea & Dur. & Dependencias & Tarea & Dur. & Dependencias\\
+\midrule
+A & 5 & -- & E & 2 & B [FC]\\
+B & 3 & -- & F & 7 & C [FC], D [FC]\\
+C & 4 & A [FC] & G & 3 & E [FC]\\
+D & 6 & A [FC], B [FC] & H & 4 & F [FC], G [FC]\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{enunciado}
+\begin{enunciado}{Ejercicio E2 (estilo TP3, ejercicio 2: dependencias CC)}
+Ídem para:
+\begin{center}\small
+\begin{tabular}{ccl@{\qquad}ccl}
+\toprule
+Tarea & Dur. & Dependencias & Tarea & Dur. & Dependencias\\
+\midrule
+A & 2 & -- & E & 3 & D [CC]\\
+B & 4 & -- & F & 8 & C [FC]\\
+C & 6 & A [FC], B [FC] & G & 4 & E [FC]\\
+D & 5 & B [CC] & H & 2 & F [FC], G [FC]\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{enunciado}
+\begin{enunciado}{Ejercicio E3 (estilo TP3, ejercicio 3, el que resolvió la cátedra: los cuatro tipos)}
+(a) Elabore el diagrama de red PDM. (b) Obtenga el camino crítico. (c) Calcule las planificaciones temprana y
+tardía. (d) Calcule el margen libre, el margen total y la ventana de cada tarea.
+\begin{center}\small
+\begin{tabular}{ccl@{\qquad}ccl}
+\toprule
+Tarea & Dur. & Dependencias & Tarea & Dur. & Dependencias\\
+\midrule
+A & 4 & -- & G & 7 & E [FC]\\
+B & 6 & -- & H & 2 & G [FF]\\
+C & 5 & A [FC] & I & 5 & E [FC]\\
+D & 8 & B [FC] & J & 6 & I [CF]\\
+E & 3 & C [FC], D [FC] & K & 9 & F [FC], I [FC]\\
+F & 4 & D [CC] & L & 4 & G [FC]\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{enunciado}
+\begin{enunciado}{Ejercicio E4: análisis de atrasos y compresión}
+Sobre la red del ejercicio E1: (a) ¿qué pasa con el proyecto si D se atrasa 2 días?, ¿y si G se atrasa 8 días?, ¿y
+si C se atrasa 3 días? (b) Si E se atrasa 1 día, ¿a qué otra tarea afecta y por qué? (c) El cliente pide terminar
+en 20 días. ¿Sobre qué tareas actuaría, con qué técnicas y qué riesgos tiene?
+\end{enunciado}
+
+% =====================================================================
+\section{Bloque F --- Puntos de Función y COCOMO}
+% =====================================================================
+\begin{plantilla}{Puntos de Función}
+\begin{minipage}[t]{0.45\linewidth}
+\begin{tabular}{lccc}
+\toprule
+Comp. & Simple & Prom. & Compl.\\
+\midrule
+EE & 3 & 4 & 6\\
+SE & 4 & 5 & 7\\
+CE & 3 & 4 & 6\\
+AI & 7 & 10 & 15\\
+AE & 5 & 7 & 10\\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.52\linewidth}
+PFNA $= \sum$ cantidad $\times$ peso. Cada factor F1--F14 se califica de 0 (irrelevante) a 5 (esencial); TI es su
+suma. FCT $= 0{,}65 + 0{,}01 \times$ TI. PFA $=$ PFNA $\times$ FCT.
+\end{minipage}
+\end{plantilla}
+\begin{enunciado}{Ejercicio F1 (estilo TP4)}
+Para cada sistema calcule (a) los puntos de función no ajustados y (b) el factor de complejidad técnica y los
+puntos de función ajustados.
+\begin{center}\small
+\begin{tabular}{@{}l l l l@{}}
+\toprule
+ & S4 & S5 & S6\\
+\midrule
+Entradas externas & 6 simples & 5 promedio y 2 complejas & 8 simples\\
+Salidas externas & 5 promedio & 4 complejas & 3 simples y 3 complejas\\
+Consultas externas & 3 simples y 2 promedio & 6 promedio & 5 simples\\
+Archivos internos & 4 promedio & 2 promedio y 3 complejos & 2 simples\\
+Archivos externos & 1 simple & 2 promedio & 3 complejos\\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+ & Irrelevante (0) & 1 & 2 & Promedio (3) & 4 & Esencial (5)\\
+\midrule
+S4 & F2, F13 & F10 & F1, F11 & F3--F6, F12 & F7, F8, F14 & F9\\
+S5 & & F11, F13 & F12 & F1, F2, F10 & F3--F7 & F8, F9, F14\\
+S6 & F1--F5 & & F6--F9 & & F10--F12 & F13, F14\\
+\bottomrule
+\end{tabular}
+\end{center}
+(c) ¿Por qué S6 queda con menos puntos ajustados que no ajustados? ¿Qué valor del total de influencias deja los
+PF sin cambio?
+\end{enunciado}
+\begin{enunciado}{Ejercicio F2: contar desde una especificación}
+Un sistema de biblioteca universitaria debe: dar de alta, modificar y dar de baja socios; registrar préstamos;
+registrar devoluciones (que actualizan el préstamo); permitir consultar el catálogo por autor o título y ver la
+ficha de un socio, mostrando los datos tal como están guardados; emitir un comprobante de multa con el monto
+calculado según los días de atraso; y emitir un reporte mensual de préstamos por categoría con totales. El
+sistema mantiene los datos de socios, de libros y ejemplares, y de préstamos. Además valida que el socio sea
+alumno consultando el padrón de alumnos que mantiene el sistema académico de la universidad.
+
+Las complejidades ya se determinaron: los ABM de socios, la consulta del catálogo, la ficha del socio, el
+comprobante de multa, el archivo de socios, el de préstamos y el padrón son \emph{simples}; el registro de
+préstamos, el de devoluciones, el reporte mensual y el archivo de libros y ejemplares son \emph{promedio}.
+(a) Clasifique cada componente (EE, SE, CE, AI o AE) y justifique los casos dudosos. (b) Calcule los PFNA. (c) Con
+TI $= 40$, calcule los PFA.
+\end{enunciado}
+
+\begin{plantilla}{COCOMO}
+$E = a \cdot S^{\,b} \cdot F$ (personas-mes), $D = c \cdot E^{\,d}$ (meses), personas $= E/D$; $S$ en miles de
+líneas. Básico: $F = 1$. Intermedio: $F =$ producto de los multiplicadores de los conductores de costo.
+\begin{center}
+\begin{tabular}{lcccc@{\qquad}l}
+\toprule
+Modo (básico) & $a$ & $b$ & $c$ & $d$ & Intermedio: $a$\\
+\midrule
+Orgánico & 2,4 & 1,05 & 2,5 & 0,38 & 3,2\\
+Semi-embebido & 3,0 & 1,12 & 2,5 & 0,35 & 3,0\\
+Embebido & 3,6 & 1,20 & 2,5 & 0,32 & 2,8\\
+\bottomrule
+\end{tabular}
+\end{center}
+Conversión: 128 líneas de C por punto de función. Puntos objeto: pantalla 1/2/3, reporte 2/5/8 (simple/media/alta),
+componente 3GL 10; NPO $=$ PO $\times (100 - \%\text{reuso})/100$; PM $=$ NPO/PROD, con PROD $=$ 4, 7, 13, 25, 50
+(muy baja a muy alta).
+\end{plantilla}
+\begin{enunciado}{Ejercicio F3: COCOMO básico}
+Un sistema tiene 120 puntos de función ajustados y se programará en C. (a) Estime su tamaño en KLOC. (b) Calcule
+esfuerzo, duración y personas promedio en modo orgánico y en modo embebido. (c) Compare los resultados: ¿qué
+crece más, el esfuerzo o la duración?, ¿por qué? (d) ¿En qué modo clasificaría un sistema de liquidación de
+sueldos y uno de control de semáforos de una ciudad?
+\end{enunciado}
+\begin{enunciado}{Ejercicio F4: COCOMO intermedio}
+El mismo sistema, en modo orgánico, con estos conductores (el resto nominales): RELY alta (1,15), CPLX muy alta
+(1,30), ACAP alta (0,86), LEXP baja (1,07), TOOL alta (0,91) y SCED muy baja (1,23). (a) Calcule el factor de
+ajuste, el esfuerzo y la duración. (b) ¿Qué conductores aumentan el esfuerzo y cuáles lo reducen? ¿Por qué SCED
+``muy baja'' lo aumenta?
+\end{enunciado}
+\begin{enunciado}{Ejercicio F5: puntos objeto (COCOMO II)}
+Una aplicación tiene 8 pantallas simples, 4 medias y 2 altas; 3 reportes simples, 2 medios y 1 alto; y 3
+componentes 3GL. Se estima un 25\% de reuso y una productividad nominal. Calcule los puntos objeto, los nuevos
+puntos objeto y el esfuerzo. ¿Cuánto sería con productividad baja?
+\end{enunciado}
+
+% =====================================================================
+\section{Bloque G --- Lanzamiento: matriz por perfil, asignación y cambios}
+% =====================================================================
+\begin{plantilla}{matriz por perfil}
+(1) Matriz Persona $\times$ Perfil; (2) matriz Actividad $\times$ Perfil; (3) combinación: matriz Persona $\times$
+Actividad (candidatos de cada actividad, se elige uno). Un recurso es crítico si es el único que cubre un perfil
+necesario.
+\end{plantilla}
+\begin{enunciado}{Ejercicio G1 (estilo TP5, ejercicio 2, resuelto por la cátedra)}
+Este es el equipo disponible:
+\begin{center}\small
+\begin{tabular}{llr}
+\toprule
+Nombre & Perfil & Costo por semana\\
+\midrule
+Ana Torres & Analista funcional & 9.000\\
+Bruno Díaz & Desarrollador backend & 11.000\\
+Carla Gómez & Desarrolladora backend & 10.500\\
+Diego Paz & Desarrollador frontend & 10.000\\
+Elena Ruiz & Tester & 7.500\\
+Federico Lima & Tester & 8.000\\
+Gabriela Sosa & Administradora de bases de datos y desarrolladora backend & 12.000\\
+Hugo Vera & Diseñador UX y desarrollador frontend & 9.500\\
+\bottomrule
+\end{tabular}
+\end{center}
+El proyecto tiene siete actividades: A1 relevamiento (analista), A2 diseño de la base de datos (DBA), A3 API de
+turnos (backend), A4 pantallas (frontend), A5 prototipos de experiencia de usuario (UX), A6 pruebas (tester) y A7
+servicio de notificaciones (backend). A3 y A7 se hacen en paralelo, y A4 y A5 también.
+(a) Construya la matriz Persona/Perfil. (b) ¿Qué recursos son críticos? ¿Por qué? (c) Construya la matriz
+Actividad/Perfil y combine ambas para asignar una persona a cada actividad al menor costo posible. ¿Cuánto cuesta
+el equipo por semana? (d) ¿Qué haría con los recursos críticos?
+\end{enunciado}
+\begin{enunciado}{Ejercicio G2 (estilo TP5, ejercicio 1): asignar personas y horas}
+Un proyecto de 8 semanas lo hace este equipo: Laura (LP), Martín (programador/analista, aspirante a LP),
+Sofía (programadora), Tomás (tester) y Rocío (referente del cliente, hasta 10 h por semana). Cada uno trabaja
+como máximo 40 h por semana. Tareas:
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+Tarea & Semanas & Esfuerzo & Perfil\\
+\midrule
+T1 Gestión del proyecto & 1--8 & 8 h por semana & LP\\
+T2 Relevamiento & 1--2 & 40 h $+$ 10 h del cliente & analista\\
+T3 Diseño & 2--3 & 50 h & analista o programador\\
+T4 Módulo de inscripciones & 3--6 & 120 h & programador\\
+T5 Módulo de reportes & 3--6 & 100 h & programador\\
+T6 Pruebas & 6--7 & 60 h $+$ 10 h del cliente & tester\\
+T7 Capacitación e implantación & 8 & 30 h $+$ 8 h del cliente & analista\\
+\bottomrule
+\end{tabular}
+\end{center}
+(a) Asigne personas a las tareas y arme una tabla con las horas de cada persona en cada tarea. (b) Verifique que
+nadie supere su carga semanal. (c) Justifique la asignación de Martín.
+\end{enunciado}
+\begin{enunciado}{Ejercicio G3: pedido de cambio de alcance}
+En la semana 5 de un proyecto de 12 semanas, el cliente pide que el sistema de reservas también permita pagar
+online. El equipo estima 3 semanas de un desarrollador. (a) Describa cómo se procesa el pedido. (b) Proponga
+tres alternativas e indique a cuál de los seis resultados posibles del análisis de impacto corresponde cada una.
+(c) ¿Quién elige la alternativa?
+\end{enunciado}
+\begin{enunciado}{Ejercicio G4: organización del equipo}
+(a) Un proyecto necesita 12 programadores. ¿Qué estructura usaría y por qué no la estructura I? (b) En una
+empresa matricial, la gerente de línea de una desarrolladora le pide que vuelva antes a su grupo. ¿Qué problema
+de la organización matricial muestra este caso? (c) Una consultora contrata a un especialista externo por 3
+meses para una integración. ¿Qué componente del personal es y qué riesgos trae?
+\end{enunciado}
+
+% =====================================================================
+\section{Bloque H --- Monitoreo y calidad}
+% =====================================================================
+\begin{plantilla}{fórmulas}
+Valor ganado: $SV = EV - PV$; $CV = EV - AC$; $SPI = EV/PV$; $CPI = EV/AC$. Densidad de defectos $=$
+defectos/KLOC. System spoilage $=$ tiempo de corrección post-entrega / tiempo total de desarrollo. Fog $= 0{,}4
+\times$ (palabras/oraciones $+ 100 \times$ palabras de 3 o más sílabas/palabras). Grafo del equipo: densidad $=
+e/[n(n-1)/2]$; nivel promedio $= 2e/n$. Riesgo de auditoría: $RA = RI \times RC \times RD$.
+\end{plantilla}
+\begin{enunciado}{Ejercicio H1: valor ganado}
+Un proyecto de 10 semanas tiene un presupuesto (BAC) de \$200.000. Al final de la semana 4 el valor planificado
+es \$70.000 y el costo real \$68.000. Las tareas T1 (\$20.000), T2 (\$15.000) y T3 (\$25.000) están terminadas; T4
+(\$20.000) está al 50\% y T5 (\$10.000) no empezó. (a) Calcule EV contando solo las tareas terminadas. (b) Calcule
+SV, CV, SPI y CPI e interprételos. (c) ¿Qué cambiaría si se
+contara T4 al 50\%? ¿Por qué la cátedra sugiere contar solo las terminadas?
+\end{enunciado}
+\begin{enunciado}{Ejercicio H2: carta de tendencia de hitos}
+Desvíos de los hitos en días (positivo $=$ antes de lo planeado, negativo $=$ después). ¿Qué patrón muestra cada
+proyecto y qué hay que hacer? \quad P1: $+1, 0, -2, -3, -5, -6$. \quad P2: $-1, -2, -1, -2, -1, -1, -2$. \quad P3: $0,
+-1, +8$.
+\end{enunciado}
+\begin{enunciado}{Ejercicio H3: densidad de defectos y spoilage}
+Módulos: A (12 KLOC, 30 defectos), B (4 KLOC, 22 defectos), C (20 KLOC, 18 defectos). El sistema llevó 3.200 h de
+desarrollo y en el primer año se usaron 480 h en corregir fallas reportadas. (a) Calcule la densidad de cada
+módulo y la del sistema. ¿Qué módulo revisaría? (b) Calcule el spoilage. (c) ¿Por qué la densidad de C podría
+engañar?
+\end{enunciado}
+\begin{enunciado}{Ejercicio H4: grafo del equipo}
+Un equipo de 6 personas (LP, A, B, C, D, E) se comunica así: LP con A, B, C y D; A con B; B con C; C con D; D con E.
+Calcule tamaño, nivel de comunicación del equipo, densidad, nivel individual de cada uno y nivel promedio.
+Interprete.
+\end{enunciado}
+\begin{enunciado}{Ejercicio H5: índice Fog}
+Calcule el índice Fog del texto: ``El equipo entrega el sistema en marzo. Los usuarios prueban cada pantalla
+durante una semana. Después, el líder del proyecto aprueba la versión final.'' ¿Cómo se interpreta el resultado
+en castellano?
+\end{enunciado}
+\begin{enunciado}{Ejercicio H6: riesgo de auditoría}
+Un auditor acepta un riesgo de auditoría del 4\%. Estima un riesgo inherente de 0,8 y un riesgo de control de
+0,25. (a) ¿Qué riesgo de detección necesita? (b) ¿Y si el riesgo de control fuera 0,5? ¿Qué hace el auditor?
+\end{enunciado}
+\begin{enunciado}{Ejercicio H7: clasificaciones}
+(a) Tipo de mantenimiento: (1) se corrige un cálculo de intereses erróneo; (2) se adapta el sistema a una nueva
+alícuota de IVA; (3) se agrega la exportación a Excel que pidieron los usuarios; (4) se reestructura un módulo
+difícil de entender. (b) Tipo de control (preventivo, detectivo o correctivo): (1) quien carga un pago no puede
+aprobarlo; (2) se comparan los totales del lote con la planilla en papel; (3) backup diario con procedimiento de
+restauración; (4) revisión semanal del log de accesos. (c) Tipo de abuso: (1) un empleado consulta datos de un
+famoso; (2) roban una notebook con la base de clientes; (3) un ransomware cifra los servidores; (4) un atacante
+entra por una vulnerabilidad web. (d) ¿A qué factor de McCall afecta cada caso? (1) el sistema no se puede llevar
+a otro sistema operativo; (2) cambiar un reporte lleva semanas; (3) usuarios sin permiso ven sueldos.
+\end{enunciado}
+
+% =====================================================================
+\section{Bloque I --- Preguntas conceptuales (estilo ``conceptos importantes'')}
+% =====================================================================
+\begin{enumerate}\small
+  \item ¿En qué consiste un proyecto? ¿Cuáles son sus parámetros o restricciones? ¿Cuáles son sus etapas?
+  \item ¿Cómo se clasifican los proyectos de software? ¿Qué proceso es obligatorio en todos los tipos?
+  \item ¿Qué es el POS? ¿Qué diferencia hay entre meta, objetivo y criterio de éxito? ¿Y entre FCE y criterio de éxito?
+  \item ¿Qué son las condiciones de satisfacción y cuáles son sus etapas?
+  \item ¿Cómo se clasifican los riesgos? ¿Qué es una lista de comprobación? ¿Qué son los conductores de riesgo?
+  ¿En qué consiste un plan RSGR? ¿Con qué herramientas se desarrolla y aplica?
+  \item Diferencie requerimiento funcional, no funcional y solución. ¿Qué es un atributo y cómo se especifica?
+  \item Explique la diferencia entre actividad y tarea. ¿Qué es el crash point?
+  \item ¿Sobre qué aspectos se estima? Describa los métodos de estimación de la duración.
+  \item ¿Qué es el WBS, para qué sirve, cómo se construye y qué características deben tener sus tareas?
+  \item ¿Qué tipos de diagramas de red hay? Ventajas y desventajas.
+  \item Describa los cuatro tipos de dependencias y las restricciones que las originan.
+  \item Defina planificación temprana y tardía, ventana, camino crítico, margen total y libre.
+  \item ¿Qué describe la especificación? ¿Qué miden los PF y cómo se calculan los PFNA y los PFA?
+  \item Diferencias entre COCOMO básico, intermedio y avanzado. ¿Qué vale $F$? ¿Cómo varían $a$, $b$, $c$, $d$ según
+  el modo? Características y ejemplos de cada modo. Objetivos y diferencias de COCOMO II.
+  \item Organizaciones del equipo de trabajo: tipos y diferencias. ¿Por qué planificar la organización?
+  \item ¿En qué consiste la reunión de lanzamiento y para qué sirve? ¿Cómo se maneja un pedido de cambio de alcance?
+  \item ¿Para qué medir atributos externos? ¿Qué utilidad y problemas tiene la densidad de defectos?
+  \item Definiciones de calidad de Fenton; enfoques para monitorearla; modelo de McCall y cómo se analizan sus
+  criterios; ventajas y desventajas de un modelo único.
+  \item Bug vs.\ defecto; system spoilage; cómo medir usabilidad; tipos de mantenimiento; productividad y sus
+  problemas; influencia de la estructura del equipo.
+  \item Calidad según ISO; componentes de ISO 9001 (QMS, trazabilidad, desarrollo); calidad en ISO 9126.
+  \item Niveles de CMM y cómo se pasa de uno a otro. ¿Qué es CMMI?
+  \item Auditoría de SI: definición, objetivos, abuso computacional (tipos, consecuencias, ejemplos), controles,
+  riesgo de auditoría y pasos.
+\end{enumerate}
+
+\end{document}

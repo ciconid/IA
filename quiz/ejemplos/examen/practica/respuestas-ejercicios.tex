@@ -1,0 +1,924 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{2em}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\usepackage[hidelinks]{hyperref}
+
+\usetikzlibrary{babel,arrows.meta,positioning,calc,shapes.geometric}
+\tcbuselibrary{skins,breakable}
+
+\definecolor{azulnuevo}{HTML}{1F4E79}
+\definecolor{grisrep}{HTML}{6B7280}
+\definecolor{ambar}{HTML}{B45309}
+\definecolor{verde}{HTML}{15803D}
+\definecolor{fondonuevo}{HTML}{F3F7FB}
+\definecolor{fondorep}{HTML}{F4F4F5}
+\definecolor{fondoaviso}{HTML}{FFF7ED}
+\definecolor{fondoej}{HTML}{F0FDF4}
+\definecolor{critrojo}{HTML}{DC2626}
+\definecolor{azultemp}{HTML}{1D4ED8}
+\definecolor{rojotard}{HTML}{B91C1C}
+
+\titleformat{\section}{\Large\bfseries\color{azulnuevo}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{9pt}{4pt}
+
+\newtcolorbox{defbox}[1]{
+  breakable, enhanced, colback=fondonuevo, colframe=azulnuevo,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=azulnuevo, fonttitle=\small}
+\newtcolorbox{yavisto}{
+  breakable, enhanced, colback=fondorep, colframe=grisrep,
+  boxrule=0.4pt, left=6pt, right=6pt, top=4pt, bottom=4pt, fontupper=\small}
+\newtcolorbox{aviso}[1]{
+  breakable, enhanced, colback=fondoaviso, colframe=ambar,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=ambar, fonttitle=\small}
+\newtcolorbox{ejemplo}[1]{
+  breakable, enhanced, colback=fondoej, colframe=verde,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=verde, fonttitle=\small}
+\newtcolorbox{enresumen}{
+  breakable, enhanced, colback=white, colframe=azulnuevo,
+  boxrule=0.4pt, leftrule=3pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries En resumen}, coltitle=azulnuevo, colbacktitle=white,
+  fonttitle=\small, attach title to upper={\ }, fontupper=\small}
+
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{itemsep=1pt, topsep=2pt, parsep=0pt}
+\captionsetup{font=small, labelfont=bf}
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+
+\tikzset{
+  caja/.style={draw=azulnuevo, fill=fondonuevo, rounded corners=2pt, align=center, font=\small, inner sep=4pt},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=azulnuevo},
+  tarea/.style={draw=black!80, thick, minimum width=17mm, minimum height=8mm, fill=white, font=\small},
+  crit/.style={tarea, draw=critrojo, fill=critrojo!15, very thick},
+  temp/.style={text=azultemp, font=\scriptsize\bfseries},
+  tard/.style={text=rojotard, font=\scriptsize\bfseries},
+  dep/.style={-{Stealth[length=2.2mm]}, thick, draw=azulnuevo!75},
+  depc/.style={-{Stealth[length=2.2mm]}, very thick, draw=critrojo}
+}
+\newcommand{\tnode}[9][tarea]{\node[#1,
+  label={[temp,anchor=south west,inner sep=1pt]north west:#6},
+  label={[temp,anchor=south east,inner sep=1pt]north east:#7},
+  label={[tard,anchor=north west,inner sep=1pt]south west:#8},
+  label={[tard,anchor=north east,inner sep=1pt]south east:#9}] (#2) at (#3) {\textbf{#4}\hspace{5mm}#5};}
+
+\definecolor{fondoenun}{HTML}{F8FAFC}
+\newtcolorbox{enunciado}[1]{
+  breakable, enhanced, colback=fondoenun, colframe=black!55,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=black!65, fonttitle=\small}
+\newtcolorbox{plantilla}[1]{
+  breakable, enhanced, colback=fondorep, colframe=grisrep,
+  boxrule=0.5pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries Dado en el enunciado: #1}, coltitle=white, colbacktitle=grisrep, fonttitle=\small, fontupper=\small}
+\newtcolorbox{resultado}[1]{
+  breakable, enhanced, colback=fondoej, colframe=verde,
+  boxrule=0.8pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  title={\bfseries #1}, coltitle=white, colbacktitle=verde, fonttitle=\small}
+\newcommand{\hueco}[1][1.6cm]{\rule{0pt}{#1}}
+\title{\vspace{-1.6cm}\textbf{Respuestas de la guía de ejercicios}\\[4pt]
+\large Resoluciones paso a paso, para comparar después de resolver}
+\author{\normalsize Administración de Proyectos de Software (7502) --- UNS}
+\date{\normalsize Enunciados en \texttt{ejercicios-examen.pdf}}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{yavisto}
+\textbf{Cómo usar este documento.} Resolvé primero cada ejercicio con la guía y después compará. Cada respuesta
+indica qué teoría interviene (con la sección del resumen final), la estrategia, el desarrollo y el resultado en
+una caja verde. Todos los cálculos numéricos (redes, Puntos de Función, COCOMO, valor ganado, matrices) se
+verificaron con un script de Python. El script de redes reproduce exactamente la resolución de la cátedra del
+ejercicio 3 del TP3, así que sigue la misma convención. En los ejercicios abiertos (requerimientos, riesgos,
+asignaciones) la respuesta es \emph{una} solución válida: lo que se evalúa es que esté justificada.
+\end{yavisto}
+
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section{Bloque A --- Scrum}
+% =====================================================================
+\subsection*{Ejercicio A1}
+\textbf{Teoría}: resumen final §2 (historias, INVEST, criterios de aceptación, velocity).
+
+\paragraph{a) Descripción.} Es un sistema de \textbf{reservas de un club deportivo}: los socios reservan, cancelan
+y pagan canchas (pádel), reciben recordatorios; los administrativos ven la ocupación; los profesores publican sus
+clases. Los ítems técnicos (migrar la base, backups, corregir duplicados) indican que el sistema ya está en
+producción.
+
+\paragraph{b) Historias de usuario vs.\ ítems técnicos.} Pregunta guía: ¿lo podría haber pedido un usuario sin
+conocimientos técnicos, porque necesita hacer algo nuevo?
+\begin{itemize}
+  \item \textbf{Historias de usuario}: \#1, \#2, \#4, \#6, \#8 y \#9. Siguen el formato ``como [rol], quiero\ldots''
+  y su beneficiario es un usuario (socio, administrativo, profesor).
+  \item \textbf{Ítems del equipo}: \#3 (migrar a PostgreSQL: infraestructura invisible para el usuario), \#5
+  (corregir un error: el usuario ve el efecto, pero el ítem es una acción técnica de diagnóstico y corrección) y
+  \#7 (backups: operación). Están en infinitivo y su beneficiario directo es el sistema.
+\end{itemize}
+
+\paragraph{c) Selección con velocity 21.}
+\begin{center}\small
+\begin{tabular}{@{}c l c c c c c@{}}
+\toprule
+Orden & \# & Valor & Esfuerzo & Ratio & Acumulado & ¿Entra?\\
+\midrule
+1 & 2 cancelar reserva & 5 & 2 & 2,50 & 2 & sí\\
+2 & 1 reservar cancha & 8 & 5 & 1,60 & 7 & sí\\
+3 & 5 corregir duplicados & 4 & 3 & 1,33 & 10 & sí\\
+4 & 6 recordatorio & 3 & 3 & 1,00 & 13 & sí\\
+5 & 4 ocupación semanal & 6 & 8 & 0,75 & 21 & sí\\
+6 & 8 pagar con tarjeta & 7 & 13 & 0,54 & 34 & no\\
+7 & 7 backups & 2 & 5 & 0,40 & 26 & no\\
+7 & 9 horarios de clases & 2 & 5 & 0,40 & 26 & no\\
+9 & 3 migrar a PostgreSQL & 3 & 8 & 0,38 & 29 & no\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{resultado}{Resultado}
+Entran \textbf{\#2, \#1, \#5, \#6 y \#4}, con \textbf{21 puntos}: la capacidad queda usada exactamente. Ningún otro
+ítem cabe.
+\end{resultado}
+\textbf{Discusión}: \#3 (migración) y \#7 (backups) quedaron afuera por su ratio, pero un PO razonable podría
+subir los backups (riesgo de perder datos) aunque su ratio sea bajo: el ratio orienta, no decide. Si se cambiara
+\#4 (8 puntos) por \#7 (5 puntos), sobrarían 3 puntos.
+
+\paragraph{d) Criterios de aceptación.}
+\textbf{\#2 Cancelar reserva}: el socio puede ver sus reservas futuras; puede seleccionar una y cancelarla; si
+faltan menos de X horas para el turno, el sistema informa que no se puede cancelar sin cargo (regla a acordar con
+el PO); si la cancelación es válida, la cancha queda libre para otros socios; luego se muestra la lista de
+reservas actualizada y se confirma la cancelación.
+\textbf{\#6 Recordatorio}: el socio con una reserva recibe un recordatorio el día anterior, con cancha, día y
+hora; si la reserva se canceló, no se envía; si el socio desactivó los recordatorios, no se envía; el
+recordatorio incluye un enlace para cancelar. Patrón: lo que puede hacer el usuario, reglas ``si\ldots
+entonces'', confirmación visible.
+
+\paragraph{e) Agregar \#8 a mitad del sprint.} No se puede: una vez que empieza el sprint \textbf{el alcance
+queda congelado}. El ítem va al Product Backlog y el PO lo prioriza para el próximo sprint (además, con 13
+puntos ni siquiera entraría en la velocity). Si fuera realmente urgente, la única salida en Scrum es cancelar el
+sprint, algo excepcional.
+
+% =====================================================================
+\section{Bloque B --- Requerimientos y riesgos}
+% =====================================================================
+\subsection*{Ejercicio B1: turnos en centros de salud municipales}
+\textbf{Teoría}: resumen final §5 (requerimientos, atributos, soluciones disfrazadas) y §6 (riesgos).
+\textbf{Estrategia}: subrayar el enunciado buscando cifras, plazos, actores, restricciones y faltantes (es lo que
+hace la cátedra en la resolución del caso de salud), y después recorrer las categorías de riesgo de Pressman
+preguntando cuáles aplican.
+
+\paragraph{a) Requerimientos funcionales.}
+\begin{enumerate}[label=F\arabic*]
+  \item El paciente puede solicitar un turno por web o app, eligiendo centro, especialidad, profesional y horario disponible.
+  \item El paciente puede consultar y cancelar sus turnos.
+  \item El administrativo puede otorgar, consultar y cancelar turnos en mostrador.
+  \item El director de cada centro define la agenda semanal de cada profesional.
+  \item El sistema bloquea la agenda por feriados y licencias.
+  \item El sistema valida que el paciente esté en el padrón provincial de beneficiarios antes de otorgar un turno.
+  \item El sistema envía un recordatorio por SMS 48 horas antes del turno.
+  \item El paciente puede anotarse en una lista de espera; cuando se cancela un turno, el sistema lo ofrece al
+  primero de la lista.
+  \item El sistema registra si el paciente asistió (turno usado o perdido).
+  \item El sistema emite un reporte mensual de turnos dados, usados y perdidos por centro y especialidad, con el
+  porcentaje de ausentismo.
+\end{enumerate}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l X X@{}}
+\toprule
+Campo & F1 & F8\\
+\midrule
+categoría & funcional & funcional\\
+descripción & El paciente registrado solicita un turno eligiendo centro, especialidad, profesional, día y
+horario entre los disponibles; el sistema lo reserva y lo muestra. & Si no hay turnos, el paciente se anota en
+la lista de espera de una especialidad y centro; al cancelarse un turno, el sistema se lo ofrece al primero de
+la lista por SMS, con un plazo para aceptarlo.\\
+términos & paciente, turno, agenda, centro, especialidad & lista de espera, oferta de turno, plazo de aceptación\\
+justificación & reducir la espera telefónica de más de 40 minutos & aprovechar los turnos cancelados (25\% de
+ausentismo)\\
+prioridad & alta & media\\
+dependencias & F4 (agenda), F6 (padrón) & F1, F2, F7 (SMS)\\
+factibilidad & existen soluciones maduras de agendas en línea & requiere un proveedor de SMS\\
+verificación & un paciente empadronado reserva un turno libre y el horario deja de estar disponible para otros &
+al cancelar un turno, el primero de la lista recibe la oferta y, si acepta, el turno queda a su nombre\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{b) No funcionales y atributo crítico.} Usabilidad para adultos mayores; tiempo de respuesta;
+disponibilidad (la web y la app deben estar operativas, y los centros rurales deben poder seguir trabajando con
+conectividad irregular); seguridad y confidencialidad de los datos de salud (cumplimiento de la ley de datos
+personales); capacidad (85.000 consultas por año, picos en la campaña de vacunación); restricción de diseño:
+web, app móvil y mostrador; fecha (8 meses) y presupuesto fijo.
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\multicolumn{2}{@{}l}{\textbf{Atributo: tiempo para sacar un turno (usabilidad)}}\\
+\midrule
+Escala & minutos desde que el paciente inicia la solicitud hasta que recibe la confirmación del turno\\
+Test & prueba con 20 pacientes mayores de 65 años sin capacitación, en la app y en la web; se toma el promedio\\
+Peor caso & 10 minutos (por encima, la gente seguiría llamando por teléfono y el sistema no resuelve el problema)\\
+Nivel planificado & 3 minutos\\
+Mejor caso & 1 minuto\\
+Nivel actual & más de 40 minutos de espera telefónica en horas pico (dato de la Secretaría)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Otro atributo crítico válido: ausentismo (\% de turnos perdidos), con nivel actual 25\%, planificado 10\% y peor
+caso 20\%; o disponibilidad del sistema en horario de atención.
+
+\paragraph{c) Solución disfrazada y requerimiento ambiguo.}
+\begin{itemize}
+  \item \textbf{Solución disfrazada}: ``un sistema de turnos como el que usa la ciudad vecina''. Es una solución
+  elegida de antemano. Se pregunta \emph{¿por qué ese?}: probablemente quiere reducir la espera y el ausentismo
+  con algo ya probado. Ese es el requerimiento real; el sistema de la ciudad vecina es una solución candidata
+  (\emph{non-sancta}) que se evalúa contra los atributos (¿consulta el padrón provincial?, ¿funciona con mala
+  conectividad?, ¿cuesta lo que permite el presupuesto?).
+  \item \textbf{Ambiguo}: ``el sistema tiene que ser rápido y fácil de usar''. Mezcla dos atributos sin escala.
+  Hay que separarlos (tiempo de respuesta; tiempo para sacar un turno, tasa de error de los usuarios mayores) y
+  especificarlos con escala, test y niveles, como en b).
+  \item También es una solución el ``recordatorio por SMS'': el requerimiento real es bajar el ausentismo; el SMS
+  es una forma (podría ser WhatsApp o una llamada automática).
+\end{itemize}
+
+\paragraph{d) y e) Lista de comprobación y tabla de riesgos.}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}c X l l c l@{}}
+\toprule
+\# & Riesgo & Categoría & Conductor & Prob. & Impacto\\
+\midrule
+1 & Plazo de 8 meses insuficiente para web, app, SMS, lista de espera e integración & Proceso & Planif.\ ambiciosa & 70\% & 2 crítico\\
+2 & Falta de experiencia del equipo en apps móviles & Plantilla & Tecnología poco familiar & 70\% & 2 crítico\\
+3 & Pérdida de una de las 3 personas por la licencia (y reemplazo no previsto) & Plantilla & Personal no adecuado & 60\% & 2 crítico\\
+4 & Resistencia de los administrativos de los centros & Negocio & --- & 60\% & 2 crítico\\
+5 & Conectividad irregular en los centros rurales & Entorno / tecnología & --- & 60\% & 3 marginal\\
+6 & Baja adopción por pacientes mayores & Negocio & Expectativas poco realistas & 50\% & 1 catastrófico\\
+7 & Presupuesto fijo que vence a fin de año insuficiente & Tamaño / negocio & Subestimación del presupuesto & 50\% & 2 crítico\\
+8 & Dificultades o demoras para integrarse con el padrón provincial & Tecnología & --- & 40\% & 2 crítico\\
+9 & Requerimientos cambiantes (agenda, reglas de cancelación, lista de espera) & Cliente & Req.\ pobremente definidos & 40\% & 3 marginal\\
+10 & Filtración de datos de salud & Tecnología / negocio & --- & 20\% & 1 catastrófico\\
+11 & Pérdida de apoyo político por las elecciones & Negocio & Falta de soporte político & 20\% & 1 catastrófico\\
+12 & Demora del proveedor de SMS o costo mayor al previsto & Entorno & --- & 20\% & 3 marginal\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Justificaciones} (las que se esperan en el examen): (1) el alcance es amplio y el plazo lo impone la
+campaña de vacunación, que no se mueve: 70\%; crítico y no catastrófico porque puede salir una primera versión
+reducida. (2) El enunciado dice que nadie hizo una app: es casi un hecho, pero se puede capacitar o hacer web
+\emph{responsive}. (3) La licencia está prevista: lo incierto es si se consigue reemplazo; con 3 personas, perder
+una es un tercio de la capacidad. (4) Los administrativos ya expresaron temor. (5) Ya existe el problema, pero solo
+afecta a 3 de 12 centros y hay atención en mostrador: marginal. (6) Si los pacientes no lo usan, el problema no se
+resuelve: catastrófico; 50\% porque hay mostrador y la población mayor es grande. (7) El presupuesto es fijo y
+vence: si el proyecto se atrasa, se pierde. (8) Depende de otro organismo. (10) y (11) son graves pero poco
+probables.
+
+\textbf{Ordenamiento y línea de corte}: la tabla ya está ordenada por probabilidad y, a igual probabilidad, por
+impacto (1, 2, 3, 4 tienen 70\% o 60\% y crítico; el 5 va después de los críticos del 60\% por ser marginal; el 6
+va antes que el 7 por ser catastrófico). \textbf{Línea de corte en 50\%}: requieren mayor atención los riesgos 1 a
+7. Casi todos nacen del mismo punto débil: \emph{mucho alcance, poco equipo y una fecha fija}.
+
+\paragraph{f) RSGR de los tres primeros.}
+\begin{itemize}
+  \item \textbf{1. Plazo insuficiente}. \emph{Reducción}: priorizar con el Secretario una primera versión para
+  la campaña (turnos web y mostrador, padrón y recordatorios) y dejar la app y la lista de espera para una
+  segunda; planificación detallada con hitos y una reserva de tiempo. \emph{Supervisión}: reuniones de avance
+  semanales; carta de tendencia de hitos. \emph{Gestión}: usar la reserva; mover funcionalidad a la segunda
+  versión; pedir recursos adicionales.
+  \item \textbf{2. Falta de experiencia en móvil}. \emph{Reducción}: capacitación temprana; empezar por una web
+  \emph{responsive} y hacer una prueba de concepto de la app. \emph{Supervisión}: revisión técnica del prototipo en
+  un hito fijo. \emph{Gestión}: contratar a un desarrollador móvil por tiempo acotado o dejar la app para la
+  segunda versión.
+  \item \textbf{3. Pérdida de personal por la licencia}. \emph{Reducción}: planificar la licencia en el
+  cronograma; documentar en paquetes de trabajo lo que hace esa persona; capacitar a un compañero en sus tareas;
+  pedir el reemplazo con anticipación. \emph{Supervisión}: seguimiento de la documentación y del pedido de
+  reemplazo. \emph{Gestión}: reasignar tareas; incorporar un contratado; renegociar el alcance.
+\end{itemize}
+
+\subsection*{Ejercicio B2: cooperativa frutihortícola}
+\paragraph{a) Requerimientos.} \textbf{Funcionales}: el productor publica semanalmente su mercadería (producto,
+cantidad, precio, fecha de cosecha); el sistema da de baja los productos vencidos según los días de frescura de
+su tipo; el cliente (comercio o particular) arma un pedido y elige día y franja de entrega; el sistema cobra con
+tarjeta a través de la pasarela; el sistema emite la factura electrónica mediante el servicio del organismo
+recaudador; el sistema genera la hoja de ruta diaria de cada repartidor; el repartidor confirma cada entrega
+desde la app; el sistema calcula la liquidación mensual de cada productor (ventas menos comisión); el sistema
+emite un reporte de ventas por producto y por productor. \textbf{No funcionales}: capacidad para triplicar los
+pedidos en diciembre; usabilidad para productores sin experiencia digital; confiabilidad y exactitud de la
+liquidación (hoy genera reclamos); seguridad de los pagos; disponibilidad de la app en ruta (posible mala
+señal); interoperabilidad con la pasarela y con la facturación electrónica.
+
+\paragraph{b) La planilla de Google.} Es una \textbf{solución disfrazada}. Preguntando \emph{¿para qué?} aparece
+el requerimiento real: \emph{que los productores puedan informar su stock disponible de forma simple y que esa
+información se use para vender, armar las entregas y liquidar}. La planilla es una solución posible (barata y
+conocida), pero no da de baja los productos vencidos, no se integra con los pedidos ni con la liquidación y es
+frágil ante errores de carga. Se trata como \emph{non-sancta}: quizás sirva para un primer piloto.
+
+\paragraph{c) Riesgos (tabla ordenada).}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}c X l c l@{}}
+\toprule
+\# & Riesgo & Categoría & Prob. & Impacto\\
+\midrule
+1 & Productores que no cargan el stock o lo cargan mal (baja adopción) & Cliente / negocio & 70\% & 1 catastrófico\\
+2 & Consultora sin conocimiento del dominio cooperativo (requerimientos mal entendidos) & Plantilla & 60\% & 2 crítico\\
+3 & Reglas de liquidación y comisión ambiguas o cambiantes & Cliente & 60\% & 2 crítico\\
+4 & Pérdida del apoyo al terminar el mandato de la presidenta & Negocio & 50\% & 1 catastrófico\\
+5 & El sistema no soporta el pico de diciembre & Tecnología & 40\% & 2 crítico\\
+6 & Demoras o problemas en la integración con la facturación electrónica & Tecnología & 40\% & 2 crítico\\
+7 & Atrasos que impiden rendir los hitos del subsidio & Proceso & 40\% & 2 crítico\\
+8 & Falta de señal en las rutas de reparto & Entorno & 40\% & 3 marginal\\
+9 & Cambios en las comisiones de la pasarela de pagos & Negocio & 30\% & 3 marginal\\
+10 & Fraude o filtración de datos de pago & Tecnología & 10\% & 1 catastrófico\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Línea de corte en 50\%}: riesgos 1 a 4. \textbf{RSGR}:
+\textbf{1. Baja adopción de los productores}. \emph{Reducción}: involucrar a productores en el diseño; pantallas
+muy simples; capacitación presencial; un referente de la cooperativa que cargue por quien no pueda.
+\emph{Supervisión}: porcentaje de productores que cargan stock cada semana, contra lo esperado.
+\emph{Gestión}: carga asistida por la administrativa; rediseño de la carga.
+\textbf{2. Consultora sin conocimiento del dominio}. \emph{Reducción}: rondas de COS con la administrativa y
+productores; prototipos validados; glosario. \emph{Supervisión}: validación de cada entrega con usuarios reales.
+\emph{Gestión}: retrabajo priorizado; incorporar un referente de la cooperativa al equipo.
+
+% =====================================================================
+\subsection*{Ejercicio B3: funcional, no funcional o solución}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}c c X@{}}
+\toprule
+\# & Tipo & Comentario\\
+\midrule
+1 & F & función: está o no está.\\
+2 & NF & atributo con escala (tiempo de respuesta) y condiciones de prueba.\\
+3 & S & ¿por qué Oracle? Si es porque la empresa ya tiene licencias y DBA, el requerimiento real es una
+\emph{restricción de diseño} o de costo; si no, es una solución que limita alternativas.\\
+4 & F & salida con datos derivados (totales).\\
+5 & S $+$ NF & el chatbot es una solución; el requerimiento real es reducir las llamadas (atributo: llamadas por
+día, con nivel actual y planificado).\\
+6 & NF & disponibilidad, con escala.\\
+7 & mezcla & ``generar un manual'' es F; ``fácil de entender'' es NF (legibilidad): hay que separarlos.\\
+8 & NF (restricción de diseño) & limita las soluciones posibles.\\
+9 & F & función.\\
+10 & NF & usabilidad (tiempo de aprendizaje) bien especificada.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\section{Bloque C --- Comparación de soluciones}
+% =====================================================================
+\subsection*{Ejercicio C1}
+\textbf{Teoría}: resumen final §5.4.
+\paragraph{a) Por impacto.} Sumas: S1 $= 60 + 15 + 10 + 35 = 120$; S2 $= 20 + 50 + 40 + 20 = \mathbf{130}$; S3
+$= 30 + 30 + 35 + 25 = 120$. Se elige \textbf{S2}: mayor suma algebraica de impactos. Además es pareja (ninguno
+por debajo de 20), mientras que S1 deja C en 10. Supuesto: los cuatro atributos pesan igual.
+
+\paragraph{b) Atributo determinante.} Se excluye un atributo por vez:
+\begin{center}\small
+\begin{tabular}{lcccl}
+\toprule
+Sin & S1 & S2 & S3 & Preferida\\
+\midrule
+--- & 120 & 130 & 120 & S2\\
+A & 60 & 110 & 90 & S2\\
+B & \textbf{105} & 80 & 90 & \textbf{S1} (cambia)\\
+C & \textbf{110} & 90 & 85 & \textbf{S1} (cambia)\\
+D & 85 & 110 & 95 & S2\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{resultado}{Resultado b}
+Son determinantes \textbf{B y C}: la ventaja de S2 viene de cubrir 50\% de B y 40\% de C. Si se revisara la
+importancia de cualquiera de los dos, ganaría S1.
+\end{resultado}
+
+\paragraph{c) Con costos.} Razón de impactos: S1 $= 120/30 = \mathbf{4{,}00}$; S2 $= 130/50 = 2{,}60$; S3 $=
+120/40 = 3{,}00$. \textbf{Gana S1}: da más calidad por unidad de presupuesto.
+
+\paragraph{d) Peor caso de C.} S1 aporta solo 10\% a C, por debajo del 15\% exigido: produce el \textbf{peor
+caso} y se \textbf{elimina} (paso 3 del proceso). Entre S2 y S3, por razón de impactos gana \textbf{S3} (3,00
+contra 2,60). Si no se consideraran costos, ganaría S2 (130).
+
+\paragraph{e) Como líder de S2.} Legítimo: \textbf{reconsiderar la implementación} (la solución es
+\emph{non-sancta}): bajar su costo (con 130 de impacto: por debajo del 32,5\% del presupuesto su razón supera el 4,00 de S1; en el escenario de d), con S1 descartada, alcanza con bajar del 43,3\% para superar el 3,00 de S3) o mejorar
+A o D sin perjudicar el resto; o mostrar con evidencia (prototipo, medición) que su impacto real es mayor.
+\textbf{Reconsiderar la relevancia de los atributos} solo es válido si se hace con el cliente y la gerencia, a
+partir de los objetivos del POS, y no para acomodar el resultado: el líder de S2 no puede redefinir solo los
+objetivos (los gerentes enuncian el problema; los \emph{problem solvers} buscan soluciones).
+% =====================================================================
+\section{Bloque D --- Estimación}
+% =====================================================================
+\textbf{Teoría}: resumen final §7.3.
+\paragraph{D1 Delphi.} (a) Ordenadas: 9, 12, 13, 14, 15, 16, 22, 30. Con 8 valores, cada cuartil tiene 2: justifican
+los del \textbf{cuartil inferior (9 y 12)} y los del \textbf{superior (22 y 30)}. La técnica lo pide porque en los
+extremos suele estar la información que los demás no tienen (alguien ya hizo algo igual, o alguien ve un problema
+técnico). (b) Promedio de la tercera pasada: $(14 + 15 + 15 + 16 + 17 + 15 + 16 + 18)/8 = 126/8 =
+\mathbf{15{,}75}$ días. (c) Aprovecha el conocimiento del grupo y evita que mande el jefe o el más carismático.
+Planning Poker es su versión ágil: también es grupal y discuten los extremos, pero estima en story points (relativos),
+con cartas Fibonacci y revelación simultánea, y busca el consenso en vez de promediar.
+
+\paragraph{D2 3 puntos.}
+\begin{center}\small
+\begin{tabular}{lcccc}
+\toprule
+Tarea & $E = (O + 4M + P)/6$ & & Rango $P - O$\\
+\midrule
+T1 & $(2 + 16 + 12)/6 = 5$ & & 10\\
+T2 & $(5 + 32 + 17)/6 = 9$ & & 12\\
+T3 & $(1 + 12 + 5)/6 = 3$ & & 4\\
+T4 & $(10 + 48 + 26)/6 = 14$ & & 16\\
+\bottomrule
+\end{tabular}
+\end{center}
+(b) En T1 el pesimista (12) está mucho más lejos del más probable (4) que el optimista (2): la distribución es
+asimétrica y la fórmula ``paga'' el riesgo de que salga mal. (c) La más incierta es \textbf{T4}: es la de mayor
+distancia entre optimista y pesimista (16 días). T3 es simétrica: $E = M$.
+
+\paragraph{D3 banda ancha.} Descartando mínimo y máximo de cada columna: $\bar O = (4 + 3 + 4)/3 = 3{,}67$; $\bar
+M = (6 + 7 + 6)/3 = 6{,}33$; $\bar P = (10 + 12 + 11)/3 = 11$.
+\begin{resultado}{Resultado D3}
+$E = (3{,}67 + 4 \times 6{,}33 + 11)/6 = 40/6 \approx \mathbf{6{,}67}$ días. (Si en lugar de eso se descartara
+solo el valor más extremo de cada columna, quedaría $\bar O = 4$, $\bar M = 6$, $\bar P = 10{,}5$ y $E \approx
+6{,}42$: conviene aclarar en el examen qué criterio se usa.)
+\end{resultado}
+
+\paragraph{D4 duración y esfuerzo.} (a) $96 / (8 \times 1) = \mathbf{12}$ días. (b) Dedicación total $2 \times
+0{,}6 = 1{,}2$: $96 / (8 \times 1{,}2) = \mathbf{10}$ días. (c) $96 / (8 \times 6) = \mathbf{2}$ personas full
+time. (d) Por el \textbf{crash point}: cada persona agregada reduce cada vez menos la duración (coordinación,
+comunicación, capacitación), y además muchas
+tareas no se pueden partir. (e) El costo depende del \textbf{esfuerzo} (96 h-persona, con cualquier
+distribución); la fecha de fin, de la \textbf{duración}.
+
+% =====================================================================
+\section{Bloque E --- Planificación}
+% =====================================================================
+\textbf{Teoría}: resumen final §7.5 y §7.6. Las tablas se calcularon con la convención de la cátedra y se
+verificaron con un script que reproduce su resolución del ejercicio 3 del TP3. En los diagramas, arriba en azul
+CTe y FTe; abajo en rojo CTa y FTa; en rojo las tareas y flechas críticas.
+
+\subsection*{Ejercicio E1}
+\textbf{Estrategia}: ordenar las tareas de modo que cada una venga después de sus predecesoras, ir hacia adelante
+(máximo de los FTe $+1$), después hacia atrás (mínimo de los CTa $-1$), y calcular ventanas y márgenes.
+\begin{center}
+\begin{tikzpicture}[x=1.3cm, y=1.1cm]
+  \tnode[crit]{A}{0,1}{A}{5}{1}{5}{1}{5}
+  \tnode{B}{0,-1}{B}{3}{1}{3}{3}{5}
+  \tnode{C}{2.5,1.6}{C}{4}{6}{9}{8}{11}
+  \tnode[crit]{D}{2.5,0}{D}{6}{6}{11}{6}{11}
+  \tnode{E}{2.5,-1.6}{E}{2}{4}{5}{14}{15}
+  \tnode[crit]{F}{5,0.8}{F}{7}{12}{18}{12}{18}
+  \tnode{G}{5,-1.6}{G}{3}{6}{8}{16}{18}
+  \tnode[crit]{H}{7.5,0}{H}{4}{19}{22}{19}{22}
+  \draw[dep] (A) -- (C.west); \draw[depc] (A) -- (D.west); \draw[dep] (B) -- (D.west); \draw[dep] (B) -- (E.west);
+  \draw[dep] (C) -- (F.west); \draw[depc] (D) -- (F.west); \draw[dep] (E) -- (G);
+  \draw[depc] (F) -- (H.west); \draw[dep] (G) -- (H.west);
+\end{tikzpicture}
+\end{center}
+\begin{center}\small
+\begin{tabular}{ccccccccl}
+\toprule
+Tarea & $d$ & CTe & FTe & CTa & FTa & $V$ & MT & ML\\
+\midrule
+A & 5 & 1 & 5 & 1 & 5 & 5 & 0 & 0\\
+B & 3 & 1 & 3 & 3 & 5 & 5 & 2 & $\min(6, 4) - 3 - 1 = 0$\\
+C & 4 & 6 & 9 & 8 & 11 & 6 & 2 & $12 - 9 - 1 = 2$\\
+D & 6 & $\max(5, 3) + 1 = 6$ & 11 & 6 & 11 & 6 & 0 & 0\\
+E & 2 & 4 & 5 & 14 & 15 & 12 & 10 & $6 - 5 - 1 = 0$\\
+F & 7 & $\max(9, 11) + 1 = 12$ & 18 & 12 & 18 & 7 & 0 & 0\\
+G & 3 & 6 & 8 & 16 & 18 & 13 & 10 & $19 - 8 - 1 = 10$\\
+H & 4 & $\max(18, 8) + 1 = 19$ & 22 & 19 & 22 & 4 & 0 & $23 - 22 - 1 = 0$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Hacia atrás, por ejemplo: FTa(B) $= \min(\text{CTa}_D, \text{CTa}_E) - 1 = \min(6, 14) - 1 = 5$, así que CTa(B) $= 3$.
+\begin{resultado}{Resultado E1}
+Duración: \textbf{22 días}. Camino crítico: \textbf{A -- D -- F -- H} ($5 + 6 + 7 + 4 = 22$). Los otros caminos:
+A--C--F--H y B--D--F--H duran 20; B--E--G--H dura 12.
+\end{resultado}
+Detalle interesante: B tiene MT $= 2$ pero ML $= 0$, porque su sucesora E empieza justo al día siguiente; E tiene
+MT $= 10$ y ML $= 0$ por lo mismo con G: el margen de 10 días lo comparten E y G.
+
+\subsection*{Ejercicio E2}
+Lo nuevo son las CC: la sucesora puede empezar el mismo día que la predecesora (CTe($p$) $\ge$ CTe($q$), sin $+1$).
+\begin{center}\small
+\begin{tabular}{ccccccccl}
+\toprule
+Tarea & $d$ & CTe & FTe & CTa & FTa & $V$ & MT & ML\\
+\midrule
+A & 2 & 1 & 2 & 3 & 4 & 4 & 2 & $5 - 2 - 1 = 2$\\
+B & 4 & 1 & 4 & 1 & 4 & 4 & 0 & 0\\
+C & 6 & $\max(2, 4) + 1 = 5$ & 10 & 5 & 10 & 6 & 0 & 0\\
+D & 5 & CC con B: 1 & 5 & 12 & 16 & 16 & 11 & CC con E: $1 - 1 = 0$\\
+E & 3 & CC con D: 1 & 3 & 12 & 14 & 14 & 11 & $4 - 3 - 1 = 0$\\
+F & 8 & 11 & 18 & 11 & 18 & 8 & 0 & 0\\
+G & 4 & 4 & 7 & 15 & 18 & 15 & 11 & $19 - 7 - 1 = 11$\\
+H & 2 & 19 & 20 & 19 & 20 & 2 & 0 & 0\\
+\bottomrule
+\end{tabular}
+\end{center}
+Hacia atrás con CC: E tiene FTa $= \text{CTa}_G - 1 = 14$ y CTa $= 12$. D no tiene sucesoras FC, así que su FTa
+inicial sería el fin del proyecto (20) y su CTa 16; pero su sucesora E (CC) exige CTa(D) $\le$ CTa(E) $= 12$, así
+que CTa(D) $= 12$ y FTa(D) $= 16$.
+\begin{resultado}{Resultado E2}
+Duración: \textbf{20 días}. Camino crítico: \textbf{B -- C -- F -- H} ($4 + 6 + 8 + 2 = 20$). D y E tienen 11 días de
+margen total pero 0 de margen libre: cada día que se atrasa D empuja a E, y E empuja a G.
+\end{resultado}
+
+\subsection*{Ejercicio E3 (los cuatro tipos de dependencias)}
+\begin{center}
+\begin{tikzpicture}[x=1.18cm, y=1.08cm]
+  \tnode{A}{0,1.6}{A}{4}{1}{4}{6}{9}
+  \tnode[crit]{B}{0,-1.2}{B}{6}{1}{6}{1}{6}
+  \tnode{C}{2.4,1.6}{C}{5}{5}{9}{10}{14}
+  \tnode[crit]{D}{2.4,-1.2}{D}{8}{7}{14}{7}{14}
+  \tnode[crit]{E}{4.8,0.2}{E}{3}{15}{17}{15}{17}
+  \tnode{F}{4.8,-2.8}{F}{4}{7}{10}{19}{22}
+  \tnode{G}{7.2,1.8}{G}{7}{18}{24}{21}{27}
+  \tnode[crit]{I}{7.2,-1.0}{I}{5}{18}{22}{18}{22}
+  \tnode{H}{9.6,3.2}{H}{2}{1}{24}{30}{31}
+  \tnode{L}{9.6,1.2}{L}{4}{25}{28}{28}{31}
+  \tnode{J}{9.6,-0.9}{J}{6}{1}{18}{26}{31}
+  \tnode[crit]{K}{9.6,-2.9}{K}{9}{23}{31}{23}{31}
+  \draw[dep] (A) -- (C);
+  \draw[depc] (B) -- (D);
+  \draw[dep] (C) -- (E.west);
+  \draw[depc] (D) -- (E.west);
+  \draw[dep] (D.south west) |- node[pos=0.75, above, font=\tiny\bfseries, text=ambar]{CC} (F.west);
+  \draw[dep] (E) -- (G.west);
+  \draw[depc] (E) -- (I.west);
+  \draw[dep] (G.east) to[out=0, in=0, looseness=1.6] node[pos=0.5, right, font=\tiny\bfseries, text=ambar]{FF} (H.east);
+  \draw[dep] (G) -- (L.west);
+  \draw[dep] (I.west) -- ++(-0.3,0) |- (6.9,0.05) -| node[pos=0.25, above, font=\tiny\bfseries, text=ambar]{CF} ([xshift=5mm]J.east) -- (J.east);
+  \draw[depc] (I) -- (K.west);
+  \draw[dep] (F) -- (K.west);
+\end{tikzpicture}
+\end{center}
+Las flechas rotuladas salen del extremo de la predecesora que manda: la CC del comienzo de D, la FF del fin de G al
+fin de H, la CF del comienzo de I al fin de J.
+
+\paragraph{Planificación temprana.} A y B empiezan el día 1. C $=$ FTe(A) $+ 1 = 5$; D $=$ FTe(B) $+ 1 = 7$; E $=
+\max(9, 14) + 1 = 15$ (manda D); F, CC con D: CTe $=$ CTe(D) $= 7$; G $=$ FTe(E) $+ 1 = 18$; I $= 18$; K $= \max(10,
+22) + 1 = 23$; L $= 24 + 1 = 25$. \textbf{H (FF con G)}: nada restringe su comienzo, CTe $= 1$, FTe $= \max(1 + 2 -
+1, \text{FTe}_G) = \max(2, 24) = 24$. \textbf{J (CF con I)}: CTe $= 1$, FTe $= \max(1 + 6 - 1, \text{CTe}_I) =
+\max(6, 18) = 18$. El mayor FTe es el de K: \textbf{fin del proyecto día 31}.
+
+\paragraph{Planificación tardía.} Sin sucesoras (H, J, K, L): FTa $= 31$. I: por K (FC) $23 - 1 = 22$; por J (CF)
+CTa(I) $\le$ FTa(J) $= 31$, no restringe: FTa $= 22$, CTa $= 18$. G: por L $28 - 1 = 27$; por H (FF) FTa(G) $\le
+31$, no restringe: FTa $= 27$, CTa $= 21$. F: por K $23 - 1 = 22$, CTa $= 19$. E: $\min(21, 18) - 1 = 17$, CTa
+$= 15$. D: por E $15 - 1 = 14$; por F (CC) CTa(D) $\le$ CTa(F) $= 19$, no restringe: CTa $= 7$. C: $15 - 1 =
+14$, CTa $= 10$. B: $7 - 1 = 6$, CTa $= 1$. A: $10 - 1 = 9$, CTa $= 6$.
+
+\begin{center}\small
+\begin{tabular}{cccccccccl}
+\toprule
+Tarea & $d$ & CTe & FTe & CTa & FTa & $V$ & MT $= V - d$ & ML & cálculo del ML\\
+\midrule
+A & 4 & 1 & 4 & 6 & 9 & 9 & 5 & 0 & $5 - 4 - 1$\\
+B & 6 & 1 & 6 & 1 & 6 & 6 & 0 & 0 & $7 - 6 - 1$\\
+C & 5 & 5 & 9 & 10 & 14 & 10 & 5 & 5 & $15 - 9 - 1$\\
+D & 8 & 7 & 14 & 7 & 14 & 8 & 0 & 0 & $\min(15 - 14 - 1;\ \text{CC: } 7 - 7)$\\
+E & 3 & 15 & 17 & 15 & 17 & 3 & 0 & 0 & $18 - 17 - 1$\\
+F & 4 & 7 & 10 & 19 & 22 & 16 & 12 & 12 & $23 - 10 - 1$\\
+G & 7 & 18 & 24 & 21 & 27 & 10 & 3 & 0 & $\min(\text{FF: } 24 - 24;\ 25 - 24 - 1)$\\
+H & 2 & 1 & 24 & 30 & 31 & 31 & \textbf{29} & 7 & $32 - 24 - 1$\\
+I & 5 & 18 & 22 & 18 & 22 & 5 & 0 & 0 & $\min(\text{CF: } 18 - 18;\ 23 - 22 - 1)$\\
+J & 6 & 1 & 18 & 26 & 31 & 31 & \textbf{25} & 13 & $32 - 18 - 1$\\
+K & 9 & 23 & 31 & 23 & 31 & 9 & 0 & 0 & $32 - 31 - 1$\\
+L & 4 & 25 & 28 & 28 & 31 & 7 & 3 & 3 & $32 - 28 - 1$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{resultado}{Resultado E3}
+Duración: \textbf{31 días}. Camino crítico: \textbf{B -- D -- E -- I -- K} ($6 + 8 + 3 + 5 + 9 = 31$), las tareas con
+MT $= 0$ y temprana igual a tardía. Caminos que lo siguen: B--D--E--G--L $= 28$ (3 de margen) y A--C--E--I--K $=
+26$.
+\end{resultado}
+\begin{aviso}{Igual que en la resolución de la cátedra}
+En H y J el margen total \textbf{no} es FTa $-$ FTe ($31 - 24 = 7$ y $31 - 18 = 13$) sino $V - d$ ($29$ y $25$),
+porque su CTe quedó en 1 y su FTe fue empujado por la FF y la CF. FTa $-$ FTe coincide, en cambio, con su margen
+libre. Con la otra convención (la de MS Project: si se empuja el fin, se corre toda la tarea), H tendría CTe $=
+23$ y MT $= 7$, y J CTe $= 13$ y MT $= 13$; el camino crítico y la duración no cambian.
+\end{aviso}
+
+\subsection*{Ejercicio E4: atrasos y compresión}
+\begin{itemize}
+  \item \textbf{D se atrasa 2 días}: D es crítica (MT $= 0$): el proyecto se atrasa 2 días y termina el día 24.
+  \item \textbf{G se atrasa 8 días}: MT(G) $= 10$: el proyecto no se atrasa (G pasa a terminar el 16, antes de su FTa 18).
+  \item \textbf{C se atrasa 3 días}: MT(C) $= 2$: se consumen 2 días de margen y el tercero atrasa el proyecto
+  \textbf{1 día} (termina el 23). Ahora A--C--F--H dura 23 y pasa a ser el camino crítico.
+  \item \textbf{E se atrasa 1 día}: ML(E) $= 0$, así que se atrasa el comienzo temprano de \textbf{G} (pasa del 6 al
+  7); el proyecto no se atrasa porque E tiene MT $= 10$, que comparte con G.
+  \item \textbf{Terminar en 20 días}: hay que acortar 2 días el camino crítico A--D--F--H. Pero A--C--F--H y
+  B--D--F--H duran 20, así que conviene comprimir una tarea común a todos: \textbf{F} (o H). Opciones:
+  agregar recursos a F (si no llegó a su crash point; cuesta dinero) o que F empiece con entregables parciales
+  de D (FC $\to$ CC con lag; sube el riesgo de retrabajo). Acortando F en 2 días
+  hay tres caminos críticos de 20 días: el proyecto queda más frágil.
+\end{itemize}
+
+% =====================================================================
+\section{Bloque F --- Puntos de Función y COCOMO}
+% =====================================================================
+\textbf{Teoría}: resumen final §8.
+\subsection*{Ejercicio F1}
+\paragraph{a) PFNA.}
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+ & S4 & S5 & S6\\
+\midrule
+EE & $6 \times 3 = 18$ & $5 \times 4 + 2 \times 6 = 32$ & $8 \times 3 = 24$\\
+SE & $5 \times 5 = 25$ & $4 \times 7 = 28$ & $3 \times 4 + 3 \times 7 = 33$\\
+CE & $3 \times 3 + 2 \times 4 = 17$ & $6 \times 4 = 24$ & $5 \times 3 = 15$\\
+AI & $4 \times 10 = 40$ & $2 \times 10 + 3 \times 15 = 65$ & $2 \times 7 = 14$\\
+AE & $1 \times 5 = 5$ & $2 \times 7 = 14$ & $3 \times 10 = 30$\\
+\midrule
+\textbf{PFNA} & \textbf{105} & \textbf{163} & \textbf{116}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\paragraph{b) FCT y PFA.} Se despliegan los rangos y se verifica que haya 14 factores:
+\begin{center}\small
+\begin{tabular}{l*{14}{c}c}
+\toprule
+ & F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8 & F9 & F10 & F11 & F12 & F13 & F14 & TI\\
+\midrule
+S4 & 2 & 0 & 3 & 3 & 3 & 3 & 4 & 4 & 5 & 1 & 2 & 3 & 0 & 4 & 37\\
+S5 & 3 & 3 & 4 & 4 & 4 & 4 & 4 & 5 & 5 & 3 & 1 & 2 & 1 & 5 & 48\\
+S6 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 4 & 4 & 4 & 5 & 5 & 30\\
+\bottomrule
+\end{tabular}
+\end{center}
+Control por grupos: S4 $= 0 \cdot 2 + 1 \cdot 1 + 2 \cdot 2 + 3 \cdot 5 + 4 \cdot 3 + 5 \cdot 1 = 37$ (con $2 + 1 + 2 + 5 +
+3 + 1 = 14$ factores); S5 $= 1 \cdot 2 + 2 \cdot 1 + 3 \cdot 3 + 4 \cdot 5 + 5 \cdot 3 = 48$; S6 $= 2 \cdot 4 + 4 \cdot 3 + 5
+\cdot 2 = 30$.
+\begin{resultado}{Resultado F1}
+\begin{tabular}{lcccc}
+ & PFNA & TI & FCT & PFA\\
+S4 & 105 & 37 & $0{,}65 + 0{,}37 = 1{,}02$ & $105 \times 1{,}02 = \mathbf{107{,}10}$\\
+S5 & 163 & 48 & 1,13 & $163 \times 1{,}13 = \mathbf{184{,}19}$\\
+S6 & 116 & 30 & 0,95 & $116 \times 0{,}95 = \mathbf{110{,}20}$\\
+\end{tabular}
+\end{resultado}
+(c) S6 tiene TI $= 30 < 35$: su entorno técnico es menos exigente que el promedio, así que el FCT es menor que 1 y
+los PF bajan un 5\%. Con \textbf{TI $= 35$} (FCT $= 1$) los PFA son iguales a los PFNA. S6 tiene menos componentes
+que S4, pero más PF, por sus 3 archivos externos complejos (30 puntos).
+
+\subsection*{Ejercicio F2: contar desde la especificación}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l c c c X@{}}
+\toprule
+Componente & Tipo & Compl. & Peso & Por qué\\
+\midrule
+Alta, modificación y baja de socios & 3 EE & simple & $3 \times 3 = 9$ & ingresan datos y mantienen el archivo de socios; cada operación cuenta\\
+Registrar préstamo & EE & promedio & 4 & mantiene préstamos\\
+Registrar devolución & EE & promedio & 4 & actualiza el préstamo\\
+Comprobante de multa & SE & simple & 4 & tiene un dato \emph{derivado} (monto calculado)\\
+Reporte mensual por categoría & SE & promedio & 5 & tiene totales\\
+Consultar catálogo & CE & simple & 3 & muestra datos tal cual, sin modificar\\
+Ficha del socio & CE & simple & 3 & ídem\\
+Socios, Préstamos & 2 AI & simple & $2 \times 7 = 14$ & los mantiene el sistema\\
+Libros y ejemplares & AI & promedio & 10 & ídem\\
+Padrón de alumnos & AE & simple & 5 & lo mantiene el sistema académico; el nuestro solo lo lee\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{resultado}{Resultado F2}
+PFNA $= 17 + 9 + 6 + 24 + 5 = \mathbf{61}$; con TI $= 40$, FCT $= 1{,}05$ y \textbf{PFA $= 64{,}05$}.
+\end{resultado}
+Casos dudosos: el comprobante de multa parece una consulta, pero calcula un monto: es salida. El padrón está en
+la universidad, pero no lo mantiene nuestro sistema: es externo.
+
+\subsection*{Ejercicio F3: COCOMO básico}
+(a) $S = 120 \times 128 / 1000 = \mathbf{15{,}36}$ KLOC.
+\begin{center}\small
+\begin{tabular}{lcccc}
+\toprule
+Modo & $S^b$ & $E = a S^b$ (PM) & $D = 2{,}5 E^d$ (meses) & $P = E/D$\\
+\midrule
+Orgánico ($2{,}4$; $1{,}05$; $0{,}38$) & 17,61 & \textbf{42,3} & \textbf{10,4} & 4,1\\
+Semi-embebido ($3{,}0$; $1{,}12$; $0{,}35$) & 21,32 & 64,0 & 10,7 & 6,0\\
+Embebido ($3{,}6$; $1{,}20$; $0{,}32$) & 26,53 & \textbf{95,5} & \textbf{10,8} & 8,9\\
+\bottomrule
+\end{tabular}
+\end{center}
+(c) Del orgánico al embebido el esfuerzo se multiplica por 2,26 y la duración apenas un 4\%: el sistema embebido
+no tarda mucho más, pero necesita más del doble de gente en paralelo ($d < 1$, y $d$ baja de 0,38 a 0,32). (d)
+Liquidación de sueldos: \textbf{orgánico} (procesamiento de datos, requisitos negociables). Semáforos:
+\textbf{embebido} (tiempo real, integrado con hardware, restricciones rígidas).
+
+\subsection*{Ejercicio F4: COCOMO intermedio}
+EAF $= 1{,}15 \times 1{,}30 \times 0{,}86 \times 1{,}07 \times 0{,}91 \times 1{,}23 = \mathbf{1{,}540}$. Esfuerzo
+nominal intermedio: $3{,}2 \times 15{,}36^{1{,}05} = 56{,}35$ PM.
+\begin{resultado}{Resultado F4}
+$E = 56{,}35 \times 1{,}540 = \mathbf{86{,}8}$ personas-mes; $D = 2{,}5 \times 86{,}8^{0{,}38} = \mathbf{13{,}6}$
+meses; unas 6,4 personas.
+\end{resultado}
+(b) Aumentan: RELY alta, CPLX muy alta (producto más exigente), LEXP baja (poca experiencia en el lenguaje) y SCED
+muy baja. Reducen: ACAP alta (analistas capaces) y TOOL alta (buenas herramientas). SCED ``muy baja'' significa
+un cronograma \emph{apretado} respecto del nominal: comprimir el plazo exige más gente y coordinación, y por eso
+cuesta más esfuerzo (sin SCED, EAF $= 1{,}25$ y $E \approx 70{,}5$ PM).
+
+\subsection*{Ejercicio F5: puntos objeto}
+PO $= 8 \cdot 1 + 4 \cdot 2 + 2 \cdot 3 + 3 \cdot 2 + 2 \cdot 5 + 1 \cdot 8 + 3 \cdot 10 = 8 + 8 + 6 + 6 + 10 + 8 + 30
+= \mathbf{76}$. NPO $= 76 \times 75/100 = \mathbf{57}$. Con PROD nominal (13): PM $= 57/13 \approx
+\mathbf{4{,}4}$ personas-mes; con productividad baja (7): $57/7 \approx 8{,}1$.
+
+% =====================================================================
+\section{Bloque G --- Lanzamiento}
+% =====================================================================
+\textbf{Teoría}: resumen final §9.
+\subsection*{Ejercicio G1: matriz persona/perfil}
+\begin{center}\small
+\begin{tabular}{l*{6}{c}r}
+\toprule
+Persona & Analista & DBA & Backend & Frontend & UX & Tester & \$/sem\\
+\midrule
+Ana Torres & \textcolor{critrojo}{\checkmark} & & & & & & 9.000\\
+Bruno Díaz & & & \checkmark & & & & 11.000\\
+Carla Gómez & & & \checkmark & & & & 10.500\\
+Gabriela Sosa & & \textcolor{critrojo}{\checkmark} & \checkmark & & & & 12.000\\
+Diego Paz & & & & \checkmark & & & 10.000\\
+Hugo Vera & & & & \checkmark & \textcolor{critrojo}{\checkmark} & & 9.500\\
+Elena Ruiz & & & & & & \checkmark & 7.500\\
+Federico Lima & & & & & & \checkmark & 8.000\\
+\midrule
+Personas por perfil & \textbf{1} & \textbf{1} & 3 & 2 & \textbf{1} & 2 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+\paragraph{b) Críticos.} \textbf{Ana} (única analista), \textbf{Gabriela} (única DBA) y \textbf{Hugo} (único UX): si
+faltan, A1, A2 o A5 se detienen y no hay quién los reemplace. Matiz: como A4 y A5 se hacen en paralelo y Hugo tiene
+que hacer A5, durante ese período \textbf{Diego} es el único frontend disponible: también es crítico en esas
+semanas. Gabriela, Bruno y Carla no son críticos como backend (hay tres), pero Gabriela es la única DBA.
+
+\paragraph{c) Asignación al menor costo.}
+\begin{center}\small
+\begin{tabular}{llll r}
+\toprule
+Actividad & Perfil & Candidatos & Asignado & \$/sem\\
+\midrule
+A1 relevamiento & analista & Ana & Ana & 9.000\\
+A2 diseño de BD & DBA & Gabriela & Gabriela & 12.000\\
+A3 API de turnos & backend & Bruno, Carla, Gabriela & Carla & 10.500\\
+A7 notificaciones (paralela a A3) & backend & Bruno, Gabriela & Bruno & 11.000\\
+A4 pantallas & frontend & Diego, Hugo & Diego (Hugo está en A5) & 10.000\\
+A5 prototipos UX & UX & Hugo & Hugo & 9.500\\
+A6 pruebas & tester & Elena, Federico & Elena & 7.500\\
+\midrule
+ & & & \textbf{Total} & \textbf{69.500}\\
+\bottomrule
+\end{tabular}
+\end{center}
+Para A3 y A7 hacen falta dos backend a la vez: se eligen los dos más baratos (Carla y Bruno) y Gabriela queda para
+su perfil crítico. Para A4, Hugo es más barato que Diego, pero no puede hacer A4 y A5 al mismo tiempo.
+\paragraph{d)} Paquetes de trabajo bien escritos de Ana, Gabriela y Hugo (el seguro ante su ausencia); capacitar a
+otro (por ejemplo, Carla en bases de datos, Diego en UX); no asignarles tareas simultáneas; identificar de antemano
+a quién contratar; tratarlo como un riesgo en el plan RSGR.
+
+\subsection*{Ejercicio G2: asignación de horas (una solución válida)}
+\begin{center}\small
+\begin{tabular}{l*{5}{c}c}
+\toprule
+Tarea (semanas) & Laura & Martín & Sofía & Tomás & Rocío & Total\\
+\midrule
+T1 Gestión (1--8) & 64 & & & & & 64\\
+T2 Relevamiento (1--2) & & 40 & & & 10 & 50\\
+T3 Diseño (2--3) & & 20 & 30 & & & 50\\
+T4 Inscripciones (3--6) & & 120 & & & & 120\\
+T5 Reportes (3--6) & & & 100 & & & 100\\
+T6 Pruebas (6--7) & & & & 60 & 10 & 70\\
+T7 Capacitación (8) & & 30 & & & 8 & 38\\
+\midrule
+Total & 64 & 210 & 130 & 60 & 28 & 492\\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Carga semanal} (horas repartidas en forma pareja en la ventana de cada tarea): Laura 8 h todas las semanas;
+Martín 20, 30, 40, 30, 30, 30, 0, 30; Sofía 0, 15, 40, 25, 25, 25, 0, 0; Tomás 30 en las semanas 6 y 7; Rocío 5,
+5, 0, 0, 0, 5, 5, 8. \textbf{Nadie supera 40 h} (ni Rocío sus 10 h). La trampa: si Martín hacía solo el diseño, en
+la semana 2 sumaba $20 + 25 = 45$ h. Se resolvió repartiendo T3 con Sofía (nivelación).
+\textbf{Martín} (aspirante a LP) hace el relevamiento, parte del diseño y la capacitación: tareas de contacto con
+el cliente y de visión global, que lo preparan para liderar (crecimiento individual); además es el respaldo de
+Laura. Laura no programa: con 4 personas a cargo, gestiona y queda libre para imprevistos.
+
+\subsection*{Ejercicio G3: pedido de cambio}
+(a) El cliente lo pide \textbf{por escrito}; se abre una \textbf{ronda de COS} para entenderlo (¿qué medios de pago,
+qué pasarela?); se revisa el pedido (se acepta para análisis); el equipo hace el \textbf{análisis de impacto} con
+alternativas; el cliente elige; se actualiza el plan. (b) Alternativas: \emph{extender el cronograma 3 semanas}
+(resultado 2: extensión); \emph{sumar un desarrollador contratado sin mover la fecha} (resultado 3: recursos
+adicionales); \emph{mantener plazo y equipo y sacar otra funcionalidad de menor prioridad, que pasa a una segunda
+versión} (resultado 5: revisión completa de los entregables). (c) \textbf{El cliente}: controla el alcance; el LP
+le muestra el precio de cada alternativa.
+
+\subsection*{Ejercicio G4: organización}
+(a) La estructura I no sirve porque un LP no puede supervisar a más de 5 programadores. Con 12, la
+\textbf{estructura II}: el LP coordina a 2 o 3 líderes de equipo, cada uno con 4 a 6 programadores (o la III, con
+programadores senior a cargo de subgrupos). (b) El problema de la matricial: la persona tiene \textbf{dos jefes};
+el gerente de línea es el permanente y su opinión suele pesar más que la del gerente de proyecto, que es temporario.
+Funciona bien solo si ambos tienen igual autoridad. (c) Es \textbf{equipo contratado}: el tiempo del contrato no
+varía (si la tarea se atrasa, se pierde el recurso), tiene que aprender el proyecto, su compromiso y la calidad
+pueden ser un problema y requiere más supervisión.
+
+% =====================================================================
+\section{Bloque H --- Monitoreo y calidad}
+% =====================================================================
+\subsection*{Ejercicio H1: valor ganado}
+(a) EV $= 20.000 + 15.000 + 25.000 = \mathbf{60.000}$ (regla 0/100: solo lo terminado).
+(b) $SV = 60 - 70 = \mathbf{-10}$ mil; $SPI = 60/70 = \mathbf{0{,}857}$: va \textbf{atrasado} (hizo el 86\% de lo
+planeado). $CV = 60 - 68 = \mathbf{-8}$ mil; $CPI = 60/68 = \mathbf{0{,}882}$: \textbf{sobrecosto} (cada peso
+gastado produce 88 centavos de trabajo). Mirando solo PV y AC (70 contra 68) parecía ir bien.
+(c) Contando T4 al 50\%, EV $= 70$: SPI $= 1$ y CPI $= 1{,}03$; el proyecto parecería al día y por debajo del costo.
+Es la puerta del \emph{hope creep}: el ``50\%'' lo informa quien hace la tarea y suele ser optimista; contar solo
+lo terminado es objetivo y verificable.
+
+\subsection*{Ejercicio H2: carta de tendencia de hitos}
+\textbf{P1}: después del 0, los hitos salen cada vez más tarde ($-2, -3, -5, -6$): \textbf{cuatro retrasos
+sucesivos}: el proyecto se está yendo de control; hace falta una acción correctiva. \textbf{P2}: siete hitos
+seguidos del mismo lado de la línea: \textbf{corridas sucesivas}: un cambio permanente en el cronograma
+(tendencia), hay que replanificar. \textbf{P3}: un salto de $-1$ a $+8$: \textbf{cambio radical}: hay que
+\textbf{renegociar el cronograma}.
+
+\subsection*{Ejercicio H3: densidad y spoilage}
+(a) A $= 30/12 = 2{,}5$; B $= 22/4 = \mathbf{5{,}5}$; C $= 18/20 = 0{,}9$ defectos/KLOC; sistema $= 70/36 \approx 1{,}94$.
+Se revisa \textbf{B} (más del doble que A, aunque tenga menos defectos en número absoluto). (b) Spoilage $= 480/3.200 =
+\mathbf{0{,}15}$: el 15\% del esfuerzo de desarrollo se fue en corregir fallas. (c) Defectos \emph{conocidos} no
+son defectos \emph{existentes}: C puede tener pocos defectos porque se probó o se usó poco; además depende de cómo se
+cuentan las LOC (si C tiene mucho código generado o verboso, su densidad baja artificialmente). Hay que comparar con
+las mismas reglas y la misma ventana de uso.
+
+\subsection*{Ejercicio H4: grafo del equipo}
+$n = 6$; aristas: LP--A, LP--B, LP--C, LP--D, A--B, B--C, C--D, D--E: $e = 8$. Densidad $= 8/(6 \cdot 5/2) = 8/15
+\approx 0{,}53$. Niveles individuales (grados): LP 4, A 2, B 3, C 3, D 3, E 1 (suma 16 $= 2e$). Promedio $= 16/6
+\approx 2{,}67$. \textbf{Interpretación}: el LP concentra la comunicación (cuello de botella); E depende solo de
+D: si D falta, E queda aislado. Agregar un canal E--LP o E--C reduciría ese riesgo.
+
+\subsection*{Ejercicio H5: índice Fog}
+Oraciones: 3. Palabras: $7 + 8 + 9 = 24$. Palabras de 3 o más sílabas: \emph{e-qui-po, en-tre-ga, sis-te-ma} (1.ª
+oración); \emph{u-sua-rios, pan-ta-lla, du-ran-te, se-ma-na} (2.ª); \emph{pro-yec-to, a-prue-ba} (3.ª): 9 (no
+cuentan \emph{marzo, prueban, cada, después, líder, versión, final}, de 2 sílabas).
+\[ \text{Fog} = 0{,}4 \times \left(\frac{24}{3} + 100 \times \frac{9}{24}\right) = 0{,}4 \times (8 + 37{,}5) = \mathbf{18{,}2} \]
+En la escala inglesa sería nivel de posgrado, pero el texto es simple: en castellano las palabras tienen más sílabas
+y el Fog \textbf{infla} el resultado. Sirve para comparar versiones de un mismo texto, no como valor absoluto.
+
+\subsection*{Ejercicio H6: riesgo de auditoría}
+(a) $RD = RA/(RI \times RC) = 0{,}04/(0{,}8 \times 0{,}25) = \mathbf{0{,}20}$. (b) Con $RC = 0{,}5$: $RD =
+0{,}04/0{,}4 = \mathbf{0{,}10}$. El auditor no controla RI ni RC; si los controles son peores, tiene que bajar su
+riesgo de detección haciendo \textbf{más pruebas sustantivas} (muestras más grandes, más detalle).
+
+\subsection*{Ejercicio H7: clasificaciones}
+(a) (1) correctivo; (2) adaptativo; (3) perfectivo; (4) preventivo. (b) (1) preventivo (separación de funciones);
+(2) detectivo (totales de control); (3) correctivo; (4) detectivo. (c) (1) abuso de privilegios; (2) acceso físico
+ilegal; (3) virus y código malicioso; (4) hacking. (d) (1) portabilidad (transición); (2) mantenibilidad o
+flexibilidad (revisión); (3) integridad (operación).
+
+% =====================================================================
+\section{Bloque I --- Dónde se responde cada pregunta conceptual}
+% =====================================================================
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}c X l@{}}
+\toprule
+\# & Tema & Resumen final\\
+\midrule
+1--2 & Proyecto, parámetros, etapas, clasificación & §3\\
+3--4 & POS, meta/objetivo/criterio, FCE, COS & §4\\
+5 & Riesgos: clasificaciones, checklist, conductores, RSGR, herramientas & §6\\
+6 & Funcional, no funcional, solución; atributos & §5\\
+7--12 & Actividad y tarea, crash point, estimación, WBS, diagramas, dependencias, planificaciones & §7\\
+13--14 & Especificación, PF, COCOMO, COCOMO II & §8\\
+15--16 & Organización del equipo, kick-off, cambios de alcance & §9\\
+17--19 & Atributos externos, densidad, Fenton, McCall, defectos, mantenimiento, productividad & §11.1--11.2\\
+20 & ISO & §11.3\\
+21 & CMM y CMMI & §11.4\\
+22 & Auditoría & §11.5\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Para practicar estas preguntas en formato de opción múltiple, usá el quiz (\texttt{examen/quiz/index.html}).
+
+\end{document}
