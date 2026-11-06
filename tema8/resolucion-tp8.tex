@@ -1,0 +1,1133 @@
+\documentclass[11pt,a4paper]{article}
+\input{../plantilla/preambulo}
+
+\title{\vspace{-1.5cm}\textbf{Trabajo Práctico 8 --- Resolución}\\[3pt]
+\large Programación Lógica Rebatible (DeLP)}
+\author{\normalsize Inteligencia Artificial --- UNS --- 2026}
+\date{}
+
+% Estilos TikZ comunes a este TP.
+\tikzset{
+  caja/.style={draw=gris, thick, rounded corners=3pt, fill=fondogris, align=center, font=\small, inner sep=4pt},
+  cajaazul/.style={caja, fill=fondoazul, draw=azul},
+  cajaambar/.style={caja, fill=fondoambar, draw=ambar},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick, draw=azul},
+  % Reglas en los grafos: estricta (llena) y rebatible (punteada).
+  estricta/.style={-{Stealth[length=2.2mm]}, thick, draw=azul},
+  rebatible/.style={-{Stealth[length=2.2mm]}, thick, dashed, draw=ambar},
+  conflicto/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick, draw=red!70!black},
+  lit/.style={draw=gris, rounded corners=2pt, fill=white, font=\small\ttfamily, inner sep=3pt},
+}
+
+% Notación DeLP.
+\newcommand{\nf}{\textasciitilde}                 % negación fuerte en texto
+\newcommand{\reb}{\mathrel{-\!\!\!\prec}}         % regla rebatible  L0 -< L1,...,Ln
+\newcommand{\est}{\leftarrow}                      % regla estricta   L0 <- L1,...,Ln
+% Regla en el texto: \regla{cabeza}{flecha}{cuerpo}
+\newcommand{\regla}[3]{\text{\texttt{#1}}~\ensuremath{#2}~\text{\texttt{#3}}}
+% Programa P2 (ejercicios 2 y 3).
+\newcommand{\programaPdos}{%
+\[
+\Pi_2 = \left\{\begin{array}{l}
+\mathit{asustada(tina)} \\
+\mathit{gallina(tina)} \\
+\mathit{gallina(peluche)} \\
+\sim\mathit{vuela(peluche)} \\
+\mathit{ave(X)} \est \mathit{gallina(X)}
+\end{array}\right\}
+\qquad
+\Delta_2 = \left\{\begin{array}{l}
+\mathit{vuela(X)} \reb \mathit{ave(X)} \\
+\sim\mathit{vuela(X)} \reb \mathit{gallina(X)} \\
+\mathit{vuela(X)} \reb \mathit{gallina(X), asustada(X)} \\
+\mathit{anida\_en\_ramas\_altas(X)} \reb \mathit{vuela(X)}
+\end{array}\right\}
+\]}
+% Reglas de P2 con nombre (ejercicios 2 y 3).
+\newcommand{\reglasPdos}{%
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{\qquad}ll@{}}
+E1: & \regla{ave(X)}{\est}{gallina(X)} & R2: & \regla{\nf vuela(X)}{\reb}{gallina(X)} \\
+R1: & \regla{vuela(X)}{\reb}{ave(X)} & R3: & \regla{vuela(X)}{\reb}{gallina(X), asustada(X)} \\
+ & & R4: & \regla{anida\_en\_ramas\_altas(X)}{\reb}{vuela(X)} \\
+\end{tabular}
+\end{center}}
+\newcommand{\fuentesweb}[1]{\footnote{\raggedright #1.}}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+\notafuentes
+
+%======================================================================
+\section*{Ejercicio 1: Conceptos básicos}
+
+%----------------------------------------------------------------------
+\subsection*{a)}
+
+\begin{enunciado}{Consigna}
+¿Qué es un programa lógico rebatible?
+\end{enunciado}
+
+Un \textbf{programa lógico rebatible} (PLR) es un par $(\Pi, \Delta)$ (o el conjunto $\Pi \cup \Delta$) formado por:\fuentes{Cátedra, Episodio X, parte 2, «Reglas rebatibles (defeasible rules)» y «Hechos (facts)»}
+\begin{itemize}
+  \item $\Pi$: un conjunto de \textbf{hechos} y \textbf{reglas estrictas}.
+  \begin{itemize}
+    \item \textit{Hecho}: un literal fijo (sin variables).
+    \item \textit{Regla estricta} $L_0 \est L_1, \dots, L_n$: información \textbf{segura}.
+  \end{itemize}
+  \item $\Delta$: un conjunto de \textbf{reglas rebatibles} $L_0 \reb L_1, \dots, L_n$: información \textbf{tentativa}.
+\end{itemize}
+Un \textbf{literal} es un átomo $p(T_1,\dots,T_n)$ o un átomo negado ${\sim}p(T_1,\dots,T_n)$, donde ``\nf'' es la \textbf{negación fuerte}.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+  \node[cajaazul, minimum width=4.6cm, minimum height=2.3cm, text width=4.3cm] (pi) at (0,0)
+    {\textbf{$\Pi$}: información segura\\[3pt]
+     \footnotesize hechos: \texttt{de\_noche.}\\
+     \footnotesize estrictas: \regla{\nf encendida}{\est}{apagada}};
+  \node[cajaambar, minimum width=4.6cm, minimum height=2.3cm, text width=4.3cm] (de) at (5.6,0)
+    {\textbf{$\Delta$}: información tentativa\\[3pt]
+     \footnotesize rebatibles: \regla{\nf hay\_luz}{\reb}{de\_noche}};
+  \node[font=\Large] at (2.8,0) {$\cup$};
+  \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick, gris] (-2.3,-1.3) -- (7.9,-1.3)
+    node[midway, below=7pt, font=\small\bfseries, text=azul] {programa lógico rebatible $(\Pi, \Delta)$};
+\end{tikzpicture}
+\caption{Componentes de un PLR (con reglas del inciso d como ejemplo).}
+\end{figure}
+
+\begin{extras}
+\begin{itemize}
+  \item DeLP provee un \textbf{lenguaje de representación de conocimiento} que permite representar información \textbf{tentativa} y \textbf{potencialmente en conflicto}. Ante una consulta, su mecanismo de inferencia construye y evalúa \textbf{todos} los argumentos relacionados con ella (a favor y en contra).\catedra{Episodio X, parte 2}{Defeasible Logic Programing (DeLP)}
+  \item \textbf{Variables}: las mayúsculas en los literales denotan variables; una regla con variables es un \textbf{esquema de reglas}. Los hechos, en cambio, son los encargados de \textbf{propagar las instancias} en las derivaciones de las conclusiones.\fuentes{Cátedra, Episodio X, parte 2, «Reglas rebatibles (defeasible rules)» y «Hechos (facts)»}
+  \item La base es la tesis doctoral de A.~J.~García, \textit{Programación Lógica Rebatible} (UNS, 2000), cap.~2, y el artículo de García y Simari, \textit{Defeasible logic programming: An argumentative approach} (TPLP, 2004).\catedra{Episodio X, parte 2}{Defeasible Logic Programing (DeLP)}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{b)}
+
+\begin{enunciado}{Consigna}
+¿Cuál es la utilidad de contar con dos tipos de reglas: estrictas y rebatibles? ¿Qué tipo de información permite modelar cada una de estas reglas? ¿Cómo se distinguen estas reglas en el lenguaje?
+\end{enunciado}
+
+\medskip\noindent\textbf{Qué modela cada una.}\fuentes{Cátedra, Episodio X, parte 2, «Reglas rebatibles (defeasible rules)» y «Reglas estrictas (strict rules)»}
+\begin{itemize}
+  \item \textbf{Estricta}: información \textbf{segura} (no rebatible). La conexión entre el antecedente y la conclusión \textbf{se cumple siempre}: no puede haber excepciones. Ej.: \regla{\nf abierto}{\est}{cerrado}.
+  \item \textbf{Rebatible}: información \textbf{tentativa}. La conexión entre el antecedente (las razones) y la conclusión se cumple en muchos casos, pero \textbf{puede haber excepciones}. Ej.: \regla{\nf cruzar}{\reb}{semaforo(rojo)}.
+\end{itemize}
+
+\paragraph{Utilidad de tener las dos.}
+\begin{itemize}
+  \item Con las rebatibles se pueden expresar \textbf{reglas generales} que se cumplen en la mayoría de los casos y, además, reglas que dicen \textbf{en qué circunstancias hay excepciones}; también \textbf{posturas u opiniones diferentes} que pueden venir de distintas fuentes.\catedra{Episodio X, parte 2}{Defeasible Logic Programing (DeLP)}
+  \item Con las estrictas se representa lo que no admite excepciones. Si hay excepciones, no es estricta y debe representarse como rebatible; la decisión depende del \textbf{dominio de aplicación} del SBC y es responsabilidad de quien codifica el conocimiento.\catedra{Episodio X, parte 2}{Reglas estrictas (strict rules)}
+\end{itemize}
+
+\paragraph{Cómo se distinguen.} Sintácticamente, \textbf{solo por la flecha} (aunque la diferencia semántica es enorme):\catedra{Episodio X, parte 2}{Reglas estrictas (strict rules)}
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l c X l@{}}
+\toprule
+\textbf{Regla} & \textbf{Notación} & \textbf{Información que modela} & \textbf{Ejemplo} \\
+\midrule
+Estricta & $L_0 \est L_1, \dots, L_n$ & segura: se cumple siempre, sin excepciones & \regla{\nf abierto}{\est}{cerrado} \\
+Rebatible & $L_0 \reb L_1, \dots, L_n$ & tentativa: se cumple en muchos casos, puede tener excepciones & \regla{\nf cruzar}{\reb}{semaforo(rojo)} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Lectura de una regla rebatible} \texttt{conclusión} $\reb$ \texttt{antecedente}: ``si hay razones para creer en el antecedente, entonces hay una razón (rebatible) para creer en la conclusión''.\catedra{Episodio X, parte 2}{Reglas rebatibles (defeasible rules)}
+  \item \textbf{Cadena de excepciones}: cada regla puede ser excepción de la anterior. Según los hechos que perciba el agente, pueden derivar conclusiones las tres, solo dos, solo una o ninguna:\catedra{Episodio X, parte 2}{Reglas rebatibles (defeasible rules)}
+  \begin{center}
+  \small
+  \begin{tabular}{@{}ll@{}}
+    \regla{\nf cruzar}{\reb}{semaforo(rojo).} & regla general \\
+    \regla{cruzar}{\reb}{semaforo(rojo), emergencia.} & excepción a la primera \\
+    \regla{\nf cruzar}{\reb}{semaforo(rojo), emergencia, hay\_peligro.} & excepción a la segunda \\
+  \end{tabular}
+  \end{center}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{c)}
+
+\begin{enunciado}{Consigna}
+¿Qué ventajas tiene usar DeLP como mecanismo de inferencia y/o como herramienta de representación de conocimiento frente a otros enfoques, como el de la lógica clásica o frente a Prolog?
+\end{enunciado}
+
+\medskip\noindent\textbf{Ventajas de DeLP.}\fuentes{Cátedra, Episodio X, parte 2, «Defeasible Logic Programming». Mismo resumen en Episodio X (tercera parte), «Comentarios finales»}
+\begin{itemize}
+  \item \textit{Representación}: permite representar información \textbf{tentativa} y información \textbf{potencialmente en conflicto}.
+  \item \textit{Inferencia}:
+  \begin{itemize}
+    \item las conclusiones están \textbf{sustentadas con argumentos};
+    \item las respuestas se basan en un \textbf{análisis exhaustivo} de todos los argumentos relacionados (a favor y en contra);
+    \item el criterio de preferencia entre argumentos se puede \textbf{adaptar al dominio} de aplicación;
+    \item se puede dar una \textbf{explicación detallada} de las respuestas.
+  \end{itemize}
+\end{itemize}
+
+\paragraph{Frente a Prolog.}
+\begin{itemize}
+  \item Prolog estándar \textbf{no tiene negación fuerte}, y tampoco un mecanismo para \textbf{manejar información contradictoria}: si hay derivaciones para \texttt{comprar\_acciones(acme)} y para \texttt{no\_comprar\_acciones(acme)}, responde \texttt{true} a las dos.\catedra{Episodio VIII}{Extender el mecanismo de inferencia}
+  \item Solo tiene \textbf{negación por falla} (\texttt{\textbackslash+}), que no puede ir en la cabeza de una regla ni en un hecho.\catedra{Episodio VIII}{Negación por falla en Prolog}
+  \item DeLP agrega la negación fuerte (\nf) y las reglas rebatibles, y ante conclusiones contradictorias \textbf{decide cuál prevalece} comparando los argumentos a favor y en contra.\catedra{Episodio X, parte 2}{Defeasible Logic Programing (DeLP)}
+\end{itemize}
+
+\paragraph{Frente a la lógica clásica.}
+\begin{itemize}
+  \item La lógica clásica es \textbf{monotónica}:\aima{7.5}{251} \cita{the set of entailed sentences can only increase as information is added to the knowledge base}. Lo que se concluyó no se retracta al aparecer una excepción.
+  \item Para no inferir conclusiones contradictorias con inferencia monotónica (como Modus Ponens) hay que \textbf{mantener la base libre de contradicciones}. La otra opción es \textbf{admitir contradicciones potenciales} en la base y tener una inferencia (no monotónica) que \textbf{decida} ante una contradicción.\catedra{Episodio IX (valores de certeza)}{Bases de creencias inconsistentes: dos grandes opciones} DeLP sigue esta segunda opción.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X X X@{}}
+\toprule
+ & \textbf{Lógica clásica} & \textbf{Prolog} & \textbf{DeLP} \\
+\midrule
+Negación & --- & solo por falla (\texttt{\textbackslash+}) & fuerte (\nf) \\
+Información tentativa & no (monotónica) & no & sí (reglas rebatibles) \\
+Contradicciones & base libre de contradicciones & concluye las dos & decide cuál prevalece \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{No monotonía en AIMA}: razonar por defecto, sacando conclusiones \cita{in the absence of any reason to doubt it} y retractándolas si aparece nueva evidencia, es habitual en el sentido común. Ese razonamiento \cita{is said to exhibit nonmonotonicity, because the set of beliefs does not grow monotonically over time as new evidence arrives}. Ejemplos de lógicas no monotónicas: \textit{circumscription} y \textit{default logic}.\aima{12.6.1}{458}
+  \item \textbf{Un paso intermedio sobre Prolog}: agregarle el operador \nf{} y una inferencia ``cauta'' que responda \texttt{si} (deriva $Q$ pero no su complemento), \texttt{no} (deriva el complemento pero no $Q$), \texttt{indeciso} (deriva ambos) o \texttt{desconozco} (ninguno). Ante una contradicción no decide: se abstiene.\catedra{Episodio VIII}{Extendiendo el mecanismo de inferencia}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{d)}
+
+\begin{enunciado}{Consigna}
+Escriba reglas estrictas o rebatibles, según considere más adecuado, para representar el siguiente conocimiento:
+\begin{enumerate}[label=\roman*.]
+  \item Si la linterna está apagada, entonces no está encendida.
+  \item Si la linterna está encendida, entonces no está apagada.
+  \item Si es de noche, generalmente no hay luz.
+  \item Si es de noche y tengo una linterna, entonces puedo iluminar.
+  \item Si la linterna no tiene batería, entonces no ilumina.
+  \item Si es de noche y hay luna llena, entonces hay luz.
+\end{enumerate}
+\end{enunciado}
+
+\begin{aviso}{Supuesto}
+``Puedo iluminar'' (iv) y ``no ilumina'' (v) se representan con el mismo literal \texttt{ilumina} (y su complemento), y ``hay luz'' (iii y vi) con \texttt{hay\_luz}; si no, las reglas no entrarían en conflicto.
+\end{aviso}
+
+Criterio: si la regla puede tener excepciones, es rebatible; si se cumple siempre, estricta.\catedra{Episodio X, parte 2}{Reglas estrictas (strict rules)}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}c l c X@{}}
+\toprule
+ & \textbf{Regla} & \textbf{Tipo} & \textbf{Por qué} \\
+\midrule
+i & \regla{\nf encendida}{\est}{apagada} & estricta & por definición: apagada y encendida son opuestos, sin excepciones \\
+ii & \regla{\nf apagada}{\est}{encendida} & estricta & ídem \\
+iii & \regla{\nf hay\_luz}{\reb}{de\_noche} & rebatible & ``generalmente'': tiene excepciones (vi) \\
+iv & \regla{ilumina}{\reb}{de\_noche, tengo\_linterna} & rebatible & tiene excepciones: v \\
+v & \regla{\nf ilumina}{\est}{\nf tiene\_bateria} & estricta & sin batería, la linterna no ilumina nunca \\
+vi & \regla{hay\_luz}{\reb}{de\_noche, luna\_llena} & rebatible & es una excepción a iii, y a su vez puede tener excepciones (p.~ej. noche nublada) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{itemize}
+  \item iv no dice ``generalmente'', pero v es una excepción: tener linterna de noche no basta si no tiene batería. Si iv fuera estricta, con \texttt{de\_noche}, \texttt{tengo\_linterna} y \texttt{\nf tiene\_bateria} en $\Pi$ se derivarían \texttt{ilumina} y \texttt{\nf ilumina} solo con información segura.
+  \item iii y vi entran en conflicto (\texttt{\nf hay\_luz} vs.\ \texttt{hay\_luz}) en una noche de luna llena: las dos son razones tentativas y será la comparación de argumentos la que decida.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+  \tikzset{lbl/.style={font=\scriptsize, fill=white, inner sep=1pt, pos=0.5}}
+  % antecedentes
+  \node[lit] (luna) at (-3.6,0) {luna\_llena};
+  \node[lit] (noche) at (-0.6,0) {de\_noche};
+  \node[lit] (linterna) at (2.4,0) {tengo\_linterna};
+  \node[lit] (bat) at (5.4,0) {\nf tiene\_bateria};
+  % conclusiones
+  \node[lit] (luz) at (-3.6,2) {hay\_luz};
+  \node[lit] (noluz) at (-0.9,2) {\nf hay\_luz};
+  \node[lit] (ilu) at (2.1,2) {ilumina};
+  \node[lit] (noilu) at (4.8,2) {\nf ilumina};
+  % reglas
+  \draw[rebatible] (noche) -- node[lbl] {iii} (noluz);
+  \draw[rebatible] (luna) -- node[lbl] {vi} (luz);
+  \draw[rebatible] (noche) -- (luz);
+  \draw[rebatible] (linterna) -- node[lbl] {iv} (ilu);
+  \draw[rebatible] (noche) -- (ilu);
+  \draw[estricta] (bat) -- node[lbl] {v} (noilu);
+  % conflictos
+  \draw[conflicto] (luz) -- (noluz);
+  \draw[conflicto] (ilu) -- (noilu);
+  \node[font=\scriptsize, text=red!70!black] at ($(luz)!0.5!(noluz)+(0,0.4)$) {conflicto};
+  \node[font=\scriptsize, text=red!70!black] at ($(ilu)!0.5!(noilu)+(0,0.4)$) {conflicto};
+  % i y ii
+  \node[lit] (enc) at (8,2) {encendida};
+  \node[lit] (noapag) at (10.6,2) {\nf apagada};
+  \node[lit] (apag) at (8,0) {apagada};
+  \node[lit] (noenc) at (10.6,0) {\nf encendida};
+  \draw[estricta] (enc) -- node[lbl, above] {ii} (noapag);
+  \draw[estricta] (apag) -- node[lbl, above] {i} (noenc);
+  % leyenda
+  \draw[estricta] (-3.6,-1) -- ++(0.8,0) node[right, font=\scriptsize, text=black] {estricta ($\est$)};
+  \draw[rebatible] (0,-1) -- ++(0.8,0) node[right, font=\scriptsize, text=black] {rebatible ($\reb$)};
+  \draw[conflicto] (3.4,-1) -- ++(0.8,0) node[right, font=\scriptsize, text=black] {literales complementarios};
+\end{tikzpicture}
+\captionof{figure}{Las reglas del inciso d: de los antecedentes a la conclusión, y los conflictos entre conclusiones.}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item Con v estricta, si \texttt{\nf tiene\_bateria} es un hecho, el conjunto $\{$iv$\}$ junto con $\Pi$ es contradictorio (deriva \texttt{ilumina} y \texttt{\nf ilumina}), así que no es un argumento para \texttt{ilumina}: no cumple la condición de consistencia.\catedra{Episodio X, parte 2}{Argumento}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 2}
+
+\begin{enunciado}{Consigna}
+Considere el siguiente programa lógico rebatible $\mathcal{P}_2 = (\Pi_2, \Delta_2)$:
+\programaPdos
+\end{enunciado}
+
+En lo que sigue, las reglas se nombran así:
+\reglasPdos
+
+%----------------------------------------------------------------------
+\subsection*{a)}
+
+\begin{enunciado}{Consigna}
+¿A qué se denomina derivación rebatible? Obtenga todas las derivaciones para los siguientes literales: vuela(tina), \nf vuela(tina), asustada(tina), vuela(peluche) y \nf vuela(peluche).
+\end{enunciado}
+
+\paragraph{Derivación rebatible.} Una \textbf{derivación rebatible} para un literal $L$ a partir de un PLR $(\Pi, \Delta)$ es una secuencia finita de literales fijos $L_1, L_2, \dots, L_n = L$ tal que, para cada $L_i$:\catedra{Episodio X, parte 2}{Derivaciones rebatibles (defeasible derivation)}
+\begin{itemize}
+  \item $L_i$ es un \textbf{hecho} de $\Pi$, o
+  \item existe en $(\Pi, \Delta)$ una \textbf{instancia de una regla} (estricta o rebatible) con cabeza $L_i$ y cuerpo $B_1, \dots, B_k$, donde todo literal del cuerpo ya está en $L_1, \dots, L_{i-1}$.
+\end{itemize}
+Si solo usa hechos y reglas estrictas de $\Pi$, es una \textbf{derivación estricta}.
+
+\begin{aviso}{Qué se cuenta como ``todas''}
+Cambiar el orden de literales independientes (p.~ej.\ \texttt{asustada(tina)} antes o después de \texttt{gallina(tina)}) o agregar literales que no se usan da otras secuencias que también cumplen la definición. Se listan las derivaciones distintas en cuanto a \textbf{qué hechos y reglas usan}.
+\end{aviso}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l >{\ttfamily}l X l@{}}
+\toprule
+\textbf{Literal} & & \textbf{\normalfont Secuencia} & \textbf{Justificación de cada $L_i$} & \textbf{Tipo} \\
+\midrule
+\texttt{vuela(tina)} & D1 & gallina(tina), & hecho & rebatible \\
+ & & ave(tina), & E1 instanciada & \\
+ & & vuela(tina) & R1 instanciada & \\
+\cmidrule(l){2-5}
+ & D2 & gallina(tina), & hecho & rebatible \\
+ & & asustada(tina), & hecho & \\
+ & & vuela(tina) & R3 instanciada & \\
+\midrule
+\texttt{\nf vuela(tina)} & D3 & gallina(tina), & hecho & rebatible \\
+ & & \nf vuela(tina) & R2 instanciada & \\
+\midrule
+\texttt{asustada(tina)} & D4 & asustada(tina) & hecho & estricta \\
+\midrule
+\texttt{vuela(peluche)} & D5 & gallina(peluche), & hecho & rebatible \\
+ & & ave(peluche), & E1 instanciada & \\
+ & & vuela(peluche) & R1 instanciada & \\
+\midrule
+\texttt{\nf vuela(peluche)} & D6 & \nf vuela(peluche) & hecho & estricta \\
+\cmidrule(l){2-5}
+ & D7 & gallina(peluche), & hecho & rebatible \\
+ & & \nf vuela(peluche) & R2 instanciada & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{itemize}
+  \item R3 no sirve para \texttt{vuela(peluche)}: no hay forma de derivar \texttt{asustada(peluche)}.
+  \item R4 no aparece porque ninguno de los literales pedidos es \texttt{anida\_en\_ramas\_altas(...)}.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[
+    hecho/.style={lit, font=\scriptsize\ttfamily, fill=fondogris},
+    concl/.style={lit, font=\scriptsize\ttfamily},
+    rl/.style={font=\tiny, fill=white, inner sep=0.5pt},
+    dn/.style={font=\scriptsize\bfseries, text=gris}]
+  % D1
+  \node[dn] at (0,3.2) {D1};
+  \node[concl] (a) at (0,2.6) {vuela(tina)};
+  \node[concl] (b) at (0,1.5) {ave(tina)};
+  \node[hecho] (c) at (0,0.4) {gallina(tina)};
+  \draw[rebatible] (b) -- node[rl] {R1} (a);
+  \draw[estricta] (c) -- node[rl] {E1} (b);
+  % D2
+  \node[dn] at (3.2,3.2) {D2};
+  \node[concl] (a) at (3.2,2.6) {vuela(tina)};
+  \node[hecho] (b) at (2.4,1.1) {gallina(tina)};
+  \node[hecho] (c) at (4.1,0.4) {asustada(tina)};
+  \draw[rebatible] (b) -- (a);
+  \draw[rebatible] (c) -- node[rl] {R3} (a);
+  % D3
+  \node[dn] at (6.3,3.2) {D3};
+  \node[concl] (a) at (6.3,2.6) {\nf vuela(tina)};
+  \node[hecho] (b) at (6.3,1.1) {gallina(tina)};
+  \draw[rebatible] (b) -- node[rl] {R2} (a);
+  % D4
+  \node[dn] at (8.6,3.2) {D4};
+  \node[hecho] at (8.6,2.6) {asustada(tina)};
+  % D5
+  \node[dn] at (11,3.2) {D5};
+  \node[concl] (a) at (11,2.6) {vuela(peluche)};
+  \node[concl] (b) at (11,1.5) {ave(peluche)};
+  \node[hecho] (c) at (11,0.4) {gallina(peluche)};
+  \draw[rebatible] (b) -- node[rl] {R1} (a);
+  \draw[estricta] (c) -- node[rl] {E1} (b);
+  % D6
+  \node[dn] at (13.6,3.2) {D6};
+  \node[hecho] at (13.6,2.6) {\nf vuela(peluche)};
+  % D7
+  \node[dn] at (13.6,1.9) {D7};
+  \node[concl] (a) at (13.6,1.3) {\nf vuela(peluche)};
+  \node[hecho] (b) at (13.6,0.2) {gallina(peluche)};
+  \draw[rebatible] (b) -- node[rl] {R2} (a);
+  % leyenda
+  \node[hecho] at (0.6,-0.7) {hecho};
+  \draw[estricta] (2,-0.7) -- ++(0.7,0) node[right, font=\scriptsize] {estricta};
+  \draw[rebatible] (4.3,-0.7) -- ++(0.7,0) node[right, font=\scriptsize] {rebatible};
+\end{tikzpicture}
+\captionof{figure}{Las derivaciones D1--D7 como árboles: cada literal se obtiene de los de abajo con la regla indicada.}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item D1 y D5 muestran que una derivación puede usar \textbf{los dos tipos de reglas} (E1 estricta y R1 rebatible).\catedra{Episodio X, parte 2}{Derivaciones para literales complementarios}
+  \item Los literales complementarios respecto de ``\nf'' (como \texttt{vuela(tina)} y \texttt{\nf vuela(tina)}) también se llaman \textbf{literales contradictorios} o \textbf{en conflicto}, porque representan dos conclusiones contradictorias.\catedra{Episodio X, parte 2}{Derivaciones para literales complementarios}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{b)}
+
+\begin{enunciado}{Consigna}
+¿Cuándo se dice que un conjunto de reglas es contradictorio? Brinde un ejemplo.
+\end{enunciado}
+
+Un conjunto $S$ de hechos, reglas estrictas y rebatibles es \textbf{contradictorio} si a partir de $S$ se pueden obtener derivaciones rebatibles tanto para un literal $p$ como para su complemento ${\sim}p$.\catedra{Episodio X, parte 2}{Conjunto de reglas contradictorio}
+
+\textbf{Ejemplo} (de la cátedra):\catedra{Episodio X, parte 2}{Conjunto de reglas contradictorio}
+\[
+\Pi_c = \left\{\begin{array}{l}
+\texttt{en\_supermercado.} \\
+\texttt{en\_casa.} \\
+\texttt{\nf en\_casa} \est \texttt{en\_supermercado.}
+\end{array}\right\}
+\]
+\begin{itemize}
+  \item \texttt{en\_casa} se deriva porque es un hecho.
+  \item \texttt{\nf en\_casa} se deriva con la secuencia \texttt{en\_supermercado}, \texttt{\nf en\_casa}.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+  \node[lit, fill=fondogris] (s) at (0,0) {en\_supermercado};
+  \node[lit] (nc) at (0,1.4) {\nf en\_casa};
+  \node[lit, fill=fondogris] (c) at (3,1.4) {en\_casa};
+  \draw[estricta] (s) -- (nc);
+  \draw[conflicto] (nc) -- node[above, font=\scriptsize, text=red!70!black] {conflicto} (c);
+\end{tikzpicture}
+\captionof{figure}{$\Pi_c$ deriva dos literales complementarios: es contradictorio.}
+\end{center}
+
+%----------------------------------------------------------------------
+\subsection*{c)}
+
+\begin{enunciado}{Consigna}
+¿Cuál es la utilidad de que un programa lógico rebatible sea contradictorio? ¿Tiene sentido que el conjunto $\Pi$ sea contradictorio?
+\end{enunciado}
+
+\paragraph{Utilidad de un PLR contradictorio.} Es lo que permite representar:\catedra{Episodio X, parte 2}{Defeasible Logic Programing (DeLP)}
+\begin{itemize}
+  \item \textbf{información tentativa}: reglas generales y reglas para sus \textbf{excepciones}. En $\mathcal{P}_2$, R1 (las aves vuelan) tiene la excepción R2 (las gallinas no vuelan), que a su vez tiene la excepción R3 (las gallinas asustadas vuelan);
+  \item \textbf{información potencialmente en conflicto}: distintas posturas u opiniones, que pueden venir de distintas fuentes.
+\end{itemize}
+Las contradicciones no se evitan: las resuelve el mecanismo de inferencia, analizando los argumentos a favor y en contra.
+
+\paragraph{¿$\Pi$ contradictorio?} No. En todo PLR $(\Pi, \Delta)$ \textbf{se asume que $\Pi$ no es contradictorio}: los hechos y las reglas estrictas (información segura) no pueden inferir conclusiones contradictorias.\catedra{Episodio X, parte 2}{Conjunto de reglas contradictorio}
+\begin{itemize}
+  \item Un conjunto contradictorio como $\Pi_c$ del inciso b \textbf{no es válido} en DeLP como $\Pi$.
+  \item Además, un argumento $A$ exige que $\Pi \cup A$ no sea contradictorio. Con $\Pi$ contradictorio, $\Pi \cup A$ lo sería para todo $A$, y no habría ningún argumento.\catedra{Episodio X, parte 2}{Argumento}
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection*{d)}
+
+\begin{enunciado}{Consigna}
+Justifique por qué $(\Pi_2 \cup \Delta_2)$ es contradictorio, y por qué $\Pi_2$ no es contradictorio.
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{$\Pi_2 \cup \Delta_2$ es contradictorio}: deriva dos pares de literales complementarios (inciso a):
+  \begin{itemize}
+    \item \texttt{vuela(tina)} (D1 o D2) y \texttt{\nf vuela(tina)} (D3);
+    \item \texttt{vuela(peluche)} (D5) y \texttt{\nf vuela(peluche)} (D6 o D7).
+  \end{itemize}
+  \item \textbf{$\Pi_2$ no es contradictorio}: solo con hechos y E1 se derivan los cuatro hechos más \texttt{ave(tina)} y \texttt{ave(peluche)} (E1 aplicada a cada gallina). Entre estos seis literales no hay ningún par $p$, ${\sim}p$: el único literal negado, \texttt{\nf vuela(peluche)}, no tiene su complemento \texttt{vuela(peluche)}, que solo se obtiene con R1.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{Literal} & \textbf{Desde $\Pi_2$} & \textbf{Desde $\Pi_2 \cup \Delta_2$} \\
+\midrule
+\texttt{asustada(tina)}, \texttt{gallina(tina)}, \texttt{gallina(peluche)} & sí (hechos) & sí \\
+\texttt{ave(tina)}, \texttt{ave(peluche)} & sí (E1) & sí \\
+\texttt{\nf vuela(peluche)} & sí (hecho) & sí \\
+\texttt{vuela(peluche)} & no & \textbf{sí} (D5) \quad $\Rightarrow$ conflicto \\
+\texttt{vuela(tina)} & no & \textbf{sí} (D1, D2) \\
+\texttt{\nf vuela(tina)} & no & \textbf{sí} (D3) \quad $\Rightarrow$ conflicto con la anterior \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[hecho/.style={lit, font=\scriptsize\ttfamily, fill=fondogris},
+                    concl/.style={lit, font=\scriptsize\ttfamily},
+                    rl/.style={font=\tiny, fill=white, inner sep=0.5pt}]
+  % tina
+  \node[hecho] (gt) at (0,0) {gallina(tina)};
+  \node[hecho] (at) at (3,0) {asustada(tina)};
+  \node[concl] (avt) at (-1.6,1.4) {ave(tina)};
+  \node[concl] (vt) at (0,2.8) {vuela(tina)};
+  \node[concl] (nvt) at (3,2.8) {\nf vuela(tina)};
+  \draw[estricta] (gt) -- node[rl] {E1} (avt);
+  \draw[rebatible] (avt) -- node[rl] {R1} (vt);
+  \draw[rebatible] (gt) -- node[rl, pos=0.35] {R3} (vt);
+  \draw[rebatible] (at) -- (vt);
+  \draw[rebatible] (gt) -- node[rl, pos=0.3] {R2} (nvt);
+  \draw[conflicto] (vt) -- (nvt);
+  % peluche
+  \node[hecho] (gp) at (7.5,0) {gallina(peluche)};
+  \node[concl] (avp) at (6.3,1.4) {ave(peluche)};
+  \node[concl] (vp) at (7.2,2.8) {vuela(peluche)};
+  \node[hecho] (nvp) at (10.4,2.8) {\nf vuela(peluche)};
+  \draw[estricta] (gp) -- node[rl] {E1} (avp);
+  \draw[rebatible] (avp) -- node[rl] {R1} (vp);
+  \draw[rebatible] (gp) -- node[rl] {R2} (nvp);
+  \draw[conflicto] (vp) -- (nvp);
+  % marco de Pi2
+  \node[font=\scriptsize, text=gris, anchor=west] at (-2.6,-0.75) {fondo gris: hechos de $\Pi_2$};
+  \draw[estricta] (2.4,-0.75) -- ++(0.7,0) node[right, font=\scriptsize] {estricta};
+  \draw[rebatible] (4.6,-0.75) -- ++(0.7,0) node[right, font=\scriptsize] {rebatible};
+  \draw[conflicto] (6.8,-0.75) -- ++(0.7,0) node[right, font=\scriptsize] {literales complementarios};
+\end{tikzpicture}
+\captionof{figure}{Lo que se deriva de $\Pi_2 \cup \Delta_2$ para \texttt{vuela}. Los dos conflictos aparecen recién al usar reglas rebatibles (líneas punteadas).}
+\end{center}
+
+%======================================================================
+\section*{Ejercicio 3: Argumentos}
+
+%----------------------------------------------------------------------
+\subsection*{a)}
+
+\begin{enunciado}{Consigna}
+¿Cómo se define formalmente la noción de \textit{argumento} en DeLP? Explique cada una de las condiciones exigidas en la definición de argumento.
+\end{enunciado}
+
+Un \textbf{argumento} para una conclusión $h$ a partir de un PLR $(\Pi, \Delta)$ es un par $\langle A, h\rangle$, donde $h$ es un literal fijo y $A$ es un conjunto de \textbf{reglas rebatibles instanciadas} de $\Delta$ que cumple:\catedra{Episodio X, parte 2}{Argumento}
+\begin{enumerate}
+  \item \textbf{Derivación}: existe una derivación rebatible para $h$ a partir de $A \cup \Pi$.
+  \item \textbf{Consistencia}: $A \cup \Pi$ no es contradictorio.
+  \item \textbf{Minimalidad}: no existe un subconjunto propio de $A$ que cumpla (1) y (2).
+\end{enumerate}
+
+\paragraph{Qué pide cada condición.} Con los ejemplos de la cátedra, a partir de:\catedra{Episodio X, parte 2}{Algunos detalles sobre las condiciones de los argumentos}
+\[
+\Pi_n = \left\{\begin{array}{l}
+\texttt{\nf en\_casa} \est \texttt{en\_supermercado.} \\
+\texttt{en\_supermercado.} \\
+\texttt{de\_noche.} \\
+\texttt{festejo.}
+\end{array}\right\}
+\qquad
+\Delta_n = \left\{\begin{array}{l}
+\texttt{en\_casa} \reb \texttt{de\_noche.} \\
+\texttt{preparo\_cena} \reb \texttt{de\_noche.} \\
+\texttt{\nf preparo\_cena} \reb \texttt{festejo.} \\
+\texttt{acuesto\_tarde} \reb \texttt{festejo.} \\
+\texttt{en\_oficina} \reb \texttt{trabajando.}
+\end{array}\right\}
+\]
+\begin{itemize}
+  \item \textbf{(1) Derivación}: las reglas de $A$, junto con los hechos y reglas estrictas, tienen que permitir \textbf{llegar a $h$}. $Q = \{\regla{en\_oficina}{\reb}{trabajando}\}$ no es argumento para \texttt{en\_oficina}: \texttt{trabajando} no se deriva, así que $Q \cup \Pi_n$ no deriva \texttt{en\_oficina}.
+  \item \textbf{(2) Consistencia}: las reglas de $A$ \textbf{no pueden contradecir} lo que se sabe con seguridad ni contradecirse entre sí. $R = \{\regla{en\_casa}{\reb}{de\_noche}\}$ no es argumento para \texttt{en\_casa}: $R \cup \Pi_n$ deriva \texttt{en\_casa} y \texttt{\nf en\_casa}.
+  \item \textbf{(3) Minimalidad}: que \textbf{no haya reglas de más}; todas son necesarias para la derivación. $S = \{\regla{\nf preparo\_cena}{\reb}{festejo},\ \regla{acuesto\_tarde}{\reb}{festejo}\}$ no es argumento para \texttt{\nf preparo\_cena}, porque $B = \{\regla{\nf preparo\_cena}{\reb}{festejo}\} \subset S$ ya cumple (1) y (2). $\langle B, \texttt{\nf preparo\_cena}\rangle$ sí es argumento.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Condición} & \textbf{Exige} & \textbf{Contraejemplo en $(\Pi_n, \Delta_n)$} & \textbf{Por qué falla} \\
+\midrule
+(1) Derivación & $A \cup \Pi$ deriva $h$ & $Q$ para \texttt{en\_oficina} & no deriva \texttt{trabajando} \\
+(2) Consistencia & $A \cup \Pi$ no contradictorio & $R$ para \texttt{en\_casa} & deriva \texttt{en\_casa} y \texttt{\nf en\_casa} \\
+(3) Minimalidad & ningún $A' \subset A$ cumple (1) y (2) & $S$ para \texttt{\nf preparo\_cena} & $B \subset S$ ya alcanza \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Observaciones} sobre la definición:\catedra{Episodio X, parte 2}{Argumento}
+  \begin{itemize}
+    \item el conjunto incluye \textbf{solo reglas rebatibles} (instanciadas); los hechos y reglas estrictas que se usan quedan en $\Pi$;
+    \item la conclusión es \textbf{única} y está instanciada;
+    \item se dice que $\langle A, h\rangle$ \textbf{sustenta} $h$;
+    \item para una misma conclusión puede haber \textbf{varios argumentos}, cada uno una razón diferente;
+    \item el argumento para un \textbf{hecho} es el \textbf{conjunto vacío}.
+  \end{itemize}
+  \item \textbf{Notación gráfica}: un argumento se dibuja como un \textbf{triángulo}, con la conclusión en el vértice superior y el nombre del argumento adentro. Un sub-argumento es un triángulo dentro de otro.\catedra{Episodio X (tercera parte)}{Notación gráfica de argumentos}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{b)}
+
+\begin{enunciado}{Consigna}
+Considerando el programa $\mathcal{P}_2$ del ejercicio anterior, muestre los argumentos posibles para cada uno de los siguientes literales: vuela(tina), \nf vuela(tina), asustada(tina), anida\_en\_ramas\_altas(tina).
+\end{enunciado}
+
+Programa $\mathcal{P}_2$, con los nombres de reglas del ejercicio 2:
+\programaPdos
+\reglasPdos
+
+\begin{center}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X c@{}}
+\toprule
+\textbf{Conclusión} & \textbf{Argumento} & \textbf{Derivación} \\
+\midrule
+\texttt{vuela(tina)} & $A_1 = \{\regla{vuela(tina)}{\reb}{ave(tina)}\}$ & D1 \\
+ & $A_2 = \{\regla{vuela(tina)}{\reb}{gallina(tina), asustada(tina)}\}$ & D2 \\
+\midrule
+\texttt{\nf vuela(tina)} & $B = \{\regla{\nf vuela(tina)}{\reb}{gallina(tina)}\}$ & D3 \\
+\midrule
+\texttt{asustada(tina)} & $\emptyset$ (es un hecho) & D4 \\
+\midrule
+\texttt{anida\_en\_ramas\_altas(tina)} & $C_1 = \{\regla{anida\_en\_ramas\_altas(tina)}{\reb}{vuela(tina)},$\newline $\phantom{C_1 = \{}\regla{vuela(tina)}{\reb}{ave(tina)}\}$ & D1 + R4 \\
+ & $C_2 = \{\regla{anida\_en\_ramas\_altas(tina)}{\reb}{vuela(tina)},$\newline $\phantom{C_2 = \{}\regla{vuela(tina)}{\reb}{gallina(tina), asustada(tina)}\}$ & D2 + R4 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Por qué cumplen las tres condiciones:
+\begin{itemize}
+  \item \textbf{(1)}: cada uno contiene exactamente las reglas rebatibles de la derivación indicada (D1--D4 del ejercicio 2; para $C_1$ y $C_2$, esa derivación seguida de \texttt{anida\_en\_ramas\_altas(tina)} por R4).
+  \item \textbf{(2)}: con $\Pi_2$, ninguno deriva un literal y su complemento. Con $\Pi_2$ solo se deriva un literal negado, \texttt{\nf vuela(peluche)}, y estos argumentos no derivan \texttt{vuela(peluche)}. Además, ninguno junta R2 con R1 o R3 para tina.
+  \item \textbf{(3)}: sacando cualquier regla ya no se deriva la conclusión.
+\end{itemize}
+
+Conjuntos que \textbf{no} son argumentos (ejemplos):
+\begin{itemize}
+  \item $A_1 \cup A_2$ para \texttt{vuela(tina)}: falla (3), porque $A_1 \subset A_1 \cup A_2$ ya alcanza.
+  \item $C_1 \cup B$ para \texttt{anida\_en\_ramas\_altas(tina)}: falla (2), porque deriva \texttt{vuela(tina)} y \texttt{\nf vuela(tina)} (y también (3)).
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+  % \tri{x}{y}{media base}{altura}{nombre}{conclusión}{color}
+  \newcommand{\tri}[7]{%
+    \draw[thick, draw=#7, fill=#7!25] (#1-#3,#2) -- (#1,#2+#4) -- (#1+#3,#2) -- cycle;
+    \node[font=\scriptsize\bfseries] at (#1,#2+0.3*#4) {#5};
+    \node[font=\scriptsize\ttfamily, above] at (#1,#2+#4) {#6};}
+  \tri{0}{0}{0.55}{1.2}{$A_1$}{v(t)}{ambar}
+  \tri{1.6}{0}{0.55}{1.2}{$A_2$}{v(t)}{ambar}
+  \tri{3.4}{0}{0.55}{1.2}{$B$}{\nf v(t)}{azul}
+  \node[font=\scriptsize\ttfamily] at (4.9,1.45) {as(t)};
+  \node[font=\scriptsize] at (4.9,0.6) {$\emptyset$};
+  % C1 con A1 adentro
+  \tri{6.8}{0}{0.95}{2}{}{an(t)}{ambar}
+  \node[font=\scriptsize\bfseries] at (7.45,0.25) {$C_1$};
+  \tri{6.6}{0.12}{0.45}{1}{$A_1$}{}{ambar}
+  \node[font=\scriptsize\ttfamily] at (6.6,1.25) {v(t)};
+  % C2 con A2 adentro
+  \tri{9.2}{0}{0.95}{2}{}{an(t)}{ambar}
+  \node[font=\scriptsize\bfseries] at (9.85,0.25) {$C_2$};
+  \tri{9}{0.12}{0.45}{1}{$A_2$}{}{ambar}
+  \node[font=\scriptsize\ttfamily] at (9,1.25) {v(t)};
+\end{tikzpicture}
+\captionof{figure}{Los argumentos de b en notación de triángulos (\texttt{v(t)} = \texttt{vuela(tina)}, \texttt{as(t)} = \texttt{asustada(tina)}, \texttt{an(t)} = \texttt{anida\_en\_ramas\_altas(tina)}). $A_1$ y $A_2$ son sub-argumentos de $C_1$ y $C_2$.}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item Un argumento $\langle S, q\rangle$ es \textbf{sub-argumento} de $\langle X, h\rangle$ si $S \subseteq X$. Por eso $\langle A_1, \texttt{vuela(tina)}\rangle$ es sub-argumento de $\langle C_1, \texttt{anida\_en\_ramas\_altas(tina)}\rangle$ (y $A_2$ de $C_2$).\catedra{Episodio X (tercera parte)}{Relaciones entre argumentos: sub-argumento}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{c)}
+
+\begin{enunciado}{Consigna}
+¿Qué relación existe entre las nociones de argumento y derivación?
+\end{enunciado}
+
+\begin{itemize}
+  \item Todo argumento \textbf{necesita una derivación}: es la condición (1), una derivación rebatible de $h$ a partir de $A \cup \Pi$.\catedra{Episodio X, parte 2}{Argumento}
+  \item El conjunto $A$ son las \textbf{reglas rebatibles instanciadas que usa esa derivación}. En el ejemplo de la cátedra, $N$ tiene las dos reglas rebatibles (R2 y R5) de la derivación de \texttt{\nf comprar\_acciones(acme)}; la regla estricta E3 y el hecho que usa la derivación quedan en $\Pi$.\catedra{Episodio X, parte 2}{Argumento}
+  \item La recíproca no vale: \textbf{no toda derivación da un argumento}. Además de derivar, $A$ tiene que ser consistente con $\Pi$ (2) y mínimo (3). Ejemplo: \texttt{vuela(peluche)} (inciso d).
+  \item Si la derivación es \textbf{estricta}, no usa reglas rebatibles y el argumento es $\emptyset$ (p.~ej.\ D4 para \texttt{asustada(tina)}).\catedra{Episodio X, parte 2}{Argumento}
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}
+  \node[cajaazul, text width=3.8cm] (d) at (0,0) {\textbf{Derivación} de $h$\\\footnotesize secuencia de literales con hechos, estrictas y rebatibles};
+  \node[cajaambar, text width=3.8cm] (a) at (8.5,0) {\textbf{Argumento} $\langle A, h\rangle$\\\footnotesize $A$ = sus reglas rebatibles};
+  \draw[flecha] (d) -- node[above, font=\scriptsize, align=center] {solo si $A \cup \Pi$ es\\consistente (2) y $A$ mínimo (3)} (a);
+  \draw[flecha, draw=ambar] (a.south) to[bend left=25] node[below, font=\scriptsize] {siempre tiene una (1)} (d.south);
+\end{tikzpicture}
+\captionof{figure}{Todo argumento se apoya en una derivación; no toda derivación da un argumento.}
+\end{center}
+
+%----------------------------------------------------------------------
+\subsection*{d)}
+
+\begin{enunciado}{Consigna}
+¿Por qué a partir del programa $\mathcal{P}_2$ existe una derivación para vuela(peluche) pero no existe un argumento para vuela(peluche)?
+\end{enunciado}
+
+\begin{itemize}
+  \item \textbf{Derivación}: D5 = \texttt{gallina(peluche)}, \texttt{ave(peluche)} (E1), \texttt{vuela(peluche)} (R1). Una derivación solo pide que cada literal se obtenga de un hecho o una regla; no controla contradicciones.
+  \item \textbf{Argumento}: el único candidato es $A = \{\regla{vuela(peluche)}{\reb}{ave(peluche)}\}$ (R3 no sirve: \texttt{asustada(peluche)} no se deriva). Pero \texttt{\nf vuela(peluche)} es un \textbf{hecho} de $\Pi_2$, así que $A \cup \Pi_2$ deriva \texttt{vuela(peluche)} y \texttt{\nf vuela(peluche)}: es contradictorio y \textbf{no cumple la condición (2)}.
+  \item Agregar reglas no lo arregla: cualquier conjunto que derive \texttt{vuela(peluche)}, unido con $\Pi_2$, sigue derivando también el hecho \texttt{\nf vuela(peluche)}.
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[hecho/.style={lit, font=\scriptsize\ttfamily, fill=fondogris},
+                    concl/.style={lit, font=\scriptsize\ttfamily},
+                    rl/.style={font=\tiny, fill=white, inner sep=0.5pt}]
+  \node[hecho] (gp) at (0,0) {gallina(peluche)};
+  \node[concl] (avp) at (0,1.2) {ave(peluche)};
+  \node[concl] (vp) at (0,2.4) {vuela(peluche)};
+  \node[hecho] (nvp) at (3.4,2.4) {\nf vuela(peluche)};
+  \draw[estricta] (gp) -- node[rl] {E1} (avp);
+  \draw[rebatible] (avp) -- node[rl] {R1} (vp);
+  \draw[conflicto] (vp) -- node[above=5pt, font=\scriptsize, text=red!70!black] {conflicto} (nvp);
+  \node[font=\scriptsize, text=gris, anchor=west] at (2.2,1.5) {hecho de $\Pi_2$: siempre está};
+  \draw[dashed, ambar, thick, rounded corners] (-1.35,-0.5) rectangle (1.35,2.8);
+  \node[font=\scriptsize, text=ambar, anchor=north] at (0,-0.55) {D5: derivación \checkmark};
+  \node[font=\scriptsize, text=red!70!black, anchor=west] at (1.6,0.4) {$A \cup \Pi_2$ contradictorio $\Rightarrow$ argumento \texttimes};
+\end{tikzpicture}
+\captionof{figure}{\texttt{vuela(peluche)} tiene derivación, pero choca con el hecho \texttt{\nf vuela(peluche)}.}
+\end{center}
+
+%======================================================================
+\section*{Ejercicio 4: Ataques y derrotas}
+
+% Triángulo de argumento: \tri{x}{y}{media base}{altura}{nombre}{conclusión}{color}
+\newcommand{\tri}[7]{%
+  \draw[thick, draw=#7, fill=#7!25] (#1-#3,#2) -- (#1,#2+#4) -- (#1+#3,#2) -- cycle;
+  \node[font=\scriptsize\bfseries] at (#1,#2+0.3*#4) {#5};
+  \node[font=\scriptsize\ttfamily, above] at (#1,#2+#4) {#6};}
+\tikzset{
+  ataque/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick, dashed, draw=gris},
+  dpropia/.style={-{Stealth[length=2.4mm]}, very thick, draw=red!70!black},
+  dbloqueo/.style={{Stealth[length=2.4mm]}-{Stealth[length=2.4mm]}, very thick, draw=red!70!black},
+}
+
+%----------------------------------------------------------------------
+\subsection*{a)}
+
+\begin{enunciado}{Consigna}
+Defina formalmente las nociones de contra-argumento y derrotador (distinguiendo entre derrotador propio y derrotador por bloqueo).
+\end{enunciado}
+
+Definiciones, dado un PLR $(\Pi, \Delta)$:
+\begin{itemize}
+  \item \textbf{Desacuerdo}: $\langle X, f\rangle$ y $\langle Y, g\rangle$ están en desacuerdo (o en conflicto) si $\Pi \cup \{f, g\}$ es contradictorio.\catedra{Episodio X (tercera parte)}{Relaciones entre argumentos: desacuerdo}
+  \item \textbf{Contra-argumento (ataque)}: $\langle X, p\rangle$ ataca (contra-argumenta) a $\langle Y, h\rangle$ si existe un sub-argumento $\langle S, q\rangle$ de $\langle Y, h\rangle$ tal que $\langle X, p\rangle$ y $\langle S, q\rangle$ están en desacuerdo.\catedra{Episodio X (tercera parte)}{Ataque (contra-argumento)}
+  \begin{itemize}
+    \item $\langle S, q\rangle$ se llama \textbf{sub-argumento de desacuerdo}; puede ser el propio $\langle Y, h\rangle$.
+    \item $q$ es el \textbf{punto de ataque}.
+  \end{itemize}
+  \item \textbf{Derrotador}: $\langle X, p\rangle$ derrota a $\langle Y, h\rangle$ si lo ataca con sub-argumento de desacuerdo $\langle S, q\rangle$ y se cumple una de estas condiciones:\catedra{Episodio X (tercera parte)}{Derrota propia y derrota por bloqueo}
+  \begin{itemize}
+    \item[(a)] $\langle X, p\rangle$ es \textbf{preferido} a $\langle S, q\rangle$: es un \textbf{derrotador propio};
+    \item[(b)] $\langle X, p\rangle$ \textbf{no es comparable} con $\langle S, q\rangle$: es un \textbf{derrotador por bloqueo}.
+  \end{itemize}
+  La derrota combina ataque y preferencia, y la preferencia se evalúa entre el atacante y el \textbf{sub-argumento de desacuerdo} (no el argumento atacado completo).
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{$\langle X, p\rangle$ ataca a $\langle Y, h\rangle$ en $\langle S, q\rangle$, y\dots} & \textbf{¿Derrota?} & \textbf{Tipo} \\
+\midrule
+$\langle X, p\rangle$ es preferido a $\langle S, q\rangle$ & sí & derrotador propio \\
+$\langle X, p\rangle$ y $\langle S, q\rangle$ no son comparables & sí & derrotador por bloqueo \\
+$\langle S, q\rangle$ es preferido a $\langle X, p\rangle$ & no & (solo ataque) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  % Ataque en un sub-argumento
+  \tri{0}{0}{0.5}{1.1}{$X$}{p}{azul}
+  \tri{2.6}{0}{1.2}{2.4}{}{h}{ambar}
+  \node[font=\scriptsize\bfseries] at (3.35,0.25) {$Y$};
+  \tri{2.4}{0.35}{0.45}{0.9}{$S$}{}{ambar}
+  \node[font=\scriptsize\ttfamily, above] at (2.4,1.22) {q};
+  \draw[ataque] (0.25,1.15) -- (2.2,1.45);
+  \node[font=\scriptsize, align=center] at (1.3,-0.5) {ataque en el sub-argumento\\de desacuerdo $\langle S, q\rangle$};
+  % Derrota propia
+  \tri{5.6}{0}{0.5}{1.1}{$X$}{p}{azul}
+  \tri{7.4}{0}{0.5}{1.1}{$S$}{q}{ambar}
+  \draw[dpropia] (5.95,0.7) -- (7.05,0.7);
+  \node[font=\scriptsize, align=center] at (6.5,-0.5) {derrota propia\\($X$ preferido a $S$)};
+  % Derrota por bloqueo
+  \tri{9.6}{0}{0.5}{1.1}{$X$}{p}{azul}
+  \tri{11.4}{0}{0.5}{1.1}{$S$}{q}{ambar}
+  \draw[dbloqueo] (9.95,0.7) -- (11.05,0.7);
+  \node[font=\scriptsize, align=center] at (10.5,-0.5) {derrota por bloqueo\\(no comparables)};
+\end{tikzpicture}
+\captionof{figure}{Ataque (flecha gris punteada), derrota propia (flecha simple) y derrota por bloqueo (flecha doble), como en la notación de la cátedra.}
+\end{minipage}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item Todo ataque a un sub-argumento es también un ataque al súper-argumento, y si $R$ derrota a un sub-argumento $X$ de $N$, también derrota a $N$.\catedra{Episodio X (tercera parte)}{Relaciones entre argumentos}
+  \item Si $R$ derrota a $N$, $R$ \textbf{defiende indirectamente} todo lo que $N$ ataca; y un $D$ que ataque a $R$ defiende indirectamente a $N$ (y ataca indirectamente lo que $N$ ataca).\catedra{Episodio X (tercera parte)}{Relaciones entre argumentos}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{b)}
+
+\begin{enunciado}{Consigna}
+A partir de los argumentos formados en el ejercicio 3.b, indique los ataques que aparecen entre los argumentos para vuela(tina) y los argumentos para \nf vuela(tina).
+\end{enunciado}
+
+Argumentos del ejercicio 3.b (nombres de reglas del ejercicio 2):
+\begin{itemize}
+  \item $\langle A_1, \texttt{vuela(tina)}\rangle$, con $A_1 = \{\regla{vuela(tina)}{\reb}{ave(tina)}\}$ (R1);
+  \item $\langle A_2, \texttt{vuela(tina)}\rangle$, con $A_2 = \{\regla{vuela(tina)}{\reb}{gallina(tina), asustada(tina)}\}$ (R3);
+  \item $\langle B, \texttt{\nf vuela(tina)}\rangle$, con $B = \{\regla{\nf vuela(tina)}{\reb}{gallina(tina)}\}$ (R2).
+\end{itemize}
+
+Ataques:
+\begin{itemize}
+  \item $A_1$ y $B$ \textbf{se atacan mutuamente}: $\Pi_2 \cup \{\texttt{vuela(tina)}, \texttt{\nf vuela(tina)}\}$ es contradictorio.
+  \item $A_2$ y $B$ \textbf{se atacan mutuamente}, por la misma razón.
+  \item Cada argumento tiene una sola regla, así que su único sub-argumento es él mismo: el sub-argumento de desacuerdo es el \textbf{argumento completo} y el punto de ataque es la \textbf{conclusión}.
+  \item $A_1$ y $A_2$ \textbf{no se atacan}: tienen la misma conclusión, no están en desacuerdo.
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}c c c c@{}}
+\toprule
+\textbf{Atacante} & \textbf{Atacado} & \textbf{Sub-argumento de desacuerdo} & \textbf{Punto de ataque} \\
+\midrule
+$\langle A_1, \texttt{vuela(tina)}\rangle$ & $\langle B, \texttt{\nf vuela(tina)}\rangle$ & $\langle B, \texttt{\nf vuela(tina)}\rangle$ & \texttt{\nf vuela(tina)} \\
+$\langle B, \texttt{\nf vuela(tina)}\rangle$ & $\langle A_1, \texttt{vuela(tina)}\rangle$ & $\langle A_1, \texttt{vuela(tina)}\rangle$ & \texttt{vuela(tina)} \\
+$\langle A_2, \texttt{vuela(tina)}\rangle$ & $\langle B, \texttt{\nf vuela(tina)}\rangle$ & $\langle B, \texttt{\nf vuela(tina)}\rangle$ & \texttt{\nf vuela(tina)} \\
+$\langle B, \texttt{\nf vuela(tina)}\rangle$ & $\langle A_2, \texttt{vuela(tina)}\rangle$ & $\langle A_2, \texttt{vuela(tina)}\rangle$ & \texttt{vuela(tina)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \tri{0}{0}{0.55}{1.2}{$A_1$}{v(t)}{ambar}
+  \tri{3}{0}{0.55}{1.2}{$B$}{\nf v(t)}{azul}
+  \tri{6}{0}{0.55}{1.2}{$A_2$}{v(t)}{ambar}
+  \draw[ataque] (0.4,0.6) -- (2.6,0.6);
+  \draw[ataque] (3.4,0.6) -- (5.6,0.6);
+  \node[font=\scriptsize, text=gris] at (1.5,0.85) {ataque};
+  \node[font=\scriptsize, text=gris] at (4.5,0.85) {ataque};
+\end{tikzpicture}
+\captionof{figure}{Ataques entre los argumentos para \texttt{vuela(tina)} (\texttt{v(t)}) y \texttt{\nf vuela(tina)}: $B$ ataca y es atacado por $A_1$ y por $A_2$.}
+\end{minipage}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item $B$ también ataca a $\langle C_1, \texttt{anida\_en\_ramas\_altas(tina)}\rangle$ y a $\langle C_2, \texttt{anida\_en\_ramas\_altas(tina)}\rangle$ del ejercicio 3.b, con sub-argumentos de desacuerdo $A_1$ y $A_2$ (punto de ataque \texttt{vuela(tina)}): todo ataque a un sub-argumento es un ataque al súper-argumento. En cambio, $C_1$ y $C_2$ no atacan a $B$: $\Pi_2 \cup \{\texttt{anida\_en\_ramas\_altas(tina)}, \texttt{\nf vuela(tina)}\}$ no es contradictorio.\catedra{Episodio X (tercera parte)}{Relaciones entre argumentos}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{c)}
+
+\begin{enunciado}{Consigna}
+Defina un orden de preferencia para el conjunto de reglas rebatibles $\Delta_2$ y, a partir de las relaciones de ataque presentadas en el inciso anterior, indique qué derrotas se producen. Para cada una, indique si se trata de una derrota propia o por bloqueo.
+\end{enunciado}
+
+\paragraph{Orden elegido.} Se prioriza la regla más específica (la excepción sobre la regla general):
+\[
+\text{R2} > \text{R1} \quad (\text{\small las gallinas no vuelan, aunque sean aves}) \qquad\quad
+\text{R3} > \text{R2} \quad (\text{\small las gallinas asustadas vuelan})
+\]
+Por transitividad, también R3 $>$ R1. R4 queda sin relacionar (no aparece en los argumentos que se comparan).
+
+\paragraph{Criterio de preferencia (prioridad entre reglas).} $N$ es preferido a $A$ si:\catedra{Episodio X (tercera parte)}{Preferencia entre argumentos}
+\begin{enumerate}
+  \item existe $R_1 \in N$ y $R_2 \in A$ con $R_1 > R_2$ ($N$ tiene al menos una regla mejor que una de $A$), y
+  \item no existe $R_1 \in N$ y $R_2 \in A$ con $R_1 < R_2$ ($A$ no tiene ninguna regla mejor que una de $N$).
+\end{enumerate}
+
+\paragraph{Comparaciones.}
+\begin{itemize}
+  \item $B$ vs.\ $A_1$: R2 $>$ R1 y $A_1$ no tiene reglas mejores $\Rightarrow$ \textbf{$B$ es preferido a $A_1$}.
+  \item $A_2$ vs.\ $B$: R3 $>$ R2 y $B$ no tiene reglas mejores $\Rightarrow$ \textbf{$A_2$ es preferido a $B$}.
+\end{itemize}
+
+\paragraph{Derrotas.}
+\begin{center}
+\small
+\begin{tabular}{@{}c c c c@{}}
+\toprule
+\textbf{Ataque} & \textbf{Preferencia} & \textbf{¿Derrota?} & \textbf{Tipo} \\
+\midrule
+$B$ ataca a $A_1$ & $B$ preferido a $A_1$ & \textbf{sí} & \textbf{propia} \\
+$A_1$ ataca a $B$ & $B$ preferido a $A_1$ & no & --- \\
+$A_2$ ataca a $B$ & $A_2$ preferido a $B$ & \textbf{sí} & \textbf{propia} \\
+$B$ ataca a $A_2$ & $A_2$ preferido a $B$ & no & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+  \item $\langle B, \texttt{\nf vuela(tina)}\rangle$ es \textbf{derrotador propio} de $\langle A_1, \texttt{vuela(tina)}\rangle$.
+  \item $\langle A_2, \texttt{vuela(tina)}\rangle$ es \textbf{derrotador propio} de $\langle B, \texttt{\nf vuela(tina)}\rangle$.
+  \item Con este orden \textbf{no hay derrotas por bloqueo}: todos los pares que se atacan son comparables.
+\end{itemize}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \tri{0}{0}{0.55}{1.2}{$A_1$}{v(t)}{ambar}
+  \tri{3}{0}{0.55}{1.2}{$B$}{\nf v(t)}{azul}
+  \tri{6}{0}{0.55}{1.2}{$A_2$}{v(t)}{ambar}
+  \draw[dpropia] (2.6,0.6) -- (0.4,0.6);
+  \draw[dpropia] (5.6,0.6) -- (3.4,0.6);
+  \node[font=\scriptsize, text=red!70!black] at (1.5,0.85) {propia};
+  \node[font=\scriptsize, text=red!70!black] at (4.5,0.85) {propia};
+  \node[font=\scriptsize] at (1.5,0.25) {R2 $>$ R1};
+  \node[font=\scriptsize] at (4.5,0.25) {R3 $>$ R2};
+\end{tikzpicture}
+\captionof{figure}{Derrotas con el orden R3 $>$ R2 $>$ R1: $B$ derrota a $A_1$ y $A_2$ derrota a $B$, ambas derrotas propias.}
+\end{minipage}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Otro orden posible}: solo R2 $>$ R1 (sin comparar R3 con R2). Entonces $A_2$ y $B$ no son comparables y \textbf{se derrotan mutuamente por bloqueo}; $B$ sigue siendo derrotador propio de $A_1$. Es el mismo caso que $\langle A, g\rangle$ y $\langle C, {\sim}g\rangle$ en el ejemplo de la cátedra.\catedra{Episodio X (tercera parte)}{Derrota propia y derrota por bloqueo}
+  \begin{center}
+  \begin{tikzpicture}
+    \tri{0}{0}{0.55}{1.2}{$A_1$}{v(t)}{ambar}
+    \tri{3}{0}{0.55}{1.2}{$B$}{\nf v(t)}{azul}
+    \tri{6}{0}{0.55}{1.2}{$A_2$}{v(t)}{ambar}
+    \draw[dpropia] (2.6,0.6) -- (0.4,0.6);
+    \draw[dbloqueo] (5.6,0.6) -- (3.4,0.6);
+    \node[font=\scriptsize, text=red!70!black] at (1.5,0.85) {propia};
+    \node[font=\scriptsize, text=red!70!black] at (4.5,0.85) {bloqueo};
+  \end{tikzpicture}
+  \end{center}
+  \item Con el orden elegido, $A_2$ derrota a $B$, que derrota a $A_1$: $A_2$ \textbf{defiende indirectamente} a $A_1$.\catedra{Episodio X (tercera parte)}{Relaciones entre argumentos}
+\end{itemize}
+\end{extras}
+
+%======================================================================
+\section*{Ejercicio 5}
+
+% Programa P5 (ejercicios 5 y siguientes).
+\newcommand{\programaPcinco}{%
+\[
+\Pi_5 = \left\{\begin{array}{l}
+\mathit{viento} \est \mathit{viento\_caluroso} \\
+\mathit{calor} \\
+\mathit{caluroso} \\
+\mathit{viento\_caluroso} \\
+\mathit{ahorrar\_energia}
+\end{array}\right\}
+\qquad
+\Delta_5 = \left\{\begin{array}{l}
+\mathit{aire\_acond} \reb \mathit{calor} \\
+\mathit{aire\_acond} \reb \mathit{sofocante} \\
+\sim\mathit{aire\_acond} \reb \mathit{abrir\_ventana} \\
+\sim\mathit{aire\_acond} \reb \mathit{ahorrar\_energia} \\
+\mathit{abrir\_ventana} \reb \mathit{calor, viento} \\
+\sim\mathit{abrir\_ventana} \reb \mathit{viento\_caluroso}
+\end{array}\right\}
+\]}
+% Reglas de P5 con nombre.
+\newcommand{\reglasPcinco}{%
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{\qquad}ll@{}}
+R1: & \regla{aire\_acond}{\reb}{calor} & R4: & \regla{\nf aire\_acond}{\reb}{ahorrar\_energia} \\
+R2: & \regla{aire\_acond}{\reb}{sofocante} & R5: & \regla{abrir\_ventana}{\reb}{calor, viento} \\
+R3: & \regla{\nf aire\_acond}{\reb}{abrir\_ventana} & R6: & \regla{\nf abrir\_ventana}{\reb}{viento\_caluroso} \\
+\end{tabular}
+\end{center}}
+
+\begin{enunciado}{Consigna}
+Considere el programa $\mathcal{P}_5 = (\Pi_5, \Delta_5)$:
+\programaPcinco
+\end{enunciado}
+
+En lo que sigue, las reglas se nombran así:
+\reglasPcinco
+
+\begin{aviso}{\texttt{sofocante} no se deriva}
+R2 nunca se puede usar: \texttt{sofocante} no es un hecho ni cabeza de ninguna regla. En $\Pi_5$ está el hecho \texttt{caluroso}, que ninguna regla usa; probablemente R2 debía ser \regla{aire\_acond}{\reb}{caluroso}. Se resuelve el programa tal como está.
+\end{aviso}
+
+\clearpage
+%----------------------------------------------------------------------
+\subsection*{a)}
+
+\begin{enunciado}{Consigna}
+Brinde dos argumentos para no encender el aire acondicionado (\nf aire\_acond) y muestre todos los contra-argumentos que los atacan.
+\end{enunciado}
+
+\paragraph{Argumentos para \texttt{\nf aire\_acond}.}
+\begin{itemize}
+  \item $\langle A_1, \texttt{\nf aire\_acond}\rangle$, con $A_1 = \{\regla{\nf aire\_acond}{\reb}{abrir\_ventana},\ \regla{abrir\_ventana}{\reb}{calor, viento}\}$ (R3, R5). \texttt{calor} es hecho y \texttt{viento} sale de la regla estricta con \texttt{viento\_caluroso}.
+  \begin{itemize}
+    \item Tiene el sub-argumento $\langle D, \texttt{abrir\_ventana}\rangle$, con $D = \{\regla{abrir\_ventana}{\reb}{calor, viento}\}$ (R5).
+  \end{itemize}
+  \item $\langle A_2, \texttt{\nf aire\_acond}\rangle$, con $A_2 = \{\regla{\nf aire\_acond}{\reb}{ahorrar\_energia}\}$ (R4).
+\end{itemize}
+
+\paragraph{Contra-argumentos.} Un contra-argumento tiene que estar en desacuerdo con algún sub-argumento: concluir \texttt{aire\_acond} (contra $A_1$ o $A_2$) o \texttt{\nf abrir\_ventana} (contra $D$).\catedra{Episodio X (tercera parte)}{Ataque (contra-argumento)}
+\begin{itemize}
+  \item $\langle B, \texttt{aire\_acond}\rangle$, con $B = \{\regla{aire\_acond}{\reb}{calor}\}$ (R1). Es el único argumento para \texttt{aire\_acond} (R2 no se puede usar).
+  \item $\langle C, \texttt{\nf abrir\_ventana}\rangle$, con $C = \{\regla{\nf abrir\_ventana}{\reb}{viento\_caluroso}\}$ (R6).
+\end{itemize}
+
+\begin{center}
+\small
+\begin{tabular}{@{}c c c c@{}}
+\toprule
+\textbf{Contra-argumento} & \textbf{Ataca a} & \textbf{Sub-argumento de desacuerdo} & \textbf{Punto de ataque} \\
+\midrule
+$\langle B, \texttt{aire\_acond}\rangle$ & $\langle A_1, \texttt{\nf aire\_acond}\rangle$ & $\langle A_1, \texttt{\nf aire\_acond}\rangle$ & \texttt{\nf aire\_acond} \\
+$\langle C, \texttt{\nf abrir\_ventana}\rangle$ & $\langle A_1, \texttt{\nf aire\_acond}\rangle$ & $\langle D, \texttt{abrir\_ventana}\rangle$ & \texttt{abrir\_ventana} \\
+$\langle B, \texttt{aire\_acond}\rangle$ & $\langle A_2, \texttt{\nf aire\_acond}\rangle$ & $\langle A_2, \texttt{\nf aire\_acond}\rangle$ & \texttt{\nf aire\_acond} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \tri{-3}{0}{0.55}{1.2}{$C$}{\nf ab}{azul}
+  \tri{0}{0}{1.1}{2.4}{}{\nf ac}{ambar}
+  \node[font=\scriptsize\bfseries] at (0.55,0.25) {$A_1$};
+  \tri{-0.2}{0.35}{0.45}{0.9}{$D$}{}{ambar}
+  \node[font=\scriptsize\ttfamily, above] at (-0.2,1.17) {ab};
+  \tri{3.2}{0}{0.55}{1.2}{$B$}{ac}{azul}
+  \tri{6.2}{0}{0.55}{1.2}{$A_2$}{\nf ac}{ambar}
+  \draw[ataque] (-2.6,0.8) -- (-0.45,1.4);
+  \draw[ataque] (2.85,0.9) -- (0.35,2.05);
+  \draw[ataque] (3.6,0.6) -- (5.8,0.6);
+\end{tikzpicture}
+\captionof{figure}{Ataques a los argumentos para \texttt{\nf aire\_acond} (\texttt{ac} = \texttt{aire\_acond}, \texttt{ab} = \texttt{abrir\_ventana}). $C$ ataca a $A_1$ en su sub-argumento $D$.}
+\end{minipage}
+\end{center}
+
+%----------------------------------------------------------------------
+\subsection*{b)}
+
+\begin{enunciado}{Consigna}
+Compare los argumentos obtenidos a partir del criterio de preferencia entre reglas visto en clase. En este caso, considere el siguiente orden:
+\begin{center}
+(\regla{aire\_acond}{\reb}{sofocante}) $>$ (\regla{\nf aire\_acond}{\reb}{ahorrar\_energia})\\
+(\regla{\nf aire\_acond}{\reb}{ahorrar\_energia}) $>$ (\regla{aire\_acond}{\reb}{calor})\\
+(\regla{\nf abrir\_ventana}{\reb}{viento\_caluroso}) $>$ (\regla{abrir\_ventana}{\reb}{calor, viento})
+\end{center}
+Determine si los contra-argumentos obtenidos en el inciso anterior son derrotadores. En caso afirmativo, indique si son derrotadores propios o por bloqueo.
+\end{enunciado}
+
+Con los nombres de reglas: \textbf{R2 $>$ R4}, \textbf{R4 $>$ R1}, \textbf{R6 $>$ R5} (y R2 $>$ R1 por transitividad). R3 no está relacionada con ninguna regla.
+
+La preferencia se evalúa entre el atacante y el \textbf{sub-argumento de desacuerdo}; $N$ es preferido a $A$ si tiene una regla mejor que una de $A$ y $A$ no tiene ninguna mejor que una de $N$.\fuentes{Cátedra, Episodio X (tercera parte), «Derrota propia y derrota por bloqueo»; «Preferencia entre argumentos»}
+
+\begin{center}
+\small
+\begin{tabular}{@{}c c c l c@{}}
+\toprule
+\textbf{Atacante} & \textbf{Sub-arg.\ de desacuerdo} & \textbf{Reglas} & \textbf{Comparación} & \textbf{Resultado} \\
+\midrule
+$B$ & $A_1$ & \{R1\} vs.\ \{R3, R5\} & sin relación entre R1 y R3, R5 & \textbf{bloqueo} \\
+$C$ & $D$ (de $A_1$) & \{R6\} vs.\ \{R5\} & R6 $>$ R5: $C$ preferido & \textbf{propio} \\
+$B$ & $A_2$ & \{R1\} vs.\ \{R4\} & R4 $>$ R1: $A_2$ preferido & no derrota \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+  \item $\langle B, \texttt{aire\_acond}\rangle$ es \textbf{derrotador por bloqueo} de $\langle A_1, \texttt{\nf aire\_acond}\rangle$: no son comparables.
+  \item $\langle C, \texttt{\nf abrir\_ventana}\rangle$ es \textbf{derrotador propio} de $\langle A_1, \texttt{\nf aire\_acond}\rangle$: es preferido a $D$, el sub-argumento atacado.
+  \item $\langle B, \texttt{aire\_acond}\rangle$ ataca a $\langle A_2, \texttt{\nf aire\_acond}\rangle$ pero \textbf{no es derrotador}: $A_2$ es preferido a $B$.
+  \item La regla R2 aparece en el orden pero no influye: no está en ningún argumento.
+\end{itemize}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \tri{-3}{0}{0.55}{1.2}{$C$}{\nf ab}{azul}
+  \tri{0}{0}{1.1}{2.4}{}{\nf ac}{ambar}
+  \node[font=\scriptsize\bfseries] at (0.55,0.25) {$A_1$};
+  \tri{-0.2}{0.35}{0.45}{0.9}{$D$}{}{ambar}
+  \node[font=\scriptsize\ttfamily, above] at (-0.2,1.17) {ab};
+  \tri{3.2}{0}{0.55}{1.2}{$B$}{ac}{azul}
+  \tri{6.2}{0}{0.55}{1.2}{$A_2$}{\nf ac}{ambar}
+  \draw[dpropia] (-2.6,0.8) -- (-0.45,1.4);
+  \node[font=\scriptsize, text=red!70!black] at (-1.7,1.45) {propia};
+  \draw[dbloqueo] (2.85,0.9) -- (0.35,2.05);
+  \node[font=\scriptsize, text=red!70!black] at (2.2,1.75) {bloqueo};
+  \draw[ataque, {Stealth[length=2mm]}-] (5.8,0.6) -- (3.6,0.6);
+  \node[font=\scriptsize, text=gris] at (4.7,0.85) {no derrota};
+  \node[font=\scriptsize] at (-1.6,0.35) {R6 $>$ R5};
+  \node[font=\scriptsize] at (4.7,0.3) {R4 $>$ R1};
+\end{tikzpicture}
+\captionof{figure}{Derrotas sobre los argumentos para \texttt{\nf aire\_acond}: $C$ derrota a $A_1$ (propia, en $D$), $B$ y $A_1$ se bloquean, y $B$ no derrota a $A_2$.}
+\end{minipage}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Ataques en sentido contrario}, que se usan en los ejercicios 6 y 8:\catedra{Episodio X (tercera parte)}{Derrota propia y derrota por bloqueo}
+  \begin{itemize}
+    \item $A_1$ ataca a $B$ y, como no son comparables, también es su \textbf{derrotador por bloqueo}.
+    \item $A_2$ ataca a $B$ y es su \textbf{derrotador propio} (R4 $>$ R1).
+    \item $D$ ataca a $C$ pero no lo derrota ($C$ es preferido). $A_1$ no ataca a $C$: \texttt{\nf aire\_acond} y \texttt{\nf abrir\_ventana} junto con $\Pi_5$ no forman un conjunto contradictorio; el ataque es solo de su sub-argumento $D$.
+  \end{itemize}
+\end{itemize}
+\end{extras}
+
+\end{document}
