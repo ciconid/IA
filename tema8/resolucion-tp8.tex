@@ -1130,4 +1130,215 @@ $B$ & $A_2$ & \{R1\} vs.\ \{R4\} & R4 $>$ R1: $A_2$ preferido & no derrota \\
 \end{itemize}
 \end{extras}
 
+%======================================================================
+\section*{Ejercicio 6: Líneas de argumentación}
+
+% Colores de soporte e interferencia en las líneas.
+\colorlet{soporte}{azul}
+\colorlet{interf}{ambar}
+
+%----------------------------------------------------------------------
+\subsection*{a)}
+
+\begin{enunciado}{Consigna}
+¿Qué es una línea de argumentación? ¿Qué condiciones deben cumplirse para que una línea de argumentación sea aceptable?
+\end{enunciado}
+
+\paragraph{Línea de argumentación.} Una línea de argumentación para $\langle A_0, h_0\rangle$ es una \textbf{secuencia finita de argumentos} $[A_0, A_1, A_2, \dots]$ que comienza con $A_0$ y en la que, a partir del segundo, \textbf{cada argumento es un derrotador del anterior}.\catedra{Episodio X (tercera parte)}{Línea de argumentación para un argumento}
+\begin{itemize}
+  \item $A_1$ derrota a $A_0$, pero $A_2$ derrota a $A_1$, así que \textbf{defiende} a $A_0$; y así sucesivamente.
+  \item \textbf{Argumentos de soporte} para $A_0$: los que lo defienden, $\{A_0, A_2, A_4, \dots\}$ (posiciones pares).
+  \item \textbf{Argumentos de interferencia} para $A_0$: los que lo derrotan directa o indirectamente, $\{A_1, A_3, \dots\}$ (posiciones impares).
+\end{itemize}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  \foreach \i/\c in {0/soporte, 1/interf, 2/soporte, 3/interf, 4/soporte} {
+    \tri{2*\i}{0}{0.5}{1.1}{$A_\i$}{$h_\i$}{\c}
+  }
+  \foreach \i in {1,...,4} {
+    \draw[dpropia, draw=gris] (2*\i-0.45,0.55) -- (2*\i-1.55,0.55);
+  }
+  \node[font=\scriptsize, text=soporte, anchor=west] at (9,0.8) {soporte: $A_0, A_2, A_4$};
+  \node[font=\scriptsize, text=interf, anchor=west] at (9,0.3) {interferencia: $A_1, A_3$};
+\end{tikzpicture}
+\captionof{figure}{Una línea de argumentación para $A_0$: cada argumento derrota al anterior (la flecha va del derrotador al derrotado).}
+\end{minipage}
+\end{center}
+
+\paragraph{Línea aceptable.} Una línea de argumentación para $A_0$ es \textbf{aceptable} si:\fuentes{Cátedra, Episodio X (tercera parte), «Línea de argumentación aceptable». Lo que evita cada condición: «(1) evitando líneas con ciclos (infinitos)», «(2) evitando contradicciones», «(3) evitando doble bloqueo»}
+\begin{enumerate}
+  \item Ningún argumento $A_k$ \textbf{aparece más de una vez} en la línea, ni es un \textbf{sub-argumento de desacuerdo} de otro $A_i$ que aparece antes ($i < k$).
+  \item El conjunto de argumentos de \textbf{soporte} para $A_0$ \textbf{no es contradictorio}, y tampoco el de \textbf{interferencia}. Un conjunto de argumentos $\{A_1, \dots, A_N\}$ es contradictorio si $\Pi \cup A_1 \cup \dots \cup A_N$ deriva un par de literales complementarios $p$ y ${\sim}p$.
+  \item Si $A_k$ es un \textbf{derrotador por bloqueo} de $A_{k-1}$, entonces $A_{k+1}$ debe ser un \textbf{derrotador propio} de $A_k$: no puede haber dos derrotadores por bloqueo consecutivos.
+\end{enumerate}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X X@{}}
+\toprule
+\textbf{Condición} & \textbf{Exige} & \textbf{Evita} \\
+\midrule
+(1) Sin repetición & ningún argumento repetido ni sub-argumento de desacuerdo de uno anterior & líneas con ciclos (infinitas) \\
+(2) Consistencia & soporte e interferencia no contradictorios por separado & que un bando use argumentos que se contradicen entre sí \\
+(3) Sin doble bloqueo & después de un bloqueo, una derrota propia & dos derrotadores por bloqueo seguidos \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  % (1) ciclo
+  \tri{0}{0}{0.45}{1}{$A_0$}{$h_0$}{soporte}
+  \tri{1.5}{0}{0.45}{1}{$A_1$}{$h_1$}{interf}
+  \tri{3}{0}{0.45}{1}{$A_2$}{$h_2$}{soporte}
+  \tri{4.5}{0}{0.45}{1}{$A_1$}{$h_1$}{interf}
+  \draw[dpropia, draw=gris] (1.15,0.5) -- (0.35,0.5);
+  \draw[dpropia, draw=gris] (2.65,0.5) -- (1.85,0.5);
+  \draw[dpropia, draw=gris] (4.15,0.5) -- (3.35,0.5);
+  \node[font=\Large, text=red!70!black] at (4.5,0.45) {\texttimes};
+  \node[font=\scriptsize, align=center] at (2.25,-0.5) {(1) $A_1$ repetido};
+  % (3) doble bloqueo
+  \tri{7}{0}{0.45}{1}{$A_0$}{a}{soporte}
+  \tri{8.5}{0}{0.45}{1}{$A_1$}{\nf a}{interf}
+  \tri{10}{0}{0.45}{1}{$A_2$}{a}{soporte}
+  \draw[dbloqueo] (8.15,0.5) -- (7.35,0.5);
+  \draw[dbloqueo] (9.65,0.5) -- (8.85,0.5);
+  \node[font=\Large, text=red!70!black] at (10,0.45) {\texttimes};
+  \node[font=\scriptsize, align=center] at (8.5,-0.5) {(3) dos bloqueos seguidos};
+\end{tikzpicture}
+\captionof{figure}{Dos líneas no aceptables: el argumento marcado con \texttimes{} no puede agregarse.}
+\end{minipage}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Por qué hace falta la condición (1)}: en el PLR Merval, $B$ (\texttt{buen\_precio(skynet)}) y $M$ (\texttt{\nf buen\_precio(skynet)}) se bloquean mutuamente, y sin restricciones la línea $[B, M, B, M, \dots]$ sería infinita.\fuentes{Cátedra, Episodio X (tercera parte), «¿ Argumentación infinita ?»; «Línea de argumentación aceptable»}
+  \item \textbf{Por qué alcanza con no agregar el segundo bloqueo} (3): el bloqueo es simétrico; si $A_1$ bloquea a $A_0$, $A_0$ también bloquea a $A_1$, así que $A_1$ ya está bloqueado, se agregue o no $A_2$.\catedra{Episodio X (tercera parte)}{(3) evitando doble bloqueo}
+  \item En un árbol de dialéctica, \textbf{todo camino de la raíz a una hoja es una línea de argumentación}.\catedra{Episodio X (tercera parte)}{Líneas de argumentación en un árbol de dialéctica}
+\end{itemize}
+\end{extras}
+
+%----------------------------------------------------------------------
+\subsection*{b)}
+
+\begin{enunciado}{Consigna}
+Considerando el programa $\mathcal{P}_5$ del ejercicio anterior, determine todas las líneas de argumentación aceptables para los argumentos cuya conclusión sea el literal aire\_acond o el literal \nf aire\_acond.
+\end{enunciado}
+
+Programa $\mathcal{P}_5$, con los nombres de reglas del ejercicio 5 y el orden R2 $>$ R4, R4 $>$ R1, R6 $>$ R5:
+\programaPcinco
+\reglasPcinco
+
+\paragraph{Argumentos} (del ejercicio 5):
+\begin{itemize}
+  \item $\langle A_1, \texttt{\nf aire\_acond}\rangle$, $A_1 = \{$R3, R5$\}$, con sub-argumento $\langle D, \texttt{abrir\_ventana}\rangle$, $D = \{$R5$\}$;
+  \item $\langle A_2, \texttt{\nf aire\_acond}\rangle$, $A_2 = \{$R4$\}$;
+  \item $\langle B, \texttt{aire\_acond}\rangle$, $B = \{$R1$\}$;
+  \item $\langle C, \texttt{\nf abrir\_ventana}\rangle$, $C = \{$R6$\}$.
+\end{itemize}
+
+\paragraph{Derrotas} (ejercicio 5.b y sus EXTRAS):
+\begin{center}
+\small
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{Argumento} & \textbf{Sus derrotadores} & \textbf{Tipo} \\
+\midrule
+$A_1$ & $B$ & bloqueo \\
+ & $C$ (en el sub-argumento $D$) & propio \\
+$A_2$ & --- & \\
+$B$ & $A_1$ & bloqueo \\
+ & $A_2$ & propio \\
+$C$ & --- ($D$ lo ataca, pero $C$ es preferido) & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Líneas aceptables.} Se construyen agregando derrotadores mientras se cumplan las tres condiciones:
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l l l X@{}}
+\toprule
+\textbf{Raíz} & \textbf{Línea} & \textbf{Soporte} & \textbf{Interferencia} & \textbf{Por qué termina} \\
+\midrule
+$A_1$ & $\Lambda_1 = [A_1, C]$ & $\{A_1\}$ & $\{C\}$ & $C$ no tiene derrotadores \\
+ & $\Lambda_2 = [A_1, B, A_2]$ & $\{A_1, A_2\}$ & $\{B\}$ & $A_2$ no tiene derrotadores \\
+\midrule
+$A_2$ & $\Lambda_3 = [A_2]$ & $\{A_2\}$ & $\emptyset$ & $A_2$ no tiene derrotadores \\
+\midrule
+$B$ & $\Lambda_4 = [B, A_2]$ & $\{B\}$ & $\{A_2\}$ & $A_2$ no tiene derrotadores \\
+ & $\Lambda_5 = [B, A_1, C]$ & $\{B, C\}$ & $\{A_1\}$ & $C$ no tiene derrotadores \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Por qué son aceptables:
+\begin{itemize}
+  \item \textbf{(1)}: en ninguna se repite un argumento, y ninguno es sub-argumento de desacuerdo de uno anterior.
+  \item \textbf{(2)}: ningún conjunto de soporte o de interferencia es contradictorio. Los únicos con dos argumentos son $\{A_1, A_2\}$ (ambos concluyen \texttt{\nf aire\_acond}) y $\{B, C\}$ (\texttt{aire\_acond} y \texttt{\nf abrir\_ventana}); junto con $\Pi_5$ no derivan ningún par $p$, ${\sim}p$.
+  \item \textbf{(3)}: en $\Lambda_2$ y $\Lambda_5$, al bloqueo del segundo argumento le sigue una \textbf{derrota propia} ($A_2$ sobre $B$; $C$ sobre $A_1$ en $D$).
+\end{itemize}
+
+Líneas descartadas:
+\begin{itemize}
+  \item $[A_1, B, A_1]$ y $[B, A_1, B]$: violan \textbf{(1)} (argumento repetido) y \textbf{(3)} (dos bloqueos seguidos).
+\end{itemize}
+
+\begin{aviso}{Líneas más cortas}
+Los prefijos de una línea aceptable también son líneas aceptables (p.~ej.\ $[A_1]$, $[A_1, B]$, $[B]$, $[B, A_1]$). Arriba se muestran solo las \textbf{maximales}, que no se pueden extender: son las que aparecen como caminos de la raíz a una hoja en los árboles de dialéctica.
+\end{aviso}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}[lb/.style={font=\scriptsize\bfseries, anchor=east},
+                    et/.style={font=\tiny, text=red!70!black, above=1pt}]
+  \def\d{2.3}
+  % L1
+  \node[lb] at (-0.7,0.5) {$\Lambda_1$};
+  \tri{0}{0}{0.45}{1}{$A_1$}{\nf ac}{soporte}
+  \tri{\d}{0}{0.45}{1}{$C$}{\nf ab}{interf}
+  \draw[dpropia] (\d-0.4,0.4) -- (0.4,0.4);
+  \node[et] at (\d/2,0.4) {propia (en $D$)};
+  % L2
+  \node[lb] at (4.3,0.5) {$\Lambda_2$};
+  \tri{5}{0}{0.45}{1}{$A_1$}{\nf ac}{soporte}
+  \tri{5+\d}{0}{0.45}{1}{$B$}{ac}{interf}
+  \tri{5+2*\d}{0}{0.45}{1}{$A_2$}{\nf ac}{soporte}
+  \draw[dbloqueo] (5+\d-0.4,0.4) -- (5.4,0.4);
+  \node[et] at (5+\d/2,0.4) {bloqueo};
+  \draw[dpropia] (5+2*\d-0.4,0.4) -- (5+\d+0.4,0.4);
+  \node[et] at (5+1.5*\d,0.4) {propia};
+  % L3
+  \node[lb] at (-0.7,-1.6) {$\Lambda_3$};
+  \tri{0}{-2.1}{0.45}{1}{$A_2$}{\nf ac}{soporte}
+  % L4
+  \node[lb] at (1.6,-1.6) {$\Lambda_4$};
+  \tri{2.3}{-2.1}{0.45}{1}{$B$}{ac}{soporte}
+  \tri{2.3+\d}{-2.1}{0.45}{1}{$A_2$}{\nf ac}{interf}
+  \draw[dpropia] (2.3+\d-0.4,-1.7) -- (2.7,-1.7);
+  \node[et] at (2.3+\d/2,-1.7) {propia};
+  % L5
+  \node[lb] at (6.3,-1.6) {$\Lambda_5$};
+  \tri{7}{-2.1}{0.45}{1}{$B$}{ac}{soporte}
+  \tri{7+\d}{-2.1}{0.45}{1}{$A_1$}{\nf ac}{interf}
+  \tri{7+2*\d}{-2.1}{0.45}{1}{$C$}{\nf ab}{soporte}
+  \draw[dbloqueo] (7+\d-0.4,-1.7) -- (7.4,-1.7);
+  \node[et] at (7+\d/2,-1.7) {bloqueo};
+  \draw[dpropia] (7+2*\d-0.4,-1.7) -- (7+\d+0.4,-1.7);
+  \node[et] at (7+1.5*\d,-1.7) {propia (en $D$)};
+  % leyenda
+  \node[font=\scriptsize, text=soporte, anchor=west] at (0,-3) {soporte};
+  \node[font=\scriptsize, text=interf, anchor=west] at (1.5,-3) {interferencia};
+  \node[font=\scriptsize, anchor=west] at (3.5,-3) {(\texttt{ac} = \texttt{aire\_acond}, \texttt{ab} = \texttt{abrir\_ventana})};
+\end{tikzpicture}
+\captionof{figure}{Las cinco líneas de argumentación aceptables maximales para los argumentos de \texttt{aire\_acond} y \texttt{\nf aire\_acond}.}
+\end{minipage}
+\end{center}
+
 \end{document}
