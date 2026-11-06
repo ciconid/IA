@@ -19,6 +19,11 @@ No es un proyecto de software: es material de estudio de la materia **Inteligenc
 - **Tablas y pictogramas siempre que se pueda** (comparaciones, clasificaciones, ciclos, procesos, arquitecturas): sirven como referencia visual de los conceptos. Van **además** del texto, aunque muestren exactamente lo mismo. No deben agregar información que no esté en el texto. Dibujarlos con TikZ (hay íconos reutilizables en el preámbulo).
 - **Figuras en el lugar donde se usan, aunque se repitan**: en resoluciones de TPs y resúmenes, si un ejercicio o sección necesita una figura, pictograma o gráfico que ya apareció antes, se vuelve a poner ahí completo, en vez de remitir con "ver figura del ejercicio 2". Esto aplica solo a figuras, pictogramas y gráficos; párrafos y texto **no** se repiten (para eso sí vale remitir a donde ya está). Estas dos (figura junto al texto y figura repetida donde se necesita) son las únicas repeticiones permitidas.
 
+## Reporte al terminar
+
+- Después de resolver ejercicios a pedido del usuario, **no** resumir lo que se hizo. Reportar solo lo que salió mal: errores, problemas del enunciado (p. ej. datos faltantes), supuestos que hubo que tomar, cosas que no se pudieron verificar.
+- Si no hubo ningún inconveniente, una sola línea avisando que terminó con éxito.
+
 ## Estructura
 
 - `temaN/` — un directorio por unidad, con:
@@ -39,7 +44,9 @@ No es un proyecto de software: es material de estudio de la materia **Inteligenc
 ## Formato de las resoluciones (LaTeX)
 
 - Un archivo por TP: `temaN/resolucion-tpM.tex`, que hace `\input{../plantilla/preambulo}`. Tomar `tema5/resolucion-tp5.tex` como modelo.
-- Por cada ejercicio: `\section*{Ejercicio N}`, caja `enunciado` con la consigna textual, la respuesta (mínima, en viñetas) y después una caja `extras` con la ampliación. Caja `aviso` para ambigüedades del enunciado o erratas.
+- **Índice obligatorio**: después de `\maketitle` y `\notafuentes` va `\indice` (macro del preámbulo: índice con hipervínculos).
+- Por cada ejercicio: `\section{Ejercicio N}` y, para los incisos, `\subsection{a)}`, **sin asterisco** (no se numeran, pero así entran al índice). Cada `\section` empieza en página nueva automáticamente (`\sectionbreak` del preámbulo); los incisos de un mismo ejercicio van seguidos.
+- Dentro de cada ejercicio o inciso: caja `enunciado` con la consigna textual, la respuesta (mínima, en viñetas) y después una caja `extras` con la ampliación. Caja `aviso` para ambigüedades del enunciado o erratas.
 - Citas: **nunca en el cuerpo del texto**, siempre en nota al pie con los macros del preámbulo: `\catedra{Episodio I}{<título de diapositiva>}`, `\aima{25.1}{973}`, `\pmg{12.1}{443}` y `\fuentes{...}` para varias en una nota. Si varias viñetas seguidas salen de la misma fuente, una sola nota en la viñeta que las agrupa.
 - Citas textuales en inglés con `\cita{...}`, sin traducir.
 - Compilar dentro de `temaN/`: `latexmk -pdf -interaction=nonstopmode resolucion-tpM.tex`, corregir errores y warnings relevantes, y limpiar con `latexmk -c resolucion-tpM.tex` (dejar solo `.tex` y `.pdf`).

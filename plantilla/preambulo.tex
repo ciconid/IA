@@ -33,6 +33,15 @@
 \titleformat{\section}{\Large\bfseries\color{azul}}{\thesection}{0.6em}{}
 \titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
 
+% Ejercicios y sub-incisos sin número visible, pero con entrada en el índice
+% (usar \section y \subsection sin asterisco). Cada ejercicio empieza en página nueva.
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{2}
+\newcommand{\sectionbreak}{\clearpage}
+% Índice con hipervínculos, en la primera página (después de \maketitle y \notafuentes).
+\newcommand{\indice}{{\renewcommand{\sectionbreak}{\addvspace{1.5em}}%
+  \hypersetup{linktoc=all}\tableofcontents}}
+
 % Enunciado de la consigna (gris).
 \newtcolorbox{enunciado}[1]{
   breakable, enhanced, colback=fondogris, colframe=gris,

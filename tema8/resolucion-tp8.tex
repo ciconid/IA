@@ -1,5 +1,6 @@
 \documentclass[11pt,a4paper]{article}
 \input{../plantilla/preambulo}
+\usepackage{needspace}
 
 \title{\vspace{-1.5cm}\textbf{Trabajo Práctico 8 --- Resolución}\\[3pt]
 \large Programación Lógica Rebatible (DeLP)}
@@ -60,11 +61,13 @@ R1: & \regla{vuela(X)}{\reb}{ave(X)} & R3: & \regla{vuela(X)}{\reb}{gallina(X), 
 \vspace{-1cm}
 \notafuentes
 
+\indice
+
 %======================================================================
-\section*{Ejercicio 1: Conceptos básicos}
+\section{Ejercicio 1: Conceptos básicos}
 
 %----------------------------------------------------------------------
-\subsection*{a)}
+\subsection{a)}
 
 \begin{enunciado}{Consigna}
 ¿Qué es un programa lógico rebatible?
@@ -107,7 +110,7 @@ Un \textbf{literal} es un átomo $p(T_1,\dots,T_n)$ o un átomo negado ${\sim}p(
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{b)}
+\subsection{b)}
 
 \begin{enunciado}{Consigna}
 ¿Cuál es la utilidad de contar con dos tipos de reglas: estrictas y rebatibles? ¿Qué tipo de información permite modelar cada una de estas reglas? ¿Cómo se distinguen estas reglas en el lenguaje?
@@ -154,7 +157,7 @@ Rebatible & $L_0 \reb L_1, \dots, L_n$ & tentativa: se cumple en muchos casos, p
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{c)}
+\subsection{c)}
 
 \begin{enunciado}{Consigna}
 ¿Qué ventajas tiene usar DeLP como mecanismo de inferencia y/o como herramienta de representación de conocimiento frente a otros enfoques, como el de la lógica clásica o frente a Prolog?
@@ -206,7 +209,7 @@ Contradicciones & base libre de contradicciones & concluye las dos & decide cuá
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{d)}
+\subsection{d)}
 
 \begin{enunciado}{Consigna}
 Escriba reglas estrictas o rebatibles, según considere más adecuado, para representar el siguiente conocimiento:
@@ -294,7 +297,7 @@ vi & \regla{hay\_luz}{\reb}{de\_noche, luna\_llena} & rebatible & es una excepci
 \end{extras}
 
 %======================================================================
-\section*{Ejercicio 2}
+\section{Ejercicio 2}
 
 \begin{enunciado}{Consigna}
 Considere el siguiente programa lógico rebatible $\mathcal{P}_2 = (\Pi_2, \Delta_2)$:
@@ -305,7 +308,7 @@ En lo que sigue, las reglas se nombran así:
 \reglasPdos
 
 %----------------------------------------------------------------------
-\subsection*{a)}
+\subsection{a)}
 
 \begin{enunciado}{Consigna}
 ¿A qué se denomina derivación rebatible? Obtenga todas las derivaciones para los siguientes literales: vuela(tina), \nf vuela(tina), asustada(tina), vuela(peluche) y \nf vuela(peluche).
@@ -417,7 +420,7 @@ Cambiar el orden de literales independientes (p.~ej.\ \texttt{asustada(tina)} an
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{b)}
+\subsection{b)}
 
 \begin{enunciado}{Consigna}
 ¿Cuándo se dice que un conjunto de reglas es contradictorio? Brinde un ejemplo.
@@ -450,7 +453,7 @@ Un conjunto $S$ de hechos, reglas estrictas y rebatibles es \textbf{contradictor
 \end{center}
 
 %----------------------------------------------------------------------
-\subsection*{c)}
+\subsection{c)}
 
 \begin{enunciado}{Consigna}
 ¿Cuál es la utilidad de que un programa lógico rebatible sea contradictorio? ¿Tiene sentido que el conjunto $\Pi$ sea contradictorio?
@@ -470,7 +473,7 @@ Las contradicciones no se evitan: las resuelve el mecanismo de inferencia, anali
 \end{itemize}
 
 %----------------------------------------------------------------------
-\subsection*{d)}
+\subsection{d)}
 
 \begin{enunciado}{Consigna}
 Justifique por qué $(\Pi_2 \cup \Delta_2)$ es contradictorio, y por qué $\Pi_2$ no es contradictorio.
@@ -536,10 +539,10 @@ Justifique por qué $(\Pi_2 \cup \Delta_2)$ es contradictorio, y por qué $\Pi_2
 \end{center}
 
 %======================================================================
-\section*{Ejercicio 3: Argumentos}
+\section{Ejercicio 3: Argumentos}
 
 %----------------------------------------------------------------------
-\subsection*{a)}
+\subsection{a)}
 
 \begin{enunciado}{Consigna}
 ¿Cómo se define formalmente la noción de \textit{argumento} en DeLP? Explique cada una de las condiciones exigidas en la definición de argumento.
@@ -603,7 +606,7 @@ Un \textbf{argumento} para una conclusión $h$ a partir de un PLR $(\Pi, \Delta)
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{b)}
+\subsection{b)}
 
 \begin{enunciado}{Consigna}
 Considerando el programa $\mathcal{P}_2$ del ejercicio anterior, muestre los argumentos posibles para cada uno de los siguientes literales: vuela(tina), \nf vuela(tina), asustada(tina), anida\_en\_ramas\_altas(tina).
@@ -678,7 +681,7 @@ Conjuntos que \textbf{no} son argumentos (ejemplos):
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{c)}
+\subsection{c)}
 
 \begin{enunciado}{Consigna}
 ¿Qué relación existe entre las nociones de argumento y derivación?
@@ -702,7 +705,7 @@ Conjuntos que \textbf{no} son argumentos (ejemplos):
 \end{center}
 
 %----------------------------------------------------------------------
-\subsection*{d)}
+\subsection{d)}
 
 \begin{enunciado}{Consigna}
 ¿Por qué a partir del programa $\mathcal{P}_2$ existe una derivación para vuela(peluche) pero no existe un argumento para vuela(peluche)?
@@ -734,7 +737,7 @@ Conjuntos que \textbf{no} son argumentos (ejemplos):
 \end{center}
 
 %======================================================================
-\section*{Ejercicio 4: Ataques y derrotas}
+\section{Ejercicio 4: Ataques y derrotas}
 
 % Triángulo de argumento: \tri{x}{y}{media base}{altura}{nombre}{conclusión}{color}
 \newcommand{\tri}[7]{%
@@ -748,7 +751,7 @@ Conjuntos que \textbf{no} son argumentos (ejemplos):
 }
 
 %----------------------------------------------------------------------
-\subsection*{a)}
+\subsection{a)}
 
 \begin{enunciado}{Consigna}
 Defina formalmente las nociones de contra-argumento y derrotador (distinguiendo entre derrotador propio y derrotador por bloqueo).
@@ -818,7 +821,7 @@ $\langle S, q\rangle$ es preferido a $\langle X, p\rangle$ & no & (solo ataque) 
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{b)}
+\subsection{b)}
 
 \begin{enunciado}{Consigna}
 A partir de los argumentos formados en el ejercicio 3.b, indique los ataques que aparecen entre los argumentos para vuela(tina) y los argumentos para \nf vuela(tina).
@@ -876,7 +879,7 @@ $\langle B, \texttt{\nf vuela(tina)}\rangle$ & $\langle A_2, \texttt{vuela(tina)
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{c)}
+\subsection{c)}
 
 \begin{enunciado}{Consigna}
 Defina un orden de preferencia para el conjunto de reglas rebatibles $\Delta_2$ y, a partir de las relaciones de ataque presentadas en el inciso anterior, indique qué derrotas se producen. Para cada una, indique si se trata de una derrota propia o por bloqueo.
@@ -958,7 +961,7 @@ $B$ ataca a $A_2$ & $A_2$ preferido a $B$ & no & --- \\
 \end{extras}
 
 %======================================================================
-\section*{Ejercicio 5}
+\section{Ejercicio 5}
 
 % Programa P5 (ejercicios 5 y siguientes).
 \newcommand{\programaPcinco}{%
@@ -1005,7 +1008,7 @@ R2 nunca se puede usar: \texttt{sofocante} no es un hecho ni cabeza de ninguna r
 
 \clearpage
 %----------------------------------------------------------------------
-\subsection*{a)}
+\subsection{a)}
 
 \begin{enunciado}{Consigna}
 Brinde dos argumentos para no encender el aire acondicionado (\nf aire\_acond) y muestre todos los contra-argumentos que los atacan.
@@ -1059,7 +1062,7 @@ $\langle B, \texttt{aire\_acond}\rangle$ & $\langle A_2, \texttt{\nf aire\_acond
 \end{center}
 
 %----------------------------------------------------------------------
-\subsection*{b)}
+\subsection{b)}
 
 \begin{enunciado}{Consigna}
 Compare los argumentos obtenidos a partir del criterio de preferencia entre reglas visto en clase. En este caso, considere el siguiente orden:
@@ -1131,14 +1134,14 @@ $B$ & $A_2$ & \{R1\} vs.\ \{R4\} & R4 $>$ R1: $A_2$ preferido & no derrota \\
 \end{extras}
 
 %======================================================================
-\section*{Ejercicio 6: Líneas de argumentación}
+\section{Ejercicio 6: Líneas de argumentación}
 
 % Colores de soporte e interferencia en las líneas.
 \colorlet{soporte}{azul}
 \colorlet{interf}{ambar}
 
 %----------------------------------------------------------------------
-\subsection*{a)}
+\subsection{a)}
 
 \begin{enunciado}{Consigna}
 ¿Qué es una línea de argumentación? ¿Qué condiciones deben cumplirse para que una línea de argumentación sea aceptable?
@@ -1224,7 +1227,7 @@ $B$ & $A_2$ & \{R1\} vs.\ \{R4\} & R4 $>$ R1: $A_2$ preferido & no derrota \\
 \end{extras}
 
 %----------------------------------------------------------------------
-\subsection*{b)}
+\subsection{b)}
 
 \begin{enunciado}{Consigna}
 Considerando el programa $\mathcal{P}_5$ del ejercicio anterior, determine todas las líneas de argumentación aceptables para los argumentos cuya conclusión sea el literal aire\_acond o el literal \nf aire\_acond.
@@ -1340,5 +1343,159 @@ Los prefijos de una línea aceptable también son líneas aceptables (p.~ej.\ $[
 \captionof{figure}{Las cinco líneas de argumentación aceptables maximales para los argumentos de \texttt{aire\_acond} y \texttt{\nf aire\_acond}.}
 \end{minipage}
 \end{center}
+
+%======================================================================
+\section{Ejercicio 7}
+
+% Sub-argumento dentro de un argumento (relleno más oscuro).
+\newcommand{\subtri}[7]{%
+  \draw[thick, draw=#7, fill=#7!60] (#1-#3,#2) -- (#1,#2+#4) -- (#1+#3,#2) -- cycle;
+  \node[font=\scriptsize\bfseries, text=white] at (#1,#2+0.3*#4) {#5};
+  \node[font=\tiny\ttfamily, above=-1pt] at (#1,#2+#4) {#6};}
+% Nombre de un argumento debajo de su triángulo.
+\newcommand{\nomarg}[2]{\node[font=\scriptsize\bfseries, below] at (#1,0) {#2};}
+\newcommand{\cruz}[2]{\node[font=\huge, text=red!70!black] at (#1,#2) {\texttimes};}
+
+\begin{enunciado}{Consigna}
+Indique si las siguientes líneas de argumentación son aceptables. Justifique adecuadamente en cada caso apelando a las condiciones enunciadas en el ejercicio 6.a.
+
+(Siguen cuatro líneas, (a)--(d), dadas como figura; abajo se redibujan una por una.)
+\end{enunciado}
+
+\begin{aviso}{Cómo se lee la figura}
+\begin{itemize}
+  \item Cada triángulo es un argumento, con su conclusión arriba; un triángulo interior es un sub-argumento. Dos triángulos con el mismo nombre son el mismo argumento.
+  \item Cada flecha es una derrota y apunta al \textbf{sub-argumento de desacuerdo} del derrotado (al vértice, si ataca la conclusión).
+  \item La figura \textbf{no indica} si las derrotas son propias o por bloqueo, así que la condición (3) solo puede evaluarse de forma condicional.
+\end{itemize}
+\end{aviso}
+
+Se aplican las tres condiciones del ejercicio 6.a. La que decide en los cuatro casos es la (1): el argumento que se agrega no puede estar \textbf{repetido} ni ser el \textbf{sub-argumento de desacuerdo} de uno anterior.\fuentes{Cátedra, Episodio X (tercera parte), «Línea de argumentación aceptable»; «(1) evitando líneas con ciclos (infinitos)». Las líneas (a) y (b) son las dos de esta última diapositiva}
+
+%----------------------------------------------------------------------
+\needspace{5cm}
+\paragraph{(a) $[A_0, X, A_1, X]$: no es aceptable.}
+
+\begin{center}
+\begin{tikzpicture}
+  \foreach \x/\n/\h/\c in {0/A_0/h0/soporte, 2.2/X/h1/interf, 4.4/A_1/h2/soporte, 6.6/X/h1/interf} {
+    \tri{\x}{0}{0.6}{1.3}{}{\h}{\c}
+    \subtri{\x}{0.1}{0.3}{0.6}{}{}{\c}
+    \nomarg{\x}{$\n$}
+  }
+  \foreach \x in {2.2, 4.4, 6.6} {
+    \draw[dpropia, draw=gris] (\x-0.05,1.3) -- (\x-2.2+0.2,0.42);
+  }
+  \cruz{6.6}{0.55}
+\end{tikzpicture}
+\captionof{figure}{Línea (a): $X$ aparece dos veces.}
+\end{center}
+
+\begin{itemize}
+  \item $X$ aparece \textbf{dos veces} (posiciones 2 y 4): viola la condición \textbf{(1)}.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\paragraph{(b) $[A_0, A_1, X]$, con $A_1$ atacando en $\langle X, h_4\rangle$: no es aceptable.}
+
+\begin{center}
+\begin{tikzpicture}
+  \tri{0}{0}{0.6}{1.3}{}{h0}{soporte}
+  \subtri{0}{0.1}{0.32}{0.65}{X}{h4}{soporte}
+  \nomarg{0}{$A_0$}
+  \tri{2.2}{0}{0.6}{1.3}{}{h1}{interf}
+  \subtri{2.2}{0.1}{0.3}{0.6}{}{}{interf}
+  \nomarg{2.2}{$A_1$}
+  \subtri{4.4}{0}{0.6}{1.3}{X}{}{soporte}
+  \node[font=\scriptsize\ttfamily, above] at (4.4,1.3) {h4};
+  \nomarg{4.4}{$X$}
+  \draw[dpropia, draw=gris] (2.15,1.3) -- (0.24,0.4);
+  \draw[dpropia, draw=gris] (4.35,1.3) -- (2.4,0.42);
+  \cruz{4.4}{0.5}
+\end{tikzpicture}
+\captionof{figure}{Línea (b): $X$ es el sub-argumento de desacuerdo de $A_0$.}
+\end{center}
+
+\begin{itemize}
+  \item $A_1$ derrota a $A_0$ atacando su sub-argumento $\langle X, h_4\rangle$: ese es el \textbf{sub-argumento de desacuerdo} de $A_0$.
+  \item $X$, que ya fue derrotado por $A_1$, vuelve a entrar para derrotar a $A_1$: es sub-argumento de desacuerdo de un argumento anterior ($A_0$) y viola la condición \textbf{(1)}. Sería una argumentación circular: $X$ se defendería a sí mismo.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\paragraph{(c) $[A_0, A_1, X]$, con $A_1$ atacando la conclusión $h_0$: es aceptable (salvo doble bloqueo).}
+
+\begin{center}
+\begin{tikzpicture}
+  \tri{0}{0}{0.6}{1.3}{}{h0}{soporte}
+  \subtri{0}{0.1}{0.32}{0.65}{X}{h4}{soporte}
+  \nomarg{0}{$A_0$}
+  \tri{2.2}{0}{0.6}{1.3}{}{h1}{interf}
+  \subtri{2.2}{0.1}{0.3}{0.6}{}{}{interf}
+  \nomarg{2.2}{$A_1$}
+  \subtri{4.4}{0}{0.6}{1.3}{X}{}{soporte}
+  \node[font=\scriptsize\ttfamily, above] at (4.4,1.3) {h4};
+  \nomarg{4.4}{$X$}
+  \draw[dpropia, draw=gris] (2.1,1.3) -- (0.12,1.3);
+  \draw[dpropia, draw=gris] (4.35,1.3) -- (2.4,0.42);
+\end{tikzpicture}
+\captionof{figure}{Línea (c): $X$ es sub-argumento de $A_0$, pero no el de desacuerdo.}
+\end{center}
+
+\begin{itemize}
+  \item \textbf{(1) se cumple}: no hay repetidos, y $A_1$ ataca a $A_0$ en su conclusión, así que el sub-argumento de desacuerdo es $A_0$ completo. $X$ es sub-argumento de $A_0$, pero \textbf{no el de desacuerdo}.
+  \item \textbf{(2) se cumple}:
+  \begin{itemize}
+    \item Soporte $\{A_0, X\}$: como $X \subseteq A_0$, $\Pi \cup A_0 \cup X = \Pi \cup A_0$, que no es contradictorio porque $A_0$ es un argumento.\catedra{Episodio X, parte 2}{Argumento}
+    \item Interferencia $\{A_1\}$: un solo argumento, tampoco es contradictorio.
+  \end{itemize}
+  \item \textbf{(3)} depende del tipo de derrota: se viola solo si $A_1$ bloquea a $A_0$ \textbf{y} $X$ bloquea a $A_1$.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\paragraph{(d) $[A_0, A_1, X]$, con $A_1$ atacando en $\langle S, h_5\rangle$: es aceptable (salvo doble bloqueo).}
+
+\begin{center}
+\begin{tikzpicture}
+  \tri{0}{0}{0.9}{1.6}{}{h0}{soporte}
+  \subtri{-0.33}{0.1}{0.28}{0.6}{X}{h4}{soporte}
+  \subtri{0.33}{0.1}{0.28}{0.6}{S}{h5}{soporte}
+  \nomarg{0}{$A_0$}
+  \tri{2.4}{0}{0.6}{1.3}{}{h1}{interf}
+  \subtri{2.4}{0.1}{0.3}{0.6}{}{}{interf}
+  \nomarg{2.4}{$A_1$}
+  \subtri{4.6}{0}{0.6}{1.3}{X}{}{soporte}
+  \node[font=\scriptsize\ttfamily, above] at (4.6,1.3) {h4};
+  \nomarg{4.6}{$X$}
+  \draw[dpropia, draw=gris] (2.35,1.3) -- (0.58,0.3);
+  \draw[dpropia, draw=gris] (4.55,1.3) -- (2.6,0.42);
+\end{tikzpicture}
+\captionof{figure}{Línea (d): $A_1$ ataca a $A_0$ en $S$; $X$ es otro sub-argumento de $A_0$.}
+\end{center}
+
+\begin{itemize}
+  \item \textbf{(1) se cumple}: el sub-argumento de desacuerdo de $A_0$ es $\langle S, h_5\rangle$ ($S$ es el nombre que se le da acá al sub-argumento para $h_5$), no $X$.
+  \item \textbf{(2)} y \textbf{(3)}: igual que en (c), porque el soporte vuelve a ser $\{A_0, X\}$ con $X \subseteq A_0$ y los tipos de derrota tampoco se indican.
+\end{itemize}
+
+\paragraph{Resumen.}
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X l l l@{}}
+\toprule
+\textbf{Línea} & \textbf{(1)} & \textbf{(2)} & \textbf{(3)} & \textbf{¿Aceptable?} \\
+\midrule
+(a) & no: $X$ repetido & --- & --- & \textbf{no} \\
+(b) & no: $X$ es sub-arg.\ de desacuerdo de $A_0$ & --- & --- & \textbf{no} \\
+(c) & sí: el desacuerdo es en $h_0$ & sí & si no hay doble bloqueo & \textbf{sí} \\
+(d) & sí: el desacuerdo es en $h_5$ & sí & si no hay doble bloqueo & \textbf{sí} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Ejemplo de la cátedra del caso (b)}, en el programa de \texttt{surf}: $\langle L, \texttt{\nf nice}\rangle$ derrota por bloqueo a $\langle A, \texttt{surf}\rangle$ en el sub-argumento de desacuerdo $\langle N, \texttt{nice}\rangle$. Aunque $N$ derrota por bloqueo a $L$, no puede agregarse después de $L$, porque es el sub-argumento de desacuerdo de $A$.\catedra{Episodio X (tercera parte)}{Verificando que la línea de argumentación sea aceptable}
+\end{itemize}
+\end{extras}
 
 \end{document}
