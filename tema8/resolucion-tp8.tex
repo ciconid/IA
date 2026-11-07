@@ -1855,4 +1855,209 @@ Además de para determinar la respuesta del intérprete ¿para qué más nos pue
 \end{itemize}
 \end{extras}
 
+%======================================================================
+\section{Ejercicio 9}
+
+% Árboles del enunciado; #1: código TikZ extra (p. ej. \resaltar{N1}).
+\newcommand{\arbolesNueve}[1]{%
+\begin{tikzpicture}
+  \foreach \n/\x/\y/\m/\c in {1/1.5/0/U/azul, 2/0.6/-1.5/D/ambar, 3/0.6/-3/U/azul, 4/2.4/-1.5/D/ambar, 5/2.4/-3/U/azul,
+                              6/6/0/D/ambar, 7/5.1/-1.5/U/azul, 8/5.1/-3/D/ambar, 9/5.1/-4.5/U/azul, 10/6.9/-1.5/D/ambar, 11/6.9/-3/U/azul} {
+    \coordinate (N\n) at (\x,\y);
+    \tri{\x}{\y}{0.42}{0.9}{$N_{\n}$}{}{\c}
+    \node[font=\scriptsize\bfseries, text=\c] at (\x-0.6,\y+0.6) {\m};
+  }
+  \foreach \p/\h in {1/2, 1/4, 2/3, 4/5, 6/7, 6/10, 7/8, 8/9, 10/11} {
+    \draw[gris, thick] (N\p) -- ($(N\h)+(0,0.9)$);
+  }
+  #1
+\end{tikzpicture}}
+\newcommand{\resaltar}[1]{\draw[red!70!black, very thick] ($(#1)+(-0.62,-0.12)$) -- ($(#1)+(0,1.15)$) -- ($(#1)+(0.62,-0.12)$) -- cycle;}
+
+\begin{enunciado}{Consigna}
+Considerando los árboles dialécticos que aparecen en la figura, generados a partir de un cierto programa DeLP, responda las siguientes preguntas justificando sus respuestas.
+
+\textsc{Nota}: Para justificar su respuesta por \textbf{no}, podría (por ejemplo) hacer uso de la definición de línea de argumentación aceptable; mientras que una respuesta por \textbf{sí}, podría justificarla mediante la especificación de un programa DeLP.
+\begin{enumerate}[label=\alph*.]
+  \item ¿Podrían $N_1$ y $N_6$ estar etiquetados con el mismo argumento?
+  \item ¿Podrían $N_2$ y $N_4$ estar etiquetados con el mismo argumento?
+  \item ¿Podrían $N_3$ y $N_5$ estar etiquetados con el mismo argumento?
+  \item ¿Podrían $N_9$ y $N_{11}$ estar etiquetados con el mismo argumento?
+\end{enumerate}
+(La figura se redibuja en cada inciso.)
+\end{enunciado}
+
+En los programas de los incisos c) y d), los argumentos se comparan con el criterio de prioridad entre reglas del ejercicio 4.c.
+
+%----------------------------------------------------------------------
+\subsection{a)}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\arbolesNueve{\resaltar{N1}\resaltar{N6}}
+\captionof{figure}{Inciso a): $N_1$ y $N_6$ son las raíces de los dos árboles.}
+\end{minipage}
+\end{center}
+
+\textbf{No.}
+\begin{itemize}
+  \item El árbol de un argumento está \textbf{determinado por el programa}: los hijos de cada nodo son \textbf{todos} sus derrotadores que forman una línea aceptable.\catedra{Episodio X (tercera parte)}{Definición de Árbol de dialéctica}
+  \item Si $N_1$ y $N_6$ fueran el mismo argumento, los dos árboles (generados por el mismo programa) serían \textbf{idénticos}. Pero tienen distinta forma, y la raíz de uno es U y la del otro es D.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{b)}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\arbolesNueve{\resaltar{N2}\resaltar{N4}}
+\captionof{figure}{Inciso b): $N_2$ y $N_4$ son hermanos (hijos de $N_1$).}
+\end{minipage}
+\end{center}
+
+\textbf{No.}
+\begin{itemize}
+  \item Los hijos de un nodo $\langle A_N, h_N\rangle$ salen del \textbf{conjunto} de sus derrotadores $\{\langle B_1, q_1\rangle, \dots, \langle B_k, q_k\rangle\}$: hay \textbf{un} hijo por cada derrotador que forma una línea aceptable.\catedra{Episodio X (tercera parte)}{Definición de Árbol de dialéctica}
+  \item Un mismo derrotador da un solo hijo, así que dos hermanos ($N_2$ y $N_4$, ambos hijos de $N_1$) son siempre argumentos \textbf{distintos}.
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{c)}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\arbolesNueve{\resaltar{N3}\resaltar{N5}}
+\captionof{figure}{Inciso c): $N_3$ y $N_5$ están en ramas distintas, los dos en el nivel 2 (soporte).}
+\end{minipage}
+\end{center}
+
+\textbf{Sí}: $N_3$ y $N_5$ están en \textbf{líneas distintas}, $[N_1, N_2, N_3]$ y $[N_1, N_4, N_5]$, y un argumento puede repetirse en líneas diferentes del mismo árbol.\catedra{Episodio X (tercera parte)}{Argumentos repetidos en un árbol de dialéctica} Alcanza con un argumento $X$ que derrote a $N_2$ y a $N_4$. Programa:
+\[
+\Pi = \{s,\ q,\ r\}
+\qquad
+\Delta = \left\{\begin{array}{l}
+a \reb s \\
+{\sim}a \reb c \qquad c \reb p \\
+{\sim}a \reb d \qquad d \reb p \\
+p \reb q \\
+{\sim}p \reb r
+\end{array}\right\}
+\qquad
+({\sim}p \reb r) > (p \reb q)
+\]
+
+Argumentos:
+\begin{itemize}
+  \item $N_1 = \langle \{a \reb s\},\ a\rangle$.
+  \item $N_2 = \langle \{{\sim}a \reb c;\ c \reb p;\ p \reb q\},\ {\sim}a\rangle$ y $N_4 = \langle \{{\sim}a \reb d;\ d \reb p;\ p \reb q\},\ {\sim}a\rangle$. Los dos tienen el sub-argumento $P = \langle \{p \reb q\},\ p\rangle$.
+  \item $N_3 = N_5 = X = \langle \{{\sim}p \reb r\},\ {\sim}p\rangle$.
+\end{itemize}
+
+Derrotas:
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Nodo} & \textbf{Hijos} & \textbf{Por qué} \\
+\midrule
+$N_1$ & $N_2$, $N_4$ & atacan la conclusión $a$; no hay preferencia entre sus reglas: \textbf{bloqueo} \\
+$N_2$, $N_4$ & $X$ & ataca en $P$ y $({\sim}p \reb r) > (p \reb q)$: \textbf{propio}. $N_1$ también los bloquea, pero ya está en la línea (condición 1) \\
+$X$ & --- & $P$ lo ataca, pero $X$ es preferido: no lo derrota \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{itemize}
+  \item Las líneas $[N_1, N_2, X]$ y $[N_1, N_4, X]$ son \textbf{aceptables}: no hay repeticiones; el soporte $\{N_1, X\}$ (deriva $a$ y ${\sim}p$) no es contradictorio; y a cada bloqueo le sigue una derrota propia.\catedra{Episodio X (tercera parte)}{Línea de argumentación aceptable}
+  \item Marcado: $X$ es hoja (U), $N_2$ y $N_4$ quedan D y $N_1$ queda U, como en la figura.
+\end{itemize}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}[arbol, sibling distance=30mm]
+  \node[nU] {$N_1$\\$a$}
+    child {node[nD] {$N_2$\\${\sim}a$} child {node[nU, line width=1.6pt] {$X$\\${\sim}p$}}}
+    child {node[nD] {$N_4$\\${\sim}a$} child {node[nU, line width=1.6pt] {$X$\\${\sim}p$}}};
+\end{tikzpicture}
+\captionof{figure}{Árbol para $N_1$ con el programa del inciso c): $X$ está en $N_3$ y en $N_5$. La flecha va del derrotador al derrotado.}
+\end{minipage}
+\end{center}
+
+%----------------------------------------------------------------------
+\subsection{d)}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\arbolesNueve{\resaltar{N9}\resaltar{N11}}
+\captionof{figure}{Inciso d): $N_9$ está en el nivel 3 (interferencia) y $N_{11}$ en el nivel 2 (soporte).}
+\end{minipage}
+\end{center}
+
+\textbf{Sí}: también están en líneas distintas, $[N_6, N_7, N_8, N_9]$ y $[N_6, N_{10}, N_{11}]$. El mismo argumento $X$ sería de \textbf{interferencia} para $N_6$ en una línea (derrota a $N_8$) y de \textbf{soporte} en la otra (derrota a $N_{10}$); la cátedra muestra que un argumento puede repetirse con distinto rol.\catedra{Episodio X (tercera parte)}{Argumentos repetidos en diferentes líneas y con diferente rol y marca} Programa:
+\[
+\Pi = \{s,\ t,\ q,\ r\}
+\qquad
+\Delta = \left\{\begin{array}{l}
+h \reb w \qquad w \reb s \\
+{\sim}h \reb t \\
+h \reb k \qquad k \reb p \\
+{\sim}w \reb m \qquad m \reb p \\
+p \reb q \\
+{\sim}p \reb r
+\end{array}\right\}
+\qquad
+\begin{array}{l}
+(h \reb k) > ({\sim}h \reb t) \\
+({\sim}p \reb r) > (p \reb q)
+\end{array}
+\]
+
+Argumentos:
+\begin{itemize}
+  \item $N_6 = \langle \{h \reb w;\ w \reb s\},\ h\rangle$, con sub-argumento $W = \langle \{w \reb s\},\ w\rangle$.
+  \item $N_7 = \langle \{{\sim}h \reb t\},\ {\sim}h\rangle$.
+  \item $N_8 = \langle \{h \reb k;\ k \reb p;\ p \reb q\},\ h\rangle$ y $N_{10} = \langle \{{\sim}w \reb m;\ m \reb p;\ p \reb q\},\ {\sim}w\rangle$. Los dos tienen el sub-argumento $P = \langle \{p \reb q\},\ p\rangle$.
+  \item $N_9 = N_{11} = X = \langle \{{\sim}p \reb r\},\ {\sim}p\rangle$.
+\end{itemize}
+
+Derrotas:
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Nodo} & \textbf{Hijos} & \textbf{Por qué} \\
+\midrule
+$N_6$ & $N_7$, $N_{10}$ & $N_7$ ataca la conclusión $h$ y $N_{10}$ ataca en $W$; sin preferencias entre sus reglas: \textbf{bloqueo} los dos \\
+$N_7$ & $N_8$ & ataca la conclusión ${\sim}h$ y $(h \reb k) > ({\sim}h \reb t)$: \textbf{propio}. $N_6$ ya está en la línea \\
+$N_8$ & $X$ & ataca en $P$: \textbf{propio}. $N_7$ ya está en la línea \\
+$N_{10}$ & $X$ & ataca en $P$: \textbf{propio}. $W$ también lo bloquea, pero no entra: es el sub-argumento de desacuerdo de $N_6$ (condición 1) y sería un segundo bloqueo seguido (condición 3) \\
+$X$ & --- & $P$ lo ataca, pero $X$ es preferido: no lo derrota \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{itemize}
+  \item $[N_6, N_7, N_8, X]$ es \textbf{aceptable}: sin repeticiones; soporte $\{N_6, N_8\}$ (deriva $h, w, k, p$) e interferencia $\{N_7, X\}$ (deriva ${\sim}h, {\sim}p$) no contradictorios; al bloqueo de $N_7$ le sigue la derrota propia de $N_8$.\catedra{Episodio X (tercera parte)}{Línea de argumentación aceptable}
+  \item $[N_6, N_{10}, X]$ es \textbf{aceptable}: sin repeticiones; soporte $\{N_6, X\}$ (deriva $h, w, {\sim}p$) no contradictorio; al bloqueo de $N_{10}$ le sigue la derrota propia de $X$.
+  \item $X$ no derrota a $N_6$ ni a $N_7$ (ninguno usa $p$), así que no aparece en otros lugares del árbol.
+  \item Marcado: $X$ es U en las dos hojas; $N_8$ y $N_{10}$ quedan D; $N_7$ queda U, y $N_6$ queda D, como en la figura.
+\end{itemize}
+
+\begin{center}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}[arbol, sibling distance=30mm]
+  \node[nD] {$N_6$\\$h$}
+    child {node[nU] {$N_7$\\${\sim}h$} child {node[nD] {$N_8$\\$h$} child {node[nU, line width=1.6pt] {$X$\\${\sim}p$}}}}
+    child {node[nD] {$N_{10}$\\${\sim}w$} child {node[nU, line width=1.6pt] {$X$\\${\sim}p$}}};
+\end{tikzpicture}
+\captionof{figure}{Árbol para $N_6$ con el programa del inciso d): $X$ está en $N_9$ y en $N_{11}$. La flecha va del derrotador al derrotado.}
+\end{minipage}
+\end{center}
+
 \end{document}
