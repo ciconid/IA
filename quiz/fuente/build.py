@@ -23,9 +23,10 @@ for U in bancos:
         assert p['q'] not in vistos, ('repetida', p['q']); vistos.add(p['q'])
         assert p['c'] not in p['w'], p['q']
         opts = [p['c']] + p['w']
-        seed = int(hashlib.md5(p['q'].encode()).hexdigest(), 16)
+        seed = int(hashlib.md5(p.get('id', p['q']).encode()).hexdigest(), 16)
         random.Random(seed).shuffle(opts)
-        qs.append(dict(q=p['q'], o=opts, a=opts.index(p['c']), e=p['e']))
+        qs.append(dict(h=hashlib.md5(p.get('id', p['q']).encode()).hexdigest()[:8],  # id estable: las respuestas se guardan por id
+                       q=p['q'], o=opts, a=opts.index(p['c']), e=p['e'], **({'x': p['x']} if 'x' in p else {})))
     units.append(dict(id=U['id'], nombre=U['nombre'], tp=U['tp'], qs=qs))
     s = sesgo(U['preguntas'])
     print(f"{U['id']:4} {U['nombre']:50} {len(qs):4} preguntas | más larga: {s['pct']:3.0f}% | más corta: {s['pct_corta']:3.0f}% | largo c/w: {s['ratio']:.2f}")
@@ -44,6 +45,9 @@ for r, p in peores:
 tpl = open(os.path.join(aqui, 'template.html'), encoding='utf-8').read()
 data = json.dumps(units, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 out = tpl.replace('/*__DATA__*/[]', data)
+# Orden de las preguntas de la v1 (guardaba las respuestas por posición), para migrar ese progreso.
+legado = open(os.path.join(aqui, 'orden-v1.json'), encoding='utf-8').read().strip()
+out = out.replace('/*__V1__*/{}', legado)
 # Versión local: documento completo para abrir con doble clic.
 local = ('<!doctype html>\n<html lang="es">\n<meta charset="utf-8">\n'
          '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n') + out

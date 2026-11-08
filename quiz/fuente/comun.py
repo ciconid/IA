@@ -1,8 +1,14 @@
-# Banco de preguntas: Q(pregunta, correcta, [incorrectas], explicación)
-def Q(pregunta, correcta, incorrectas, explicacion):
+# Banco de preguntas: Q(pregunta, correcta, [incorrectas], explicación, ctx=html)
+# ctx: contexto (figura, tabla o programa) que se muestra entre la pregunta y las opciones, para no tener que
+# salir del quiz a buscar el ejemplo al que se refiere la pregunta. Ver figuras.py.
+# id_texto: si se reescribe el enunciado, el texto viejo, para que el id (y el progreso guardado) no cambie.
+def Q(pregunta, correcta, incorrectas, explicacion, ctx=None, id_texto=None):
     assert len(incorrectas) == 3, pregunta
     assert len({correcta, *incorrectas}) == 4, ('opciones repetidas', pregunta)
-    return dict(q=pregunta, c=correcta, w=list(incorrectas), e=explicacion)
+    d = dict(q=pregunta, c=correcta, w=list(incorrectas), e=explicacion)
+    if ctx: d['x'] = ctx
+    if id_texto: d['id'] = id_texto
+    return d
 
 
 def sesgo(preguntas):

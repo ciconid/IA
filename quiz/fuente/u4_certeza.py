@@ -1,4 +1,5 @@
 from comun import Q
+from figuras import CF_EJEMPLO, CF_LAGO
 
 MYCIN = "Con la estrategia MYCIN de la cátedra, "
 
@@ -83,15 +84,18 @@ Q("En el ejemplo de la cátedra, la KB tiene la regla 0.9 a ← c, pero ninguna 
   ["Porque su CF es mayor que el de las otras reglas con cabeza a",
    "Porque c es el complemento de una conclusión ya derivada",
    "Porque una regla solo se usa si tiene CF igual a 1"],
-  "Para usar la regla hay que derivar su cuerpo, y c no aparece como hecho ni como cabeza de ninguna regla. Por eso la consulta c tiene respuesta «desconocido». (Ep. IX)"),
+  "Para usar la regla hay que derivar su cuerpo, y c no aparece como hecho ni como cabeza de ninguna regla. Por eso la consulta c tiene respuesta «desconocido». (Ep. IX)",
+  ctx=CF_EJEMPLO),
 Q("En el ejemplo de la cátedra, CF(a) = 0.63 y CF(~a) = 0.5. ¿Qué responde el SBC a la consulta ~a?",
   "no",
   ["sí", "indeciso", "desconocido"],
-  "Hay derivaciones para ~a y para su complemento a, y CF(~a) < CF(a): la respuesta es no. A la consulta a respondería sí. (Ep. IX, «¿Qué respuesta dar?»)"),
+  "Hay derivaciones para ~a y para su complemento a, y CF(~a) < CF(a): la respuesta es no. A la consulta a respondería sí. (Ep. IX, «¿Qué respuesta dar?»)",
+  ctx=CF_EJEMPLO),
 Q("En el ejemplo de la cátedra, m es un hecho con CF 0.8 y no hay reglas con cabeza ~m. ¿Qué responde el SBC a la consulta ~m?",
   "no",
   ["desconocido", "sí", "indeciso"],
-  "No hay derivación para ~m, pero sí para su complemento m: la respuesta es no. «Desconocido» sería si tampoco se derivara m. (Ep. IX, «¿Qué respuesta dar?»)"),
+  "No hay derivación para ~m, pero sí para su complemento m: la respuesta es no. «Desconocido» sería si tampoco se derivara m. (Ep. IX, «¿Qué respuesta dar?»)",
+  ctx=CF_EJEMPLO),
 Q("Con valores de certeza, ¿cuándo la respuesta a una consulta Q es «indeciso»?",
   "Cuando hay derivaciones para Q y su complemento, con el mismo CF",
   ["Cuando no hay derivación ni para Q ni para su complemento",
@@ -123,7 +127,8 @@ Q("En el ejercicio 7 del TP7 (estrategia MYCIN), ¿quiénes cruzan el lago?",
   ["Solo turuleca, que es la única gallina",
    "turuleca y petete, pero no donald",
    "Ninguno: el SBC queda indeciso con los tres"],
-  "Para los tres CF(cruza_lago) > CF(~cruza_lago): 0.63 > 0.448 (turuleca), 0.315 > 0 (petete) y 0.63 > 0.504 (donald). (TP7, ej. 7)"),
+  "Para los tres CF(cruza_lago) > CF(~cruza_lago): 0.63 > 0.448 (turuleca), 0.315 > 0 (petete) y 0.63 > 0.504 (donald). (TP7, ej. 7)",
+  ctx=CF_LAGO),
 # --- Uso de valores de certeza ------------------------------------------------------------
 Q("¿Cuál es la principal ventaja de usar información numérica en un SBC, según la cátedra?",
   "Las computadoras calculan con facilidad y hay mucho sustento matemático",
@@ -155,10 +160,4 @@ Q("Según la cátedra, la forma de propagar los CF basada en MYCIN…",
    "Es obligatoria en cualquier SBC que use negación fuerte",
    "Es la que usa por defecto el intérprete de Prolog estándar"],
   "Hay muchas maneras de computar el CF de una conclusión; la de la cátedra es muy simple y sirve para mostrar la idea. Al implementar un sistema se puede elegir otra. (Ep. IX, «Computando el valor de certeza de las conclusiones»)"),
-Q("¿Qué fue MYCIN?",
-  "Uno de los primeros SBC, para infecciones de la sangre",
-  ["Un algoritmo para entrenar redes neuronales por capas",
-   "El primer intérprete de Prolog con negación fuerte",
-   "Un robot quirúrgico guiado por factores de certeza"],
-  "MYCIN fue uno de los primeros SBC, desarrollado para recomendar tratamientos para infecciones en la sangre; de él viene la forma de propagar los CF. (Ep. IX, nota al pie)"),
 ])
