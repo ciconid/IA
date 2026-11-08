@@ -55,6 +55,10 @@ No es un proyecto de software: es material de estudio de la materia **Inteligenc
 
 ## Otros archivos
 
+- `quiz/`: quiz interactivo generado con `python3 -I quiz/fuente/build.py`. Antes de agregar o editar preguntas, leer
+  `quiz/README.md`: tiene las reglas de las preguntas (cada una se responde sola, sin ir a buscar el TP o la
+  diapositiva; KB una cláusula por línea; sesgo de largo de las opciones).
+
 - `tema3/busqueda.pl`: código Prolog provisto por la cátedra (búsqueda en un laberinto). Se ejecuta con SWI-Prolog (`swipl tema3/busqueda.pl`), que no está instalado en este entorno.
 
 ## Git

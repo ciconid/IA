@@ -300,3 +300,80 @@ def perceptron(entradas, b, titulo):
             f'<svg class="ctx-svg" viewBox="20 0 480 200" role="img" aria-label="Perceptrón con entradas ' +
             ', '.join(f'{_esc(e[0])} de peso {_esc(e[2])}' for e in entradas) + f' y sesgo b = {_esc(b)}">' +
             ''.join(s) + '</svg>')
+
+
+# --- TP7 ej. 9 y TP8 (programas P2 y P5, líneas y árboles) ---------------------------------------
+KB_NUEVE = programa('KB (sin valores de certeza ni informantes)', '''
+a ← b, c.
+a ← d.
+a ← ~b.
+~a ← c.
+~a ← b, d.
+~a ← e.
+b ← c.
+~b ← d.
+~b ← c.
+b.
+c.
+d.''')
+
+DELP_P2 = programa('Programa P2 = (Π2, Δ2)', '''
+Π2 = { asustada(tina).
+       gallina(tina).
+       gallina(peluche).
+       ~vuela(peluche).
+       ave(X) ← gallina(X). }
+
+Δ2 = { R1: vuela(X) -< ave(X).
+       R2: ~vuela(X) -< gallina(X).
+       R3: vuela(X) -< gallina(X), asustada(X).
+       R4: anida_en_ramas_altas(X) -< vuela(X). }''')
+
+DELP_P2_ORDEN = DELP_P2 + programa('Argumentos y orden entre reglas', '''
+A1 = { vuela(tina) -< ave(tina) }                      (R1)
+A2 = { vuela(tina) -< gallina(tina), asustada(tina) }  (R3)
+B  = { ~vuela(tina) -< gallina(tina) }                 (R2)
+
+Orden: R3 > R2
+       R2 > R1''')
+
+DELP_P5 = programa('Programa P5 = (Π5, Δ5)', '''
+Π5 = { viento ← viento_caluroso.
+       calor.
+       caluroso.
+       viento_caluroso.
+       ahorrar_energia. }
+
+Δ5 = { R1: aire_acond -< calor.
+       R2: aire_acond -< sofocante.
+       R3: ~aire_acond -< abrir_ventana.
+       R4: ~aire_acond -< ahorrar_energia.
+       R5: abrir_ventana -< calor, viento.
+       R6: ~abrir_ventana -< viento_caluroso. }
+
+Orden: R2 > R4
+       R4 > R1
+       R6 > R5''')
+
+DELP_P5_ARGS = DELP_P5 + programa('Argumentos de P5', '''
+A1 = {R3, R5}  concluye ~aire_acond
+               (sub-argumento D = {R5}, concluye abrir_ventana)
+A2 = {R4}      concluye ~aire_acond
+B  = {R1}      concluye aire_acond
+C  = {R6}      concluye ~abrir_ventana''')
+
+ARBOLES_NUEVE = programa('Dos árboles de dialéctica de un mismo programa', '''
+Árbol 1:
+N1 (U)
+├── N2 (D)
+│   └── N3 (U)
+└── N4 (D)
+    └── N5 (U)
+
+Árbol 2:
+N6 (D)
+├── N7 (U)
+│   └── N8 (D)
+│       └── N9 (U)
+└── N10 (D)
+    └── N11 (U)''')
