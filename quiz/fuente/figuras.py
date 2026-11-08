@@ -362,18 +362,66 @@ A2 = {R4}      concluye ~aire_acond
 B  = {R1}      concluye aire_acond
 C  = {R6}      concluye ~abrir_ventana''')
 
-ARBOLES_NUEVE = programa('Dos árboles de dialéctica de un mismo programa', '''
-Árbol 1:
-N1 (U)
-├── N2 (D)
-│   └── N3 (U)
-└── N4 (D)
-    └── N5 (U)
 
-Árbol 2:
-N6 (D)
-├── N7 (U)
-│   └── N8 (D)
-│       └── N9 (U)
-└── N10 (D)
-    └── N11 (U)''')
+
+
+# --- Árboles de argumentos (diagrama) ------------------------------------------------------------
+def arboles(titulo, *raices, flechas=True, desc=''):
+    """Dibuja uno o más árboles. Cada árbol es (etiqueta, [hijos]); la etiqueta puede ser 'N1' o 'N1 U'
+    (con marca). Con flechas=True, cada arco va del hijo (derrotador) al padre (derrotado)."""
+    DX, DY, R = 62, 64, 19
+    s, x0 = [], 0
+
+    def hojas(t):
+        return 1 if not t[1] else sum(hojas(h) for h in t[1])
+
+    def ubicar(t, x, prof, out):
+        hs = t[1]
+        if not hs:
+            pos = (x + 0.5) * DX
+        else:
+            xi, ps = x, []
+            for h in hs:
+                ps.append(ubicar(h, xi, prof + 1, out))
+                xi += hojas(h)
+            pos = (ps[0] + ps[-1]) / 2
+        out.append((t[0], pos, prof, [(p, prof + 1) for p in ([] if not hs else ps)]))
+        return pos
+
+    nodos, alto = [], 0
+    for r in raices:
+        out = []
+        ubicar(r, x0, 0, out)
+        nodos += out
+        x0 += hojas(r) + 0.6
+        alto = max([alto] + [n[2] for n in out])
+    ancho, altura = x0 * DX - 0.6 * DX, (alto + 1) * DY
+    for et, x, p, hijos in nodos:
+        y = 30 + p * DY
+        for hx, hp in hijos:
+            hy = 30 + hp * DY
+            if flechas:
+                s.append(f'<line x1="{hx}" y1="{hy - R}" x2="{x}" y2="{y + R + 3}" class="ar" marker-end="url(#pt)"/>')
+            else:
+                s.append(f'<line x1="{hx}" y1="{hy - R}" x2="{x}" y2="{y + R}" class="ar"/>')
+    for et, x, p, _ in nodos:
+        y = 30 + p * DY
+        nom, *marca = et.split()
+        s.append(f'<circle cx="{x}" cy="{y}" r="{R}" class="nodo"/>')
+        s.append(f'<text x="{x}" y="{y + 5}" class="tn">{_esc(nom)}</text>')
+        if marca:
+            s.append(f'<text x="{x + R + 4}" y="{y - R + 6}" class="et2" style="text-anchor:start">{marca[0]}</text>')
+    defs = ('<defs><marker id="pt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" '
+            'orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="punta"/></marker></defs>')
+    leyenda = 'La flecha va del derrotador al derrotado.' if flechas else ''
+    return (f'<div class="ctx-tit">{titulo}</div>'
+            f'<svg class="ctx-svg" style="max-width:{int(ancho + 40)}px" viewBox="-10 0 {ancho + 40} {altura + 4}" '
+            f'role="img" aria-label="{_esc(desc or titulo)}">' + defs + ''.join(s) + '</svg>' +
+            (f'<p class="et2">{leyenda}</p>' if leyenda else ''))
+
+
+ARBOLES_NUEVE = arboles('Dos árboles de dialéctica de un mismo programa (con su marcado U / D)',
+                        ('N1 U', [('N2 D', [('N3 U', [])]), ('N4 D', [('N5 U', [])])]),
+                        ('N6 D', [('N7 U', [('N8 D', [('N9 U', [])])]), ('N10 D', [('N11 U', [])])]),
+                        desc='Árbol 1: N1 (U) con hijos N2 (D) y N4 (D); N2 tiene hijo N3 (U) y N4 tiene hijo N5 (U). '
+                             'Árbol 2: N6 (D) con hijos N7 (U) y N10 (D); N7 tiene hijo N8 (D), que tiene hijo N9 (U); N10 tiene hijo N11 (U).')

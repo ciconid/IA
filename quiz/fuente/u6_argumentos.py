@@ -1,5 +1,5 @@
 from comun import Q
-from figuras import ACME
+from figuras import ACME, arboles
 
 U = dict(id="u6", nombre="Razonamiento basado en argumentos", tp="TP7", preguntas=[
 Q("Ante una consulta c, ¿qué caracteriza al camino «orientado por la consulta»?",
@@ -63,19 +63,22 @@ Q("Según la cátedra, ¿qué argumentos deberían quedar aceptados?",
 Q("B derrota a A, C derrota a B, y nadie derrota a C. ¿Qué argumentos quedan aceptados?",
   "C y A",
   ["Solo C", "C y B", "Solo A"],
-  "C no está derrotado: aceptado. B está derrotado por un aceptado: rechazado. A está derrotado solo por B, que está rechazado: aceptado. (Ep. X, parte 1)"),
+  "C no está derrotado: aceptado. B está derrotado por un aceptado: rechazado. A está derrotado solo por B, que está rechazado: aceptado. (Ep. X, parte 1)",
+  ctx=arboles('Derrotas entre argumentos', ('A', [('B', [('C', [])])]), desc='B derrota a A y C derrota a B.')),
 Q("B derrota a A, C derrota a B, D derrota a C, y nadie derrota a D. ¿Cómo queda A?",
   "Rechazado: B queda aceptado y lo derrota",
   ["Aceptado: hay un número par de derrotas",
    "Aceptado: D lo defiende de forma indirecta",
    "Rechazado: es el último de la cadena"],
-  "D aceptado → C rechazado → B aceptado → A rechazado. D defiende a B, no a A. (Ep. X, parte 1)"),
+  "D aceptado → C rechazado → B aceptado → A rechazado. D defiende a B, no a A. (Ep. X, parte 1)",
+  ctx=arboles('Derrotas entre argumentos', ('A', [('B', [('C', [('D', [])])])]), desc='B derrota a A, C derrota a B y D derrota a C.')),
 Q("B y C derrotan a A; D derrota a B, y nadie derrota a C ni a D. ¿Cómo queda A?",
   "Rechazado, porque C queda aceptado",
   ["Aceptado, porque D derrota a B",
    "Aceptado, porque uno de sus dos derrotadores cae",
    "Rechazado, porque tiene dos derrotadores"],
-  "D aceptado → B rechazado; pero C no está derrotado, así que queda aceptado, y alcanza con un derrotador aceptado para rechazar a A. (Ep. X, parte 1)"),
+  "D aceptado → B rechazado; pero C no está derrotado, así que queda aceptado, y alcanza con un derrotador aceptado para rechazar a A. (Ep. X, parte 1)",
+  ctx=arboles('Derrotas entre argumentos', ('A', [('B', [('D', [])]), ('C', [])]), desc='B y C derrotan a A; D derrota a B.')),
 Q("¿Qué aportan los argumentos aceptados de un sistema argumentativo?",
   "Una garantía para las conclusiones que sustentan",
   ["Un valor de certeza para cada una de sus reglas",

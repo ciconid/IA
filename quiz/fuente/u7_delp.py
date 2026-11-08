@@ -1,5 +1,5 @@
 from comun import Q
-from figuras import DELP_RES, DELP_NN, DELP_P2, DELP_P2_ORDEN, DELP_P5, DELP_P5_ARGS, ARBOLES_NUEVE, programa
+from figuras import DELP_RES, DELP_NN, DELP_P2, DELP_P2_ORDEN, DELP_P5, DELP_P5_ARGS, ARBOLES_NUEVE, arboles, programa
 
 RES = ("(programa de la «Resolución con DeLP»: Π = {h1. h2. h3. h4.}; Δ = {a -< h1. a -< b. ~a -< c. "
        "b -< h2. b -< h5. ~b -< h4. c -< h2. ~c -< d. d -< h3. ~d -< h4.}; orden: (~a -< c) > (a -< h1), "
@@ -398,13 +398,15 @@ Q("En el marcado de un árbol de dialéctica, ¿cuándo un nodo interno se marca
 Q("En un árbol de dialéctica, la raíz A tiene un único hijo B, y B tiene un único hijo C, que es hoja. ¿Cómo quedan marcados?",
   "A: U, B: D, C: U",
   ["A: D, B: U, C: U", "A: D, B: D, C: U", "A: U, B: U, C: D"],
-  "C es hoja: U. B tiene un hijo U: D. A tiene todos sus hijos D: U. (Ep. X, parte 2)"),
+  "C es hoja: U. B tiene un hijo U: D. A tiene todos sus hijos D: U. (Ep. X, parte 2)",
+  ctx=arboles('Árbol de dialéctica (sin marcar)', ('A', [('B', [('C', [])])]), desc='A tiene un hijo B; B tiene un hijo C, que es hoja.')),
 Q("La raíz A tiene dos hijos: B, que es hoja, y C, cuyo único hijo E es hoja. ¿Cómo queda marcada A?",
   "D, porque B es hoja y queda marcada U",
   ["U, porque E derrota a C y así defiende a A",
    "U, porque la mitad de sus hijos queda D",
    "D, porque C queda marcado U"],
-  "B y E son hojas: U. C tiene un hijo U: D. A tiene un hijo U (B): D. Que E defienda a A frente a C no alcanza, porque B sigue sin ser derrotado. (Ep. X, parte 2)"),
+  "B y E son hojas: U. C tiene un hijo U: D. A tiene un hijo U (B): D. Que E defienda a A frente a C no alcanza, porque B sigue sin ser derrotado. (Ep. X, parte 2)",
+  ctx=arboles('Árbol de dialéctica (sin marcar)', ('A', [('B', []), ('C', [('E', [])])]), desc='A tiene dos hijos: B, hoja, y C; C tiene un hijo E, hoja.')),
 Q("¿Para qué sirve la «poda» durante el marcado de un árbol de dialéctica?",
   "Para no explorar líneas que no cambian la marca del nodo padre",
   ["Para eliminar del programa las reglas que nunca se usan",
