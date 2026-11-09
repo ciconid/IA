@@ -282,7 +282,7 @@ function renderUnit(u) {
       el("button", { class: "btn primary", disabled: k === u.qs.length - 1, onclick: () => move(u, 1) }, "Siguiente →")),
     el("div", { class: "group" },
       answered ? el("button", { class: "btn", onclick: () => { delete st.r[q.h]; save(); render(); } }, "Volver a intentar esta") : null)));
-  card.append(el("p", { class: "hint" }, "Atajos: A–D o 1–4 para responder, flechas ← → para moverte."));
+  card.append(el("p", { class: "hint" }, "Atajos: A–D o 1–4 para responder, flechas ← → para moverte, 0 del teclado numérico para ir a la próxima sin responder, punto para reintentar las incorrectas."));
 
   const nextOpen = u.qs.findIndex(qq => st.r[qq.h] === undefined);
   const board = el("aside", { class: "board card", "aria-label": "Tablero de la unidad" },
@@ -301,8 +301,8 @@ function renderUnit(u) {
       return el("button", { class: cls, "aria-label": `Ir a la pregunta ${i + 1}`, onclick: () => { st.i = i; save(); render(); } }, String(i + 1));
     })),
     el("div", { class: "stack" },
-      el("button", { class: "btn", disabled: nextOpen < 0, onclick: () => { st.i = nextOpen; save(); render(); } }, "Ir a la próxima sin responder"),
-      el("button", { class: "btn", disabled: s.bad === 0, onclick: () => retryWrong(u) }, `Reintentar las incorrectas (${s.bad})`),
+      el("button", { class: "btn", disabled: nextOpen < 0, onclick: () => { st.i = nextOpen; save(); render(); } }, "[0] Próxima sin resp."),
+      el("button", { class: "btn", disabled: s.bad === 0, onclick: () => retryWrong(u) }, `[.] Reintentar las incorrectas (${s.bad})`),
       el("button", { class: "btn danger" + (armed === "reset" + u.id ? " armed" : ""), onclick: () => arm("reset" + u.id, () => resetUnit(u)) }, armed === "reset" + u.id ? "Confirmar: borrar respuestas" : "Reiniciar la unidad")));
 
   return el("div", { class: "layout" }, card, board);
@@ -347,7 +347,9 @@ document.addEventListener("keydown", e => {
   const u = unitById(state.u); if (!u) return; const st = us(u.id);
   const map = { a: 0, b: 1, c: 2, d: 3, "1": 0, "2": 1, "3": 2, "4": 3 };
   const key = e.key.toLowerCase();
-  if (key in map) { answer(u, st.i, map[key]); }
+  if (e.code === "Numpad0") { const n = u.qs.findIndex(qq => st.r[qq.h] === undefined); if (n >= 0) { st.i = n; save(); render(); } }
+  else if (e.code === "NumpadDecimal" || e.key === ".") retryWrong(u);
+  else if (key in map) { answer(u, st.i, map[key]); }
   else if (e.key === "ArrowRight") move(u, 1);
   else if (e.key === "ArrowLeft") move(u, -1);
 });
