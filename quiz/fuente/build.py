@@ -26,10 +26,11 @@ for U in bancos:
         seed = int(hashlib.md5(p.get('id', p['q']).encode()).hexdigest(), 16)
         random.Random(seed).shuffle(opts)
         qs.append(dict(h=hashlib.md5(p.get('id', p['q']).encode()).hexdigest()[:8],  # id estable: las respuestas se guardan por id
-                       q=p['q'], o=opts, a=opts.index(p['c']), e=p['e'], **({'x': p['x']} if 'x' in p else {})))
+                       q=p['q'], o=opts, a=opts.index(p['c']), e=p['e'], **({'x': p['x']} if 'x' in p else {}), **({'p': 1} if p.get('p') else {})))
     units.append(dict(id=U['id'], nombre=U['nombre'], tp=U['tp'], fuera=not U.get('examen', True), qs=qs))  # examen=False: no entra en el examen
     s = sesgo(U['preguntas'])
-    print(f"{U['id']:4} {U['nombre']:50} {len(qs):4} preguntas | más larga: {s['pct']:3.0f}% | más corta: {s['pct_corta']:3.0f}% | largo c/w: {s['ratio']:.2f}")
+    n_p = sum(1 for q in qs if q.get('p'))
+    print(f"{U['id']:4} {U['nombre']:50} {len(qs):4} preguntas ({len(qs) - n_p:3} teóricas, {n_p:2} prácticas) | más larga: {s['pct']:3.0f}% | más corta: {s['pct_corta']:3.0f}% | largo c/w: {s['ratio']:.2f}")
 
 pos = [0] * 4
 for u in units:

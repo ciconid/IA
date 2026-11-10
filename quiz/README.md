@@ -2,15 +2,21 @@
 
 Quiz interactivo de opción múltiple sobre los temas 5, 6 y 8 de la materia: 437 preguntas en 7 unidades.
 
-| Unidad | Tema | TP | Preguntas | Fuentes |
+| Unidad | Tema | TP | Preguntas (teóricas + prácticas) | Fuentes |
 |---|---|---|---|---|
-| U1 | Robótica, roboética y legislación | TP5 | 119 | Robótica y roboética, `resolucion-tp5` |
-| U2 | Aprendizaje automático | TP6 | 108 | Episodio VII (partes 1–3), `resolucion-tp6` |
-| U3 | SBC: arquitectura, Prolog y explicaciones | TP7 | 44 | Episodio VIII, `resolucion-tp7` (ej. 1–6) |
-| U4 | Información contradictoria y valores de certeza | TP7 | 40 | Episodio IX (valores de certeza), Ejemplo SBC, ej. 7 y 9 |
-| U5 | Informantes | TP7 | 24 | Episodio IX (informantes), Ejemplo SBC, ej. 8 y 9 |
-| U6 | Razonamiento basado en argumentos | TP7 | 13 | Episodio X, parte 1 |
-| U7 | DeLP | TP8 | 89 | Episodio X, partes 2 y 3, Resolución con DeLP, `resolucion-tp8` (ej. 1–9) |
+| U1 | Robótica, roboética y legislación | TP5 | 119 (119 + 0) | Robótica y roboética, `resolucion-tp5` |
+| U2 | Aprendizaje automático | TP6 | 108 (100 + 8) | Episodio VII (partes 1–3), `resolucion-tp6` |
+| U3 | SBC: arquitectura, Prolog y explicaciones | TP7 | 44 (34 + 10) | Episodio VIII, `resolucion-tp7` (ej. 1–6) |
+| U4 | Información contradictoria y valores de certeza | TP7 | 40 (16 + 24) | Episodio IX (valores de certeza), Ejemplo SBC, ej. 7 y 9 |
+| U5 | Informantes | TP7 | 24 (13 + 11) | Episodio IX (informantes), Ejemplo SBC, ej. 8 y 9 |
+| U6 | Razonamiento basado en argumentos | TP7 | 13 (10 + 3) | Episodio X, parte 1 |
+| U7 | DeLP | TP8 | 89 (49 + 40) | Episodio X, partes 2 y 3, Resolución con DeLP, `resolucion-tp8` (ej. 1–9) |
+
+Cada unidad se divide en dos secciones, **Teoría** y **Práctica**, con pestañas propias (puntaje, grilla y posición
+separados; las respuestas se siguen guardando por id para toda la unidad). Teóricas son las que se responden solo con el
+conocimiento del tema; prácticas, las que requieren algún cálculo (CF, derivaciones, argumentos, árboles de dialéctica,
+trazas del árbol de decisión o del perceptrón, consultas a un programa). Se marcan con `Q(..., practica=True)`; por
+defecto, una pregunta es teórica.
 
 Cada pregunta trae una explicación que dice por qué la correcta es correcta y, cuando hace falta, por qué falla el
 distractor más tentador. Termina con la fuente: episodio y título de la diapositiva, o ejercicio del TP.
@@ -50,7 +56,8 @@ lago, la del ej. 9, los árboles del ej. 9 del TP8).
 
 - Abrir `index.html` con el navegador (doble clic, o `xdg-open quiz/index.html`). Es un único archivo sin
   dependencias. Sin conexión cambia la tipografía, pero funciona igual.
-- Atajos: A–D o 1–4 para responder, ← → para moverse.
+- Atajos: A–D o 1–4 para responder, ← → para moverse, T / P para pasar a teoría o práctica, 0 del teclado numérico
+  para ir a la próxima sin responder, punto para reintentar las incorrectas.
 - El progreso se guarda en el navegador (`localStorage`, clave `ia-uns-2026-quiz-v2`), por id de pregunta (hash del
   enunciado): agregar, quitar o reordenar preguntas no lo desfasa. Si se borran los datos del sitio, se pierde.
   `fuente/orden-v1.json` sirve para migrar el progreso de la v1, que lo guardaba por posición.
@@ -96,7 +103,7 @@ quiz/
   plan.md                 plan por etapas con el que se armó
   fuente/
     template.html         interfaz (HTML + CSS + JS); los datos se insertan en /*__DATA__*/
-    comun.py              Q(pregunta, correcta, [3 incorrectas], explicación, ctx=, id_texto=) y estadísticas de sesgo
+    comun.py              Q(pregunta, correcta, [3 incorrectas], explicación, ctx=, id_texto=, practica=) y estadísticas de sesgo
     figuras.py            contexto de las preguntas (tablas, árboles y derivaciones en SVG, programas)
     build.py              arma index.html; el orden de las opciones se baraja con una semilla fija por pregunta
     orden-v1.json         ids de las preguntas de la v1 en su orden (migración del progreso)

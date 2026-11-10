@@ -2,12 +2,14 @@
 # ctx: contexto (figura, tabla o programa) que se muestra entre la pregunta y las opciones, para no tener que
 # salir del quiz a buscar el ejemplo al que se refiere la pregunta. Ver figuras.py.
 # id_texto: si se reescribe el enunciado, el texto viejo, para que el id (y el progreso guardado) no cambie.
-def Q(pregunta, correcta, incorrectas, explicacion, ctx=None, id_texto=None):
+# practica: True si para responder hay que hacer algún cálculo (CF, derivaciones, árboles, trazas); si no, es teórica.
+def Q(pregunta, correcta, incorrectas, explicacion, ctx=None, id_texto=None, practica=False):
     assert len(incorrectas) == 3, pregunta
     assert len({correcta, *incorrectas}) == 4, ('opciones repetidas', pregunta)
     d = dict(q=pregunta, c=correcta, w=list(incorrectas), e=explicacion)
     if ctx: d['x'] = ctx
     if id_texto: d['id'] = id_texto
+    if practica: d['p'] = True
     return d
 
 
