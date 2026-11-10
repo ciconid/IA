@@ -1117,4 +1117,208 @@ Se siguen los pasos del ejemplo resuelto de la cátedra:\catedra{Ejemplo SBC}{En
 \end{itemize}
 \end{extras}
 
+%======================================================================
+\section{Ejercicio 9}
+
+\begin{enunciado}{Consigna}
+Considere la base de conocimiento que se muestra en la siguiente tabla. Para cada uno de los incisos, muestre todas las derivaciones para los literales a, \nf a, b y \nf b. Acompañe cada derivación con el valor de certeza o el informante asociado, según corresponda.
+
+\begin{center}
+\ttfamily
+\begin{tabular}{@{}l@{\hspace{1cm}}l@{\hspace{1cm}}l@{\hspace{1cm}}l@{}}
+a ← b, c      & a ← d          & a ← \nf b      & b \\
+\nf a ← c     & \nf a ← b, d   & \nf a ← e      & c \\
+b ← c         & \nf b ← d      & \nf b ← c      & d \\
+\end{tabular}
+\end{center}
+\end{enunciado}
+
+% Árboles de derivación del ejercicio 9 (mismos colores que en el ejercicio 7:
+% celeste = vc de la KB, rosa = vc computado con MYCIN).
+% Cuerpo de dos literales en (x,y): \cuerpo{id}{x}{y}{lit1}{lit2}{vc del cuerpo}.
+% Crea los nodos id1 e id2 y la coordenada id (a donde llega la arista de arriba).
+\newcommand{\cuerpo}[6]{%
+  \node[tn] (#11) at (#2-0.4,#3) {#4,};
+  \node[tn] (#12) at (#2+0.4,#3) {#5};
+  \node[pk, right=3pt of #12] {#6};
+  \coordinate (#1) at (#2,#3+0.15);}
+% Hecho debajo de un nodo: \hecho{nodo}{vc}.
+\newcommand{\hecho}[2]{\node[bl, below=3pt of #1] {#2};}
+% Arista con el vc de la regla: \arista{de}{a}{vc}.
+\newcommand{\arista}[3]{\draw[thick] (#1) -- node[bl, left=3pt]{#3} (#2);}
+
+\subsection{a)}
+
+\begin{enunciado}{Consigna}
+Utilizando la estrategia MYCIN, asigne valores de certeza para cada uno de los elementos de la base de conocimiento, de forma tal que se cumplan las siguientes restricciones:
+\begin{enumerate}[label=\roman*.]
+  \item El literal a tiene que ser preferido a \nf a.
+  \item Alguna derivación para \nf a debe ser mejor que alguna derivación para a.
+  \item No puede existir una regla con cabeza a y valor de certeza 1.
+  \item No se debe poder preferir a b sobre \nf b, ni viceversa.
+\end{enumerate}
+\end{enunciado}
+
+\textbf{Respuesta}: valores de certeza asignados:
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}r@{\hspace{1.2em}}l@{}}
+\toprule
+\textbf{$vc$} & \textbf{Elemento de la KB} \\
+\midrule
+$0.9$  & \texttt{a ← b, c} \\
+$0.9$  & \texttt{a ← d} \\
+$0.5$  & \texttt{a ← \nf b} \\
+$0.7$  & \texttt{\nf a ← c} \\
+$1$    & \texttt{\nf a ← b, d} \\
+$-0.8$ & \texttt{\nf a ← e} \\
+$1$    & \texttt{b ← c} \\
+$1$    & \texttt{\nf b ← d} \\
+$1$    & \texttt{\nf b ← c} \\
+\midrule
+$-0.1$ & \texttt{b} \\
+$0.5$  & \texttt{c} \\
+$-0.3$ & \texttt{d} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+  \item Los $vc$ se propagan con la estrategia MYCIN, como en el ejercicio 7 (paso 1).
+  \item Las derivaciones, como árboles: en \colorbox{celeste}{celeste}, los valores de la KB; en \colorbox{rosa}{rosa}, los computados con MYCIN.
+  \item \texttt{\nf a ← e} no da ninguna derivación: \texttt{e} no es un hecho ni la cabeza de una regla.
+\end{itemize}
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  % b: hecho
+  \begin{scope}[xshift=0cm]
+    \node[tn] (R) at (0,0) {b}; \node[pk, right=3pt of R] {0}; \hecho{R}{-0.1}
+  \end{scope}
+  % b ← c
+  \begin{scope}[xshift=2.6cm]
+    \node[tn] (R) at (0,0) {b}; \node[pk, right=3pt of R] {0.5};
+    \node[tn] (C) at (0,-1.3) {c}; \arista{R}{C}{1} \hecho{C}{0.5}
+  \end{scope}
+  % ~b ← d
+  \begin{scope}[xshift=6.6cm]
+    \node[tn] (R) at (0,0) {\nf b}; \node[pk, right=3pt of R] {0};
+    \node[tn] (C) at (0,-1.3) {d}; \arista{R}{C}{1} \hecho{C}{-0.3}
+  \end{scope}
+  % ~b ← c
+  \begin{scope}[xshift=9.2cm]
+    \node[tn] (R) at (0,0) {\nf b}; \node[pk, right=3pt of R] {0.5};
+    \node[tn] (C) at (0,-1.3) {c}; \arista{R}{C}{1} \hecho{C}{0.5}
+  \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Derivaciones de \texttt{b} (izquierda) y de \texttt{\nf b} (derecha). Celeste: valores de la KB; rosa: valores computados con MYCIN.}
+\end{minipage}\par\bigskip
+
+\noindent\begin{minipage}{\linewidth}
+\centering
+\begin{tikzpicture}
+  % a ← b, c con b hecho
+  \begin{scope}[xshift=0cm]
+    \node[tn] (R) at (0,0) {a}; \node[pk, right=3pt of R] {0};
+    \cuerpo{B}{0}{-1.3}{b}{c}{0} \arista{R}{B}{0.9}
+    \hecho{B1}{-0.1} \hecho{B2}{0.5}
+  \end{scope}
+  % a ← b, c con b ← c
+  \begin{scope}[xshift=3.3cm]
+    \node[tn] (R) at (0,0) {a}; \node[pk, right=3pt of R] {0.45};
+    \cuerpo{B}{0}{-1.3}{b}{c}{0.5} \arista{R}{B}{0.9}
+    \node[tn] (C) at (-0.4,-2.6) {c}; \arista{B1}{C}{1} \hecho{C}{0.5}
+    \hecho{B2}{0.5}
+  \end{scope}
+  % a ← d
+  \begin{scope}[xshift=6.6cm]
+    \node[tn] (R) at (0,0) {a}; \node[pk, right=3pt of R] {0};
+    \node[tn] (C) at (0,-1.3) {d}; \arista{R}{C}{0.9} \hecho{C}{-0.3}
+  \end{scope}
+  % a ← ~b con ~b ← d
+  \begin{scope}[xshift=9.2cm]
+    \node[tn] (R) at (0,0) {a}; \node[pk, right=3pt of R] {0};
+    \node[tn] (N) at (0,-1.3) {\nf b}; \node[pk, right=3pt of N] {0}; \arista{R}{N}{0.5}
+    \node[tn] (C) at (0,-2.6) {d}; \arista{N}{C}{1} \hecho{C}{-0.3}
+  \end{scope}
+  % a ← ~b con ~b ← c
+  \begin{scope}[xshift=11.8cm]
+    \node[tn] (R) at (0,0) {a}; \node[pk, right=3pt of R] {0.25};
+    \node[tn] (N) at (0,-1.3) {\nf b}; \node[pk, right=3pt of N] {0.5}; \arista{R}{N}{0.5}
+    \node[tn] (C) at (0,-2.6) {c}; \arista{N}{C}{1} \hecho{C}{0.5}
+  \end{scope}
+  % ~a ← c
+  \begin{scope}[xshift=2.6cm, yshift=-4.2cm]
+    \node[tn] (R) at (0,0) {\nf a}; \node[pk, right=3pt of R] {0.35};
+    \node[tn] (C) at (0,-1.3) {c}; \arista{R}{C}{0.7} \hecho{C}{0.5}
+  \end{scope}
+  % ~a ← b, d con b hecho
+  \begin{scope}[xshift=5.9cm, yshift=-4.2cm]
+    \node[tn] (R) at (0,0) {\nf a}; \node[pk, right=3pt of R] {0};
+    \cuerpo{B}{0}{-1.3}{b}{d}{0} \arista{R}{B}{1}
+    \hecho{B1}{-0.1} \hecho{B2}{-0.3}
+  \end{scope}
+  % ~a ← b, d con b ← c
+  \begin{scope}[xshift=9.2cm, yshift=-4.2cm]
+    \node[tn] (R) at (0,0) {\nf a}; \node[pk, right=3pt of R] {0};
+    \cuerpo{B}{0}{-1.3}{b}{d}{0} \arista{R}{B}{1}
+    \node[tn] (C) at (-0.4,-2.6) {c}; \arista{B1}{C}{1} \hecho{C}{0.5}
+    \hecho{B2}{-0.3}
+  \end{scope}
+\end{tikzpicture}
+\captionof{figure}{Derivaciones de \texttt{a} (arriba) y de \texttt{\nf a} (abajo). Celeste: valores de la KB; rosa: valores computados con MYCIN (en un cuerpo de dos literales, el rosa es el mínimo de los dos).}
+\end{minipage}\par\medskip
+
+Tomando para cada literal el máximo entre sus derivaciones y respondiendo a cada consulta según los $vc$:\fuentes{Cátedra, Episodio IX (valores de certeza), «Resolución del conflicto con información numérica» y «¿Qué respuesta dar?»}
+
+\begin{center}
+\small
+\begin{tabular}{@{}l c c l@{}}
+\toprule
+\textbf{Literal} & \textbf{Derivaciones} & \textbf{$vc$} & \textbf{Respuesta} \\
+\midrule
+\texttt{a}      & 5 & \textbf{0.45} & sí \\
+\texttt{\nf a}  & 3 & 0.35          & no \\
+\texttt{b}      & 2 & 0.5           & indeciso \\
+\texttt{\nf b}  & 2 & 0.5           & indeciso \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}l X c@{}}
+\toprule
+\textbf{Restricción} & \textbf{Con estos valores} & \\
+\midrule
+i.   & $vc(\texttt{a}) = 0.45 > vc(\texttt{\nf a}) = 0.35$ & \checkmark \\
+ii.  & la derivación \texttt{\nf a ← c} (0.35) es mejor que \texttt{a ← \nf b}, \texttt{\nf b ← c} (0.25) & \checkmark \\
+iii. & las reglas con cabeza \texttt{a} tienen $vc$ 0.9, 0.9 y 0.5 & \checkmark \\
+iv.  & $vc(\texttt{b}) = vc(\texttt{\nf b}) = 0.5$ & \checkmark \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{aviso}{Supuestos}
+\begin{itemize}
+  \item Las derivaciones con $vc$ 0 se cuentan, como en el ejercicio 7. Si no se contaran, ii se cumple igual: la comparación usa la derivación de 0.25, no las de 0.
+\end{itemize}
+\end{aviso}
+
+\begin{extras}
+\begin{itemize}
+  \item \textbf{Cómo se eligieron los valores}:
+  \begin{itemize}
+    \item \texttt{c} es el único hecho positivo: toda derivación con $vc > 0$ pasa por \texttt{c}. Los hechos negativos (\texttt{b}, \texttt{d}) anulan las derivaciones que los usan, así que \texttt{a ← d}, \texttt{\nf a ← b, d} y \texttt{\nf b ← d} quedan en 0.
+    \item iv: \texttt{b ← c} y \texttt{\nf b ← c} tienen el mismo cuerpo, así que con el mismo $vc$ en las dos reglas (acá 1) empatan.
+    \item i: \texttt{a ← b, c} y \texttt{\nf a ← c} terminan con el mismo cuerpo efectivo (0.5), y gana la regla de mayor $vc$ (0.9 contra 0.7).
+    \item ii: \texttt{a ← \nf b} con $vc$ bajo (0.5) da una derivación de \texttt{a} peor que la de \texttt{\nf a}.
+  \end{itemize}
+  \item El $-0.8$ de \texttt{\nf a ← e} no influye: cualquier valor da lo mismo mientras \texttt{e} no se pueda derivar.
+\end{itemize}
+\end{extras}
+
 \end{document}

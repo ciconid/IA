@@ -1,6 +1,6 @@
 from comun import Q
 
-U = dict(id="u1", nombre="Robótica, roboética y legislación", tp="TP5", preguntas=[
+U = dict(id="u1", nombre="Robótica, roboética y legislación", tp="TP5", examen=False, preguntas=[
 # --- Definición -----------------------------------------------------
 Q("¿Cuál NO es uno de los cuatro aspectos centrales con que la cátedra (citando a COMEST) caracteriza a los robots contemporáneos?",
   "Aprendizaje",

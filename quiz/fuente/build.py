@@ -27,7 +27,7 @@ for U in bancos:
         random.Random(seed).shuffle(opts)
         qs.append(dict(h=hashlib.md5(p.get('id', p['q']).encode()).hexdigest()[:8],  # id estable: las respuestas se guardan por id
                        q=p['q'], o=opts, a=opts.index(p['c']), e=p['e'], **({'x': p['x']} if 'x' in p else {})))
-    units.append(dict(id=U['id'], nombre=U['nombre'], tp=U['tp'], qs=qs))
+    units.append(dict(id=U['id'], nombre=U['nombre'], tp=U['tp'], fuera=not U.get('examen', True), qs=qs))  # examen=False: no entra en el examen
     s = sesgo(U['preguntas'])
     print(f"{U['id']:4} {U['nombre']:50} {len(qs):4} preguntas | más larga: {s['pct']:3.0f}% | más corta: {s['pct_corta']:3.0f}% | largo c/w: {s['ratio']:.2f}")
 

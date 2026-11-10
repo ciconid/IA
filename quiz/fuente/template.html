@@ -54,6 +54,10 @@ nav.units { display: flex; flex-wrap: wrap; gap: 8px; }
 .unit-btn .mini { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .unit-btn[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 -3px 0 var(--accent); }
 .unit-btn:hover { border-color: var(--accent); }
+.unit-btn.off { border-style: dashed; opacity: 0.6; }
+.unit-btn.off[aria-current="true"] { opacity: 1; }
+.unit-btn .tag { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 6px; }
+.offnote { font-size: 0.85rem; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; padding: 8px 12px; margin: 0 0 14px; }
 @media (max-width: 640px) {
   nav.units { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
   .unit-btn { flex: 0 0 auto; scroll-snap-align: start; }
@@ -209,8 +213,8 @@ function renderNav() {
   const nav = document.getElementById("units"); nav.replaceChildren();
   UNITS.forEach((u, i) => {
     const s = stats(u);
-    nav.append(el("button", { class: "unit-btn", "aria-current": String(state.u === u.id), onclick: () => go(u.id) },
-      el("span", { class: "code" }, `U${i + 1} · ${u.tp}`),
+    nav.append(el("button", { class: "unit-btn" + (u.fuera ? " off" : ""), "aria-current": String(state.u === u.id), onclick: () => go(u.id) },
+      el("span", { class: "code" }, `U${i + 1} · ${u.tp}`, u.fuera ? el("span", { class: "tag" }, "no entra") : null),
       el("span", {}, u.nombre),
       el("span", { class: "mini" }, `${s.ok}/${s.total} correctas`)));
   });
@@ -219,7 +223,7 @@ function renderNav() {
   const cur = nav.querySelector('[aria-current="true"]');
   if (cur && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = cur.offsetLeft - nav.offsetLeft - 8;
   let ok = 0, ans = 0, total = 0;
-  UNITS.forEach(u => { const s = stats(u); ok += s.ok; ans += s.ans; total += s.total; });
+  UNITS.filter(u => !u.fuera).forEach(u => { const s = stats(u); ok += s.ok; ans += s.ans; total += s.total; });
   document.getElementById("overall").textContent = `${ans}/${total} respondidas · ${ok} correctas · ${pct(ok, ans)}% de acierto`;
 }
 function go(id) { state.u = id; save(); render(); window.scrollTo({ top: 0 }); }
@@ -244,6 +248,7 @@ function renderUnit(u) {
   const k = st.i; const q = u.qs[k]; const chosen = st.r[q.h]; const answered = chosen !== undefined;
   const s = stats(u);
   const card = el("section", { class: "card", "aria-live": "polite" });
+  if (u.fuera) card.append(el("p", { class: "offnote" }, "Esta unidad no entra en el examen. No cuenta en el puntaje total."));
 
   if (s.ans === s.total) {
     const p = pct(s.ok, s.total);
@@ -313,9 +318,9 @@ function resetUnit(u) { state.s[u.id] = { i: 0, r: {} }; save(); render(); }
 function renderSummary() {
   let tot = { ok: 0, bad: 0, ans: 0, total: 0 };
   const rows = UNITS.map((u, i) => {
-    const s = stats(u); for (const k in tot) tot[k] += s[k];
-    return el("tr", {},
-      el("td", {}, el("button", { class: "linkbtn", onclick: () => go(u.id) }, `U${i + 1} · ${u.nombre}`)),
+    const s = stats(u); if (!u.fuera) for (const k in tot) tot[k] += s[k];
+    return el("tr", { style: u.fuera ? "opacity:0.6" : null },
+      el("td", {}, el("button", { class: "linkbtn", onclick: () => go(u.id) }, `U${i + 1} · ${u.nombre}`), u.fuera ? " (no entra)" : null),
       el("td", { class: "num" }, `${s.ans}/${s.total}`), el("td", { class: "num" }, String(s.ok)), el("td", { class: "num" }, String(s.bad)),
       el("td", { class: "num" }, s.ans ? `${pct(s.ok, s.ans)}%` : "—"), el("td", { class: "num" }, `${pct(s.ok, s.total)}%`));
   });
@@ -326,7 +331,7 @@ function renderSummary() {
       el("td", { class: "num" }, tot.ans ? `${pct(tot.ok, tot.ans)}%` : "—"), el("td", { class: "num" }, `${pct(tot.ok, tot.total)}%`))));
   return el("section", { class: "card" },
     el("div", { class: "qhead" }, el("span", {}, "Resumen general"), el("span", {}, `${UNITS.length} unidades`)),
-    el("p", { class: "qtext" }, "Puntaje acumulado de todas las unidades. \"Acierto\" es sobre las respondidas; \"nota sobre el total\" cuenta las no respondidas como incorrectas."),
+    el("p", { class: "qtext" }, "Puntaje acumulado de todas las unidades. \"Acierto\" es sobre las respondidas; \"nota sobre el total\" cuenta las no respondidas como incorrectas. Las unidades que no entran en el examen no suman al total."),
     el("div", { class: "tablewrap" }, table),
     el("div", { class: "controls" }, el("span", {}),
       el("button", { class: "btn danger" + (armed === "resetall" ? " armed" : ""), onclick: () => arm("resetall", () => { state.s = {}; save(); render(); }) }, armed === "resetall" ? "Confirmar: borrar todo" : "Reiniciar todas las unidades")));
